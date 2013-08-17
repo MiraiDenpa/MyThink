@@ -23,7 +23,7 @@ pm.max_requests = 1000
  
 ;request_terminate_timeout = 0
 request_slowlog_timeout = 2
-slowlog = <?php echo LOG_PATH; ?>php-slow.log
+slowlog = <?php echo LOG_PATH; ?>fpm-slow.log
 
 ;rlimit_files = 1024
 ;rlimit_core = 0
@@ -41,9 +41,9 @@ security.limit_extensions = .php
 ;env[TEMP] = /tmp
 
 ;php_admin_value[sendmail_path] = /usr/sbin/sendmail -t -i -f www@my.domain.com
-php_flag[display_errors] = <?php echo APP_DEBUG?'on':'off'; ?>
+php_flag[display_errors] = <?php echo (APP_DEBUG?'on':'off'); ?>
 
-php_admin_value[error_log] = <?php echo LOG_PATH; ?>www-error.log
+php_admin_value[error_log] = <?php echo LOG_PATH; ?>fpm-error.log
 
 php_admin_flag[log_errors] = <?php echo APP_DEBUG?'off':'on'; ?>
 

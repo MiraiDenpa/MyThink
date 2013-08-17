@@ -40,6 +40,7 @@ function import($class, $baseUrl = '', $ext='.class.php') {
 	$classfile       = $baseUrl . $class . $ext;
 	if (!class_exists(basename($class),false)) {
 		// 如果类不存在 则导入类库文件
-		return require_cache($classfile);
+		return require_once($classfile);
 	}
+	return false;
 }

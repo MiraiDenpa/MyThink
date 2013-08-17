@@ -20,6 +20,7 @@ return array(
 	'Dispatcher' => CORE_PATH . 'Core/Dispatcher.class.php',
 	'Log'            => CORE_PATH . 'Core/Log.class.php',
 	'Model'          => CORE_PATH . 'Core/Model.class.php',
+	'OutputBuffer'          => CORE_PATH . 'Core/OutputBuffer.class.php',
 	'Think' => CORE_PATH . 'Core/Think.class.php',
 	'ThinkException' => CORE_PATH . 'Core/ThinkException.class.php',
 	'ThinkInstance' => CORE_PATH . 'Core/ThinkInstance.class.php',

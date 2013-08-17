@@ -31,14 +31,12 @@ class Model {
     protected $db               =   null;
     // 主键名称
     protected $pk               =   'id';
-    // 数据表前缀
-    protected $tablePrefix      =   '';
     // 模型名称
     protected $name             =   '';
     // 数据库名称
     protected $dbName           =   '';
     //数据库配置
-    protected $connection       =   '';
+    protected $connection       =   'default';
     // 数据表名（不包含表前缀）
     protected $tableName        =   '';
     // 实际数据表名（包含表前缀）
@@ -93,32 +91,21 @@ class Model {
      * @param string $tablePrefix 表前缀
      * @param mixed $connection 数据库连接信息
      */
-    public function __construct($name='',$tablePrefix='',$connection='') {
+    public function __construct($name='') {
+		if(func_num_args()>2) Think::halt('MODEL参数错误：多于2个 ('.func_num_args().').');
         // 模型初始化
         $this->doCallback('initialize', $name, $this);
         // 获取模型名称
         if(!empty($name)) {
-            if(strpos($name,'.')) { // 支持 数据库名.模型名的 定义
-                list($this->dbName,$this->name) = explode('.',$name);
-            }else{
-                $this->name   =  $name;
-            }
+			$this->name   =  $name;
         }elseif(empty($this->name)){
             $this->name =   $this->getModelName();
-        }
-        // 设置表前缀
-        if(is_null($tablePrefix)) {// 前缀为Null表示没有前缀
-            $this->tablePrefix = '';
-        }elseif('' != $tablePrefix) {
-            $this->tablePrefix = $tablePrefix;
-        }else{
-            $this->tablePrefix = $this->tablePrefix?$this->tablePrefix:DB_PREFIX;
         }
 
         // 数据库初始化操作
         // 获取数据库操作对象
         // 当前模型有独立的数据库连接信息
-        $this->db(0,empty($this->connection)?$connection:$this->connection);
+        $this->db(0,$this->connection);
     }
 
     /**
@@ -1213,9 +1200,6 @@ class Model {
         static $_db = array();
         if(!isset($_db[$linkNum]) || (isset($_db[$linkNum]) && $config && $_linkNum[$linkNum]!=$config) ) {
             // 创建一个新的实例
-            if(!empty($config) && is_string($config) && false === strpos($config,'/')) { // 支持读取配置参数
-                $config  =  C($config);
-            }
             $_db[$linkNum]            =    Db::getInstance($config);
         }elseif(NULL === $config){
             $_db[$linkNum]->close(); // 关闭数据库连接

@@ -115,20 +115,13 @@ class View {
                 throw_exception(L('_TEMPLATE_NOT_EXIST_').'['.$templateFile.']');
         }
         // 页面缓存
-        ob_start();
-        ob_implicit_flush(0);
-        if('php' == strtolower(TMPL_ENGINE_TYPE)) { // 使用PHP原生模板
-            // 模板阵列变量分解成为独立变量
-            extract($this->tVar, EXTR_OVERWRITE);
-            // 直接载入PHP模板
-            empty($content)?include $templateFile:eval('?>'.$content);
-        }else{
-            // 视图解析标签
-            $params = array('var'=>$this->tVar,'file'=>$templateFile,'content'=>$content,'prefix'=>$prefix);
-            tag('view_parse',$params);
-        }
+        $ob = new OutputBuffer();
+		// 视图解析标签
+		$params = array('var'=>$this->tVar,'file'=>$templateFile,'content'=>$content,'prefix'=>$prefix);
+		tag('view_parse',$params);
         // 获取并清空缓存
-        $content = ob_get_clean();
+        $content = $ob->get();
+		
         // 内容过滤标签
         tag('view_filter',$content);
         // 输出模板文件

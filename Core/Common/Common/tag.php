@@ -8,7 +8,7 @@
  * @return mixed
  */
 function tag($tag, &$params=NULL) {
-	$tags       = hidef_fetch('tags');
+	$tags       = hidef_fetch('ThinkTags');
 	
 	if(empty($tags[$tag])){
 		return;
@@ -19,7 +19,13 @@ function tag($tag, &$params=NULL) {
 	}
 	// 执行扩展
 	foreach ($tags[$tag] as $callback) {
-		$callback($params);
+		if(is_string($callback)){
+			$callback($params);
+		}else{
+			$obj = new $callback[0];
+			$cb = $callback[1];
+			$obj->$cb($params);
+		}
 	}
 	if(APP_DEBUG) { // 记录行为的执行日志
 		trace('[ '.$tag.' ] --END-- [ RunTime:'.G($tag.'Start',$tag.'End',6).'s ]','','INFO');

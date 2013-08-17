@@ -13,7 +13,7 @@ function W($name, $data=array(), $return=false,$path='') {
 	require_cache($path . 'Widget/' . $class . '.class.php');
 	if (!class_exists($class))
 		throw_exception(L('_CLASS_NOT_EXIST_') . ':' . $class);
-	$widget     =   ThinkInstance::get($class);
+	$widget     =   ThinkInstance::instance($class);
 	$content    =   $widget->render($data);
 	if ($return)
 		return $content;

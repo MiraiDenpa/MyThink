@@ -10,19 +10,25 @@
 // +----------------------------------------------------------------------
 
 /**
- * ThinkPHP Behavior基础类
- * @category   Think
- * @package  Think
- * @subpackage  Core
- * @author liu21st <liu21st@gmail.com>
+ *
+ *
+ * @param $content
+ *
+ * @return mixed
  */
-abstract class Behavior {
-    private $options =  array();
-    /**
-     * 执行行为 run方法是Behavior唯一的接口
-     * @access public
-     * @param mixed $params  行为参数
-     * @return void
-     */
-    abstract public function run(&$params);
+function ContentReplace($content){
+	if(defined('IS_AJAX') && IS_AJAX){
+		return $content;
+	}
+	// 系统默认的特殊变量替换
+	$replace = array(
+		'__ACTION__' => ACTION_NAME, // 当前操作地址
+		'__METHOD__'   => METHOD_NAME, // 当前页面地址
+		'PUBLIC_URL' => PUBLIC_URL, // 站点公共目录
+		'STATIC_URL' => STATIC_URL, // 站点公共目录
+		'APP_NAME' =>APP_NAME, // 站点公共目录
+	);
+	$content = str_replace(array_keys($replace), array_values($replace), $content);
+
+	return $content;
 }

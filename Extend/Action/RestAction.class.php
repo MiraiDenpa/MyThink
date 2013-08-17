@@ -34,7 +34,7 @@ abstract class RestAction {
      */
     public function __construct() {
         //实例化视图类
-        $this->view       = ThinkInstance::get('View');
+        $this->view       = ThinkInstance::instance('View');
 
         if(!defined('__EXT__')) define('__EXT__','');
 

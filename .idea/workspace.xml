@@ -2,100 +2,89 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="dfa75a92-4fa7-440a-8206-465565dd844d" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/logo.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/.gitignore" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Lib/Core/Action.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Extend/Action/BasicAction.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Extend/Model/BasicModel.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Lib/Core/Behavior.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Lib/Core/Cache.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Lib/Driver/Cache/CacheFile.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Lib/Behavior/CheckRouteBehavior.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Lib/Behavior/ContentReplaceBehavior.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Lib/Core/Db.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Lib/Driver/Db/DbMysql.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Lib/Driver/Db/DbMysqli.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/Common/G.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/LICENSE.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Extend/Model/ListModel.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Lib/Core/Log.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Lib/Core/Model.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/Common/N.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/NOTICE" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Lib/Behavior/ParseTemplateBehavior.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/README.md" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Lib/Behavior/ReadHtmlCacheBehavior.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Lib/Behavior/ShowPageTraceBehavior.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Lib/Behavior/ShowRuntimeBehavior.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Lib/Template/TagLib.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Lib/Driver/TagLib/TagLibCx.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Extend/Driver/TagLib/TagLibPhpml.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Extend/Driver/TagLib/TaglibHeader.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Lib/Core/ThinkException.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Lib/Core/ThinkInstance.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/ThinkPHP.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Lib/Template/ThinkTemplate.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Lib/Behavior/TokenBuildBehavior.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Lib/Core/View.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Lib/Core/Widget.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Lib/Behavior/WriteHtmlCacheBehavior.class.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Conf/alias.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/class_load/alias_inport.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Tpl/app_status.tpl" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Compile/build_app_dir.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Compile/build_runtime_dir.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/compile.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Compile/compile_core_files.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/http/cookie.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/debug.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Conf/default_debug.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Tpl/default_index.tpl" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Tpl/dispatch_jump.tpl" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Lang/en-us.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/cache/file_cache.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/Functions/filter.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/Functions/functions.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/http/get_client_ip.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/error/halt.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/class_load/import.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/init.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Compile/library_map.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/cache/mem_cache.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Compile/merge_config.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Tpl/mythink_pathinfo.conf" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mytp_include.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Tpl/page_trace.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Tpl/page_trace.tpl" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/Common/parse_name.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Tpl/php-fpm.tpl" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/phpinfo.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/http/redirect.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/runonece.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/http/session.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/Common/tag.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Conf/tags.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Tpl/think_exception.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Tpl/think_exception.tpl" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/error/throw_exception.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/error/trace.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/uri/url.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/uri/urlAction.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/uri/urlGlobal.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/Functions/widget.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Lang/zh-cn.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Lib/Core/OutputBuffer.class.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/html/content_replace.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/debug/dump_some.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/debug/show_page_trace.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/html/standard_header.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/debug/trace.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/Common/debug/xdebug_filepath.php" />
+      <change type="DELETED" beforePath="W:\web\MyThink\Core\Common\error\halt.php" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\Core\Common\error\trace.php" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\Core\Common\runonece.php" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\Core\Lib\Behavior\CheckRouteBehavior.class.php" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\Core\Lib\Behavior\ContentReplaceBehavior.class.php" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\Core\Lib\Behavior\ShowPageTraceBehavior.class.php" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\Core\Lib\Behavior\ShowRuntimeBehavior.class.php" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\Core\ThinkPHP.php" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\Core\Tpl\page_trace.tpl" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\Core\Tpl\think_exception.tpl" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\Core\debug.php" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\Extend\Behavior\FireShowPageTraceBehavior.class.php" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\Extend\Driver\Db\DbIbase.class.php" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\Extend\Driver\Db\DbMongo.class.php" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\Extend\Driver\Db\DbMssql.class.php" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\Extend\Driver\Db\DbOracle.class.php" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\Extend\Driver\Db\DbPgsql.class.php" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\Extend\Driver\Db\DbSqlsrv.class.php" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\test\.gitignore" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\test\Public\favicon.ico" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\test\base\Conf\urlmap.php" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\test\compile.php" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\test\phpinfo.php" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\test\runtime\functions.php" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\test\runtime\test\const.ini" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\test\runtime\test\const.php" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\test\runtime\test\tags.data" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\test\test_app\Action\IndexAction.php" afterPath="" />
+      <change type="DELETED" beforePath="W:\web\MyThink\test\test_app\Conf\tags.data" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/logo.png" afterPath="$PROJECT_DIR$/Core/logo.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/Lib/Core/Action.class.php" afterPath="$PROJECT_DIR$/Core/Lib/Core/Action.class.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/Lib/Core/App.class.php" afterPath="$PROJECT_DIR$/Core/Lib/Core/App.class.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/Lib/Core/Behavior.class.php" afterPath="$PROJECT_DIR$/Core/Lib/Core/Behavior.class.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/Lib/Core/Cache.class.php" afterPath="$PROJECT_DIR$/Core/Lib/Core/Cache.class.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/Lib/Core/Dispatcher.class.php" afterPath="$PROJECT_DIR$/Core/Lib/Core/Dispatcher.class.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Extend/Library/ORG/Net/Http.class.php" afterPath="$PROJECT_DIR$/Extend/Library/ORG/Net/Http.class.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Extend/Library/ORG/Util/Input.class.php" afterPath="$PROJECT_DIR$/Extend/Library/ORG/Util/Input.class.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Extend/Model/ListModel.class.php" afterPath="$PROJECT_DIR$/Extend/Model/ListModel.class.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/MyThinkCompile.php" afterPath="$PROJECT_DIR$/Core/MyThinkCompile.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Extend/Action/RestAction.class.php" afterPath="$PROJECT_DIR$/Extend/Action/RestAction.class.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/Lib/Template/TagLib.class.php" afterPath="$PROJECT_DIR$/Core/Lib/Template/TagLib.class.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/Lib/Core/ThinkInstance.class.php" afterPath="$PROJECT_DIR$/Core/Lib/Core/ThinkInstance.class.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/Lib/Template/ThinkTemplate.class.php" afterPath="$PROJECT_DIR$/Core/Lib/Template/ThinkTemplate.class.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/Lib/Core/View.class.php" afterPath="$PROJECT_DIR$/Core/Lib/Core/View.class.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/Lib/Core/Widget.class.php" afterPath="$PROJECT_DIR$/Core/Lib/Core/Widget.class.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/Conf/alias.php" afterPath="$PROJECT_DIR$/Core/Conf/alias.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/Compile/build_app_dir.php" afterPath="$PROJECT_DIR$/Core/Compile/build_app_dir.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/Compile/build_runtime_dir.php" afterPath="$PROJECT_DIR$/Core/Compile/build_runtime_dir.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/Common/Common/common.php" afterPath="$PROJECT_DIR$/Core/Common/Common/common.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/Conf/convention.php" afterPath="$PROJECT_DIR$/Core/Conf/convention.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/Conf/default_debug.php" afterPath="$PROJECT_DIR$/Core/Conf/default_debug.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/Tpl/default_index.tpl" afterPath="$PROJECT_DIR$/Core/Tpl/default_index.tpl" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/Common/class_load/import.php" afterPath="$PROJECT_DIR$/Core/Common/class_load/import.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/Tpl/page_trace.php" afterPath="$PROJECT_DIR$/Core/Tpl/page_trace.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/Tpl/php-fpm.tpl" afterPath="$PROJECT_DIR$/Core/Tpl/php-fpm.tpl" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/Common/Common/tag.php" afterPath="$PROJECT_DIR$/Core/Common/Common/tag.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/Conf/tags.php" afterPath="$PROJECT_DIR$/Core/Conf/tags.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/Tpl/think_exception.php" afterPath="$PROJECT_DIR$/Core/Tpl/think_exception.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MOVED" beforePath="W:\web\MyThink\Core\Common\Functions\Widget.php" afterPath="$PROJECT_DIR$/Core/Common/Functions/widget.php" />
+      <change type="MOVED" beforePath="W:\web\MyThink\Core\Common\error\404.php" afterPath="$PROJECT_DIR$/Core/Common/debug/404.php" />
+      <change type="MOVED" beforePath="W:\web\MyThink\Core\Common\error\throw_exception.php" afterPath="$PROJECT_DIR$/Core/Common/debug/throw_exception.php" />
+      <change type="MOVED" beforePath="W:\web\MyThink\Core\Lib\Behavior\ParseTemplateBehavior.class.php" afterPath="$PROJECT_DIR$/Core/Lib/Behavior/ParseTemplateBehavior.php" />
+      <change type="MOVED" beforePath="W:\web\MyThink\Core\init.php" afterPath="$PROJECT_DIR$/Core/Common/debug/spl_error.php" />
     </list>
     <ignored path="MyThink.iws" />
     <ignored path=".idea/workspace.xml" />
     <file path="/mytp_include.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376321740942" ignored="false" />
-    <file path="/config.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376096874128" ignored="false" />
+    <file path="/config.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376727161345" ignored="false" />
     <file path="/debug.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376372771137" ignored="false" />
     <file path="/index.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376484896085" ignored="false" />
     <file path="/BasicModel.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376230119825" ignored="false" />
     <file path="/BasicAction.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376097374757" ignored="false" />
     <file path="/NOTICE" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376099540023" ignored="false" />
     <file path="/README.md" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376405608087" ignored="false" />
-    <file path="/Dummy.txt" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376531334149" ignored="false" />
+    <file path="/Dummy.txt" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376721888992" ignored="false" />
     <file path="/lscolor.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376220173605" ignored="false" />
     <file path="W:/script/wget-cookie" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376224083237" ignored="false" />
     <file path="/wget-cookie" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376224075257" ignored="false" />
@@ -103,23 +92,23 @@
     <file path="W:/script/README.md" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376226306945" ignored="false" />
     <file path="/TaglibHeader.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376227094712" ignored="false" />
     <file path="/url.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376457277003" ignored="false" />
-    <file path="/Model.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376233554400" ignored="false" />
+    <file path="/Model.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376727017399" ignored="false" />
     <file path="/Page.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376231443234" ignored="false" />
     <file path="/app_status.tpl" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376296578382" ignored="false" />
-    <file path="/default_index.tpl" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376294331483" ignored="false" />
+    <file path="/default_index.tpl" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376639286049" ignored="false" />
     <file path="/runtime.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376296393975" ignored="false" />
-    <file path="/a.dummy" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376458943095" ignored="false" />
+    <file path="/a.dummy" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376739084431" ignored="false" />
     <file path="$PROJECT_DIR$/Extend/Vendor/EaseTemplate/template.ease.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376294761862" ignored="false" />
     <file path="$PROJECT_DIR$/Extend/Vendor/Smarty/SmartyBC.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376294841284" ignored="false" />
     <file path="$PROJECT_DIR$/Extend/Vendor/Smarty/sysplugins/smarty_internal_utility.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376294841284" ignored="false" />
     <file path="$PROJECT_DIR$/Extend/Vendor/Smarty/Smarty.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376294761862" ignored="false" />
     <file path="$PROJECT_DIR$/Extend/Vendor/TemplateLite/class.template.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376294841284" ignored="false" />
     <file path="/ThinkPHP.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376302154261" ignored="false" />
-    <file path="/common.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376478446436" ignored="false" />
+    <file path="/common.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376620190594" ignored="false" />
     <file path="/functions.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459738365" ignored="false" />
-    <file path="/Think.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376485303760" ignored="false" />
-    <file path="/compile.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376486569799" ignored="false" />
-    <file path="/build_app_dir.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376371907790" ignored="false" />
+    <file path="/Think.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376742704916" ignored="false" />
+    <file path="/compile.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376739917649" ignored="false" />
+    <file path="/build_app_dir.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376742025085" ignored="false" />
     <file path="/compile_file.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376313450236" ignored="false" />
     <file path="/compile_core_file.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376313390507" ignored="false" />
     <file path="/build_runtime_cache.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376318320718" ignored="false" />
@@ -128,19 +117,19 @@
     <file path="/runonece.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376314580946" ignored="false" />
     <file path="/library_map.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376480948364" ignored="false" />
     <file path="/hidef.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376554220829" ignored="false" />
-    <file path="/fragment.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376548411728" ignored="false" />
+    <file path="/fragment.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376745198531" ignored="false" />
     <file path="/build_runtime_dir.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376357927971" ignored="false" />
-    <file path="/php-fpm.tpl" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376381327892" ignored="false" />
+    <file path="/php-fpm.tpl" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376739750905" ignored="false" />
     <file path="/nginx.tmpl" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376365546766" ignored="false" />
     <file path="/mythink_pathinfo.conf" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376365685792" ignored="false" />
     <file path="/.gitignore" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376366075088" ignored="false" />
     <file path="/nginx.tpl" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376568191404" ignored="false" />
     <file path="/urlmap.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376373076821" ignored="false" />
     <file path="$PROJECT_DIR$/test/base/Debug/test.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376406685444" ignored="false" />
-    <file path="/MyThinkCompile.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376539629690" ignored="false" />
+    <file path="/MyThinkCompile.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376742378441" ignored="false" />
     <file path="/compile_core_files.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376453164098" ignored="false" />
     <file path="/throw_exception.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376456951499" ignored="false" />
-    <file path="/halt.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376457026393" ignored="false" />
+    <file path="/halt.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376620143920" ignored="false" />
     <file path="/404.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376457051512" ignored="false" />
     <file path="/UI.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376457129965" ignored="false" />
     <file path="/Widget.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376457304282" ignored="false" />
@@ -150,44 +139,19 @@
     <file path="/memcache.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376458056110" ignored="false" />
     <file path="/file_cache.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376458076194" ignored="false" />
     <file path="/instance.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376458357187" ignored="false" />
-    <file path="$PROJECT_DIR$/Extend/Library/ORG/Util/Input.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376458504445" ignored="false" />
-    <file path="/ThinkInstance.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376478683218" ignored="false" />
-    <file path="/*.regexp" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376565904129" ignored="false" />
+    <file path="/ThinkInstance.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376727087015" ignored="false" />
+    <file path="/*.regexp" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376635407182" ignored="false" />
     <file path="$PROJECT_DIR$/Extend/Library/ORG/Util/Cookie.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023493" ignored="false" />
     <file path="$PROJECT_DIR$/Extend/Library/ORG/Util/Session.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023493" ignored="false" />
-    <file path="$PROJECT_DIR$/Extend/Library/ORG/Util/Authority.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023493" ignored="false" />
     <file path="$PROJECT_DIR$/Extend/Library/ORG/Util/RBAC.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023493" ignored="false" />
     <file path="$PROJECT_DIR$/Extend/Library/ORG/Util/Page.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459020404" ignored="false" />
-    <file path="$PROJECT_DIR$/Extend/Driver/Db/DbPgsql.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023493" ignored="false" />
-    <file path="$PROJECT_DIR$/Extend/Driver/Db/DbIbase.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023494" ignored="false" />
-    <file path="$PROJECT_DIR$/Extend/Driver/Db/DbSqlsrv.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023494" ignored="false" />
-    <file path="$PROJECT_DIR$/Extend/Driver/Db/DbSqlite.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023494" ignored="false" />
-    <file path="$PROJECT_DIR$/Extend/Driver/Db/DbPdo.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023210" ignored="false" />
-    <file path="$PROJECT_DIR$/Extend/Driver/Db/DbMongo.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023210" ignored="false" />
-    <file path="$PROJECT_DIR$/Extend/Behavior/CheckLangBehavior.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023210" ignored="false" />
-    <file path="$PROJECT_DIR$/Extend/Driver/Db/DbMssql.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023494" ignored="false" />
-    <file path="$PROJECT_DIR$/Extend/Behavior/RobotCheckBehavior.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023210" ignored="false" />
-    <file path="$PROJECT_DIR$/Extend/Driver/Db/DbOracle.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023210" ignored="false" />
     <file path="$PROJECT_DIR$/Extend/Driver/Cache/CacheDb.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023210" ignored="false" />
-    <file path="$PROJECT_DIR$/Extend/Behavior/AgentCheckBehavior.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023209" ignored="false" />
     <file path="$PROJECT_DIR$/Extend/Driver/Cache/CacheShmop.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023210" ignored="false" />
-    <file path="$PROJECT_DIR$/Extend/Behavior/CronRunBehavior.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023493" ignored="false" />
     <file path="$PROJECT_DIR$/Extend/Driver/Cache/CacheMemcache.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023494" ignored="false" />
-    <file path="$PROJECT_DIR$/Extend/Behavior/BrowserCheckBehavior.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023209" ignored="false" />
-    <file path="$PROJECT_DIR$/Extend/Driver/Cache/CacheApachenote.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023210" ignored="false" />
-    <file path="$PROJECT_DIR$/Extend/Behavior/UpgradeNoticeBehavior.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459020408" ignored="false" />
     <file path="$PROJECT_DIR$/Extend/Driver/Cache/CacheWincache.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023494" ignored="false" />
-    <file path="$PROJECT_DIR$/Extend/Behavior/CheckActionRouteBehavior.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023493" ignored="false" />
     <file path="$PROJECT_DIR$/Extend/Driver/Cache/CacheXcache.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023494" ignored="false" />
-    <file path="$PROJECT_DIR$/Extend/Driver/Cache/CacheSqlite.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023210" ignored="false" />
-    <file path="$PROJECT_DIR$/Extend/Driver/Cache/CacheRedis.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459020409" ignored="false" />
     <file path="$PROJECT_DIR$/Extend/Driver/Cache/CacheApc.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023494" ignored="false" />
-    <file path="$PROJECT_DIR$/Extend/Driver/Cache/CacheEaccelerator.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023492" ignored="false" />
     <file path="$PROJECT_DIR$/Extend/Driver/Session/SessionDb.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459020410" ignored="false" />
-    <file path="$PROJECT_DIR$/Extend/Driver/Template/TemplateLite.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023209" ignored="false" />
-    <file path="$PROJECT_DIR$/Extend/Driver/Template/TemplateSmart.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023493" ignored="false" />
-    <file path="$PROJECT_DIR$/Extend/Driver/Template/TemplateEase.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023493" ignored="false" />
-    <file path="$PROJECT_DIR$/Extend/Driver/Template/TemplateSmarty.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459023493" ignored="false" />
     <file path="/session.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376480415649" ignored="false" />
     <file path="/cookie.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459708309" ignored="false" />
     <file path="/get_client_ip.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376459822166" ignored="false" />
@@ -199,14 +163,52 @@
     <file path="/Log.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376478579506" ignored="false" />
     <file path="/http_methods.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376480567243" ignored="false" />
     <file path="/*.txt" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376484648382" ignored="false" />
-    <file path="/trace.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376486460616" ignored="false" />
-    <file path="/convention.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376553143679" ignored="false" />
-    <file path="/tag.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376539938123" ignored="false" />
+    <file path="/trace.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376623995504" ignored="false" />
+    <file path="/convention.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376634082454" ignored="false" />
+    <file path="/tag.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376572117363" ignored="false" />
     <file path="/merge_config.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376537126751" ignored="false" />
     <file path="/think_exception.tpl" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376540237581" ignored="false" />
-    <file path="/ShowPageTraceBehavior.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376553066354" ignored="false" />
-    <file path="/Dispatcher.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376568293098" ignored="false" />
-    <file path="/App.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376568384319" ignored="false" />
+    <file path="/ShowPageTraceBehavior.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376624579365" ignored="false" />
+    <file path="/Dispatcher.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376620942740" ignored="false" />
+    <file path="/App.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376623959974" ignored="false" />
+    <file path="/Behavior.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376571537389" ignored="false" />
+    <file path="/CheckRouteBehavior.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376570914197" ignored="false" />
+    <file path="/paeseUrl.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376615239182" ignored="false" />
+    <file path="/Action.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376639682714" ignored="false" />
+    <file path="/dump_some.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376623477205" ignored="false" />
+    <file path="/show_page_trace.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376735295655" ignored="false" />
+    <file path="/standard_header.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376623762291" ignored="false" />
+    <file path="/content_replace.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376726223851" ignored="false" />
+    <file path="/default_debug.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376624226492" ignored="false" />
+    <file path="$PROJECT_DIR$/../project/dadazuche/ThinkPHP/Core/Lib/Behavior/ShowPageTraceBehavior.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376624594655" ignored="false" />
+    <file path="/OutputBuffer.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376739510763" ignored="false" />
+    <file path="/View.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376630786759" ignored="false" />
+    <file path="/Widget.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376630862013" ignored="false" />
+    <file path="/Http.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376630878620" ignored="false" />
+    <file path="/think_exception.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376635358686" ignored="false" />
+    <file path="/xdebug_filepath.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376726747253" ignored="false" />
+    <file path="/ParseTemplateBehavior.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376634161649" ignored="false" />
+    <file path="/ThinkTemplate.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376639206589" ignored="false" />
+    <file path="/IndexAction.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376745716999" ignored="false" />
+    <file path="W:/MiraiDenpa/compile.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376639874060" ignored="false" />
+    <file path="W:/MiraiDenpa/User/compile.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376739918112" ignored="false" />
+    <file path="W:/MiraiDenpa/Base/Conf/urlmap.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376640132290" ignored="false" />
+    <file path="W:/MiraiDenpa/_runtime/user/const.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376743405551" ignored="false" />
+    <file path="W:/MiraiDenpa/User/index.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376743405551" ignored="false" />
+    <file path="W:/MiraiDenpa/_runtime/functions.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376729375719" ignored="false" />
+    <file path="W:/MiraiDenpa/User/Model/UserModel.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376745626919" ignored="false" />
+    <file path="/UserModel.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376744336168" ignored="false" />
+    <file path="/ListModel.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376726321580" ignored="false" />
+    <file path="/Db.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376742653733" ignored="false" />
+    <file path="W:/MiraiDenpa/User/Conf/config.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376729362628" ignored="false" />
+    <file path="/page_trace.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376740172463" ignored="false" />
+    <file path="/spl_error.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376740665519" ignored="false" />
+    <file path="/db.tmpl.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376741968720" ignored="false" />
+    <file path="W:/MiraiDenpa/User/Conf/db/user.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376743381500" ignored="false" />
+    <file path="/user.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376743379504" ignored="false" />
+    <file path="/DbPdo.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376744504632" ignored="false" />
+    <file path="W:/MiraiDenpa/User/Action/IndexAction.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376745721526" ignored="false" />
+    <file path="$PROJECT_DIR$/Core/Lib/Core/Db.class.php" changelist="dfa75a92-4fa7-440a-8206-465565dd844d" time="1376745693841" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -229,61 +231,48 @@
       <file leaf-file-name="MyThinkCompile.php" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Core/MyThinkCompile.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="15" column="0" selection-start="339" selection-end="339" vertical-scroll-proportion="-10.7">
+            <state line="122" column="68" selection-start="4658" selection-end="4658" vertical-scroll-proportion="-4.8773584">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Dispatcher.class.php" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Core/Lib/Core/Dispatcher.class.php">
+      <file leaf-file-name="build_app_dir.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Core/Compile/build_app_dir.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="30" column="107" selection-start="1070" selection-end="1087" vertical-scroll-proportion="0.50375">
+            <state line="35" column="8" selection-start="729" selection-end="729" vertical-scroll-proportion="-13.175">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="nginx.tpl" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Core/Tpl/nginx.tpl">
+      <file leaf-file-name="db.tmpl.php" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Core/Conf/db.tmpl.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="16" column="46" selection-start="411" selection-end="411" vertical-scroll-proportion="0.0">
+            <state line="13" column="23" selection-start="256" selection-end="276" vertical-scroll-proportion="0.49569497">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="common.php" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Core/Common/Common/common.php">
+      <file leaf-file-name="page_trace.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Core/Tpl/page_trace.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="48" column="25" selection-start="1832" selection-end="1832" vertical-scroll-proportion="-25.475">
-              <folding />
+            <state line="24" column="61" selection-start="705" selection-end="705" vertical-scroll-proportion="-12.7">
+              <folding>
+                <element signature="e#2805#2906#2" expanded="true" />
+                <marker date="1376740175736" expanded="true" signature="848:863" placeholder="..." />
+                <marker date="1376740175736" expanded="true" signature="941:965" placeholder="..." />
+                <marker date="1376740175736" expanded="true" signature="947:965" placeholder="{...}" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="tag.php" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Core/Common/Common/tag.php">
+      <file leaf-file-name="show_page_trace.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Core/Common/debug/show_page_trace.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="10" column="0" selection-start="135" selection-end="135" vertical-scroll-proportion="-5.425">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="App.class.php" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Core/Lib/Core/App.class.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="161" column="25" selection-start="5574" selection-end="5574" vertical-scroll-proportion="-8.975">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="convention.php" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Core/Conf/convention.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="115" column="19" selection-start="2881" selection-end="2881" vertical-scroll-proportion="-15.9">
+            <state line="38" column="4" selection-start="1283" selection-end="1283" vertical-scroll-proportion="-3.1">
               <folding />
             </state>
           </provider>
@@ -309,22 +298,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/Core/Conf/tags.php" />
-        <option value="$PROJECT_DIR$/Core/Common/Common/tag.php" />
-        <option value="$PROJECT_DIR$/Core/Tpl/think_exception.tpl" />
-        <option value="$PROJECT_DIR$/../pecl/extensions/hidef.php" />
-        <option value="$PROJECT_DIR$/Core/Lib/Behavior/ShowPageTraceBehavior.class.php" />
-        <option value="$PROJECT_DIR$/Core/Tpl/think_exception.php" />
-        <option value="$PROJECT_DIR$/Core/Compile/hidef.php" />
-        <option value="$PROJECT_DIR$/Core/MyThinkCompile.php" />
-        <option value="$PROJECT_DIR$/Core/Lib/Core/Think.class.php" />
-        <option value="$PROJECT_DIR$/Core/Common/Common/common.php" />
-        <option value="$PROJECT_DIR$/Core/Common/error/404.php" />
-        <option value="$PROJECT_DIR$/Core/Common/http/http_methods.php" />
-        <option value="$PROJECT_DIR$/Core/Tpl/nginx.tpl" />
-        <option value="$PROJECT_DIR$/Core/Lib/Core/Dispatcher.class.php" />
         <option value="$PROJECT_DIR$/Core/Conf/convention.php" />
+        <option value="$PROJECT_DIR$/Core/Conf/tags.php" />
+        <option value="$PROJECT_DIR$/Core/Lib/Template/ThinkTemplate.class.php" />
+        <option value="$PROJECT_DIR$/Core/Common/debug/show_page_trace.php" />
         <option value="$PROJECT_DIR$/Core/Lib/Core/App.class.php" />
+        <option value="$PROJECT_DIR$/test/test_app/Action/IndexAction.php" />
+        <option value="$PROJECT_DIR$/Core/Tpl/default_index.tpl" />
+        <option value="$PROJECT_DIR$/Core/Lib/Core/Dispatcher.class.php" />
+        <option value="$PROJECT_DIR$/Core/Lib/Core/Action.class.php" />
+        <option value="$PROJECT_DIR$/Core/Tpl/php-fpm.tpl" />
+        <option value="$PROJECT_DIR$/Core/Lib/Core/Think.class.php" />
+        <option value="$PROJECT_DIR$/Core/Tpl/page_trace.php" />
+        <option value="$PROJECT_DIR$/Core/Common/debug/spl_error.php" />
+        <option value="$PROJECT_DIR$/Core/Compile/build_app_dir.php" />
+        <option value="$PROJECT_DIR$/Core/MyThinkCompile.php" />
+        <option value="$PROJECT_DIR$/Core/Conf/db.tmpl.php" />
       </list>
     </option>
   </component>
@@ -339,6 +328,11 @@
       <server host="test.mirai" name="test.mirai" use_path_mappings="true">
         <path_mappings>
           <path_mapping local_path="$PROJECT_DIR$" remote_path="/data/web/MyThink/" />
+        </path_mappings>
+      </server>
+      <server host="dev.dianbo.me" name="dev.dianbo.me" use_path_mappings="true">
+        <path_mappings>
+          <path_mapping local_path="$PROJECT_DIR$/test" remote_path="/data/web/default" />
         </path_mappings>
       </server>
     </option>
@@ -451,39 +445,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="test" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="MyThink" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="MyThink" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
               <option name="myItemId" value="Core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="MyThink" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="MyThink" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Tpl" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -505,24 +467,6 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="MyThink" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="MyThink" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Compile" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
         </subPane>
       </pane>
       <pane id="Scope" />
@@ -531,13 +475,13 @@
   <component name="PropertiesComponent">
     <property name="options.splitter.main.proportions" value="0.27730498" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="recentsLimit" value="5" />
     <property name="options.lastSelected" value="web-ide.project.structure" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../pecl/extensions" />
+    <property name="recentsLimit" value="5" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../MiraiDenpa" />
     <property name="FullScreen" value="false" />
-    <property name="GoToClass.includeJavaFiles" value="false" />
-    <property name="options.searchVisible" value="true" />
     <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="options.searchVisible" value="true" />
+    <property name="GoToClass.includeJavaFiles" value="false" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -545,11 +489,11 @@
       <recent name="W:\web\MyThink" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="W:\web\MyThink\Core\Common\http_head" />
       <recent name="W:\web\MyThink\Core\Common\class_load" />
       <recent name="W:\web\MyThink\Core\Common\error" />
       <recent name="W:\web\MyThink\Core\Common\cache" />
       <recent name="W:\web\MyThink\Core\Common\http" />
-      <recent name="W:\web\MyThink\Core\Common\uri" />
     </key>
   </component>
   <component name="RunManager" selected="PHP Script.lscolor.php">
@@ -600,17 +544,37 @@
     </task>
     <servers />
   </component>
+  <component name="TodoView" selected-index="0">
+    <todo-panel id="selected-file">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
+    <todo-panel id="default-changelist">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
+  </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="0" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32911393" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32919955" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.18830472" sideWeight="0.67080045" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="true" weight="0.3990981" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" x="2041" y="364" width="1205" height="642" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19635193" sideWeight="0.67080045" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39797068" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" x="2194" y="355" width="1449" height="642" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.18025751" sideWeight="0.427283" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32919955" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -684,126 +648,136 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/Core/Lib/Core/Dispatcher.class.php</url>
-          <line>29</line>
-          <option name="timeStamp" value="33" />
+          <url>file://$PROJECT_DIR$/Core/Lib/Core/Think.class.php</url>
+          <line>212</line>
+          <option name="timeStamp" value="59" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="php">
+          <url>file://$PROJECT_DIR$/Core/Lib/Core/Think.class.php</url>
+          <line>35</line>
+          <option name="timeStamp" value="60" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="34" />
+      <option name="time" value="61" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Core/Lib/Behavior/ShowPageTraceBehavior.class.php">
+    <entry file="file://$PROJECT_DIR$/mytp_include.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="0" selection-start="814" selection-end="814" vertical-scroll-proportion="-9.15">
+        <state line="3" column="24" selection-start="66" selection-end="66" vertical-scroll-proportion="-2.325">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Core/Compile/merge_config.php">
+    <entry file="file://$PROJECT_DIR$/Core/Common/html/content_replace.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+        <state line="18" column="9" selection-start="660" selection-end="660" vertical-scroll-proportion="0.22878228">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Core/Compile/hidef.php">
+    <entry file="file://$PROJECT_DIR$/Core/Tpl/php-fpm.tpl">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="11" column="19" selection-start="190" selection-end="190" vertical-scroll-proportion="0.4194342">
+        <state line="43" column="23" selection-start="891" selection-end="905" vertical-scroll-proportion="0.23800384">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Core/MyThinkCompile.php">
+    <entry file="file://$PROJECT_DIR$/Core/Common/debug/trace.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="0" selection-start="339" selection-end="339" vertical-scroll-proportion="-10.7">
+        <state line="30" column="16" selection-start="756" selection-end="756" vertical-scroll-proportion="0.35826772">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/runtime/test/const.php">
+    <entry file="file://$PROJECT_DIR$/Core/Common/debug/xdebug_filepath.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="123" column="7" selection-start="4978" selection-end="4978" vertical-scroll-proportion="0.6715867">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$APPLICATION_HOME_DIR$/plugins/php/lib/php.jar!/com/jetbrains/php/lang/psi/stubs/data/_standard_manual.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="43" column="31" selection-start="1632" selection-end="1654" vertical-scroll-proportion="0.54625">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$APPLICATION_HOME_DIR$/plugins/php/lib/php.jar!/com/jetbrains/php/lang/psi/stubs/data/standard_1.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="223" column="21" selection-start="6336" selection-end="6336" vertical-scroll-proportion="0.49015749">
+        <state line="21" column="4" selection-start="552" selection-end="552" vertical-scroll-proportion="0.35892513">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Core/Lib/Core/Think.class.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="233" column="43" selection-start="5570" selection-end="5570" vertical-scroll-proportion="6.890595">
+        <state line="34" column="58" selection-start="1150" selection-end="1150" vertical-scroll-proportion="0.7159309">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Core/Common/http/http_methods.php">
+    <entry file="jar://$APPLICATION_HOME_DIR$/plugins/php/lib/php.jar!/com/jetbrains/php/lang/psi/stubs/data/Core_d.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="24" column="141" selection-start="748" selection-end="748" vertical-scroll-proportion="0.5905512">
+        <state line="4" column="0" selection-start="45" selection-end="3699" vertical-scroll-proportion="0.23800384">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Core/Common/error/404.php">
+    <entry file="jar://$APPLICATION_HOME_DIR$/plugins/php/lib/php.jar!/com/jetbrains/php/lang/psi/stubs/data/standard_8.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="14" column="15" selection-start="236" selection-end="236" vertical-scroll-proportion="0.8330134">
+        <state line="825" column="9" selection-start="26460" selection-end="26460" vertical-scroll-proportion="0.72440946">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Core/Tpl/nginx.tpl">
+    <entry file="file://$PROJECT_DIR$/Core/Common/debug/spl_error.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="46" selection-start="411" selection-end="411" vertical-scroll-proportion="0.0">
+        <state line="1" column="31" selection-start="15" selection-end="37" vertical-scroll-proportion="0.05950096">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Core/Conf/convention.php">
+    <entry file="jar://$APPLICATION_HOME_DIR$/plugins/php/lib/php.jar!/com/jetbrains/php/lang/psi/stubs/data/standard_defines.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="115" column="19" selection-start="2881" selection-end="2881" vertical-scroll-proportion="-15.9">
+        <state line="262" column="8" selection-start="5455" selection-end="5455" vertical-scroll-proportion="0.35">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Core/Common/Common/common.php">
+    <entry file="jar://$APPLICATION_HOME_DIR$/plugins/php/lib/php.jar!/com/jetbrains/php/lang/psi/stubs/data/standard_1.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="48" column="25" selection-start="1832" selection-end="1832" vertical-scroll-proportion="-25.475">
+        <state line="236" column="9" selection-start="6688" selection-end="6688" vertical-scroll-proportion="0.69875">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Core/Common/Common/tag.php">
+    <entry file="file://$PROJECT_DIR$/Core/MyThinkCompile.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="10" column="0" selection-start="135" selection-end="135" vertical-scroll-proportion="-5.425">
+        <state line="122" column="68" selection-start="4658" selection-end="4658" vertical-scroll-proportion="-4.8773584">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Core/Lib/Core/App.class.php">
+    <entry file="file://$PROJECT_DIR$/Core/Common/debug/show_page_trace.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="161" column="25" selection-start="5574" selection-end="5574" vertical-scroll-proportion="-8.975">
+        <state line="38" column="4" selection-start="1283" selection-end="1283" vertical-scroll-proportion="-3.1">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Core/Lib/Core/Dispatcher.class.php">
+    <entry file="file://$PROJECT_DIR$/Core/Tpl/page_trace.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="30" column="107" selection-start="1070" selection-end="1087" vertical-scroll-proportion="0.50375">
+        <state line="24" column="61" selection-start="705" selection-end="705" vertical-scroll-proportion="-12.7">
+          <folding>
+            <element signature="e#2805#2906#2" expanded="true" />
+            <marker date="1376740175736" expanded="true" signature="848:863" placeholder="..." />
+            <marker date="1376740175736" expanded="true" signature="941:965" placeholder="..." />
+            <marker date="1376740175736" expanded="true" signature="947:965" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/Compile/build_app_dir.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="35" column="8" selection-start="729" selection-end="729" vertical-scroll-proportion="-13.175">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/Conf/db.tmpl.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="13" column="23" selection-start="256" selection-end="276" vertical-scroll-proportion="0.49569497">
           <folding />
         </state>
       </provider>

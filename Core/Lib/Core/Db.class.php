@@ -24,7 +24,7 @@ class Db {
     // 当前操作所属的模型名
     protected $model      = '_think_';
     // 是否使用永久连接
-    protected $pconnect   = false;
+    protected $pconnect   = true;
     // 当前SQL指令
     protected $queryStr   = '';
     protected $modelSql   = array();
@@ -63,7 +63,7 @@ class Db {
      */
     public static function getInstance() {
         $args = func_get_args();
-        return ThinkInstance::get(__CLASS__,'factory',$args);
+        return ThinkInstance::instance(__CLASS__,'factory',$args);
     }
 
     /**
@@ -76,7 +76,7 @@ class Db {
         // 读取数据库配置
         $db_config = $this->parseConfig($db_config);
         if(empty($db_config['dbms']))
-            throw_exception(L('_NO_DB_CONFIG_'));
+            throw_exception(LANG_NO_DB_CONFIG.': '.$db_config);
         // 数据库类型
         $this->dbType = ucwords(strtolower($db_config['dbms']));
         $class = 'Db'. $this->dbType;
@@ -114,39 +114,7 @@ class Db {
      * @return string
      */
     private function parseConfig($db_config='') {
-        if ( !empty($db_config) && is_string($db_config)) {
-            // 如果DSN字符串则进行解析
-            $db_config = $this->parseDSN($db_config);
-        }elseif(is_array($db_config)) { // 数组配置
-             $db_config =   array_change_key_case($db_config);
-             $db_config = array(
-                  'dbms'      =>  $db_config['db_type'],
-                  'username'  =>  $db_config['db_user'],
-                  'password'  =>  $db_config['db_pwd'],
-                  'hostname'  =>  $db_config['db_host'],
-                  'hostport'  =>  $db_config['db_port'],
-                  'database'  =>  $db_config['db_name'],
-                  'dsn'       =>  $db_config['db_dsn'],
-                  'params'    =>  $db_config['db_params'],
-             );
-        }elseif(empty($db_config)) {
-            // 如果配置为空，读取配置文件设置
-            if( DB_DSN && 'pdo' != strtolower(DB_TYPE) ) { // 如果设置了DB_DSN 则优先
-                $db_config =  $this->parseDSN(DB_DSN);
-            }else{
-                $db_config = array (
-                    'dbms'      =>  DB_TYPE,
-                    'username'  =>  DB_USER,
-                    'password'  =>  DB_PWD,
-                    'hostname'  =>  DB_HOST,
-                    'hostport'  =>  DB_PORT,
-                    'database'  =>  DB_NAME,
-                    'dsn'       =>  DB_DSN,
-                    'params'    =>  DB_PARAMS,
-                );
-            }
-        }
-        return $db_config;
+        return hidef_fetch('ThinkDb'.$db_config);
     }
 
     /**
@@ -207,41 +175,6 @@ class Db {
         );
         return $this->connect($db_config,$r);
     }
-
-    /**
-     * DSN解析
-     * 格式： mysql://username:passwd@localhost:3306/DbName
-     * @static
-     * @access public
-     * @param string $dsnStr
-     * @return array
-     */
-    public function parseDSN($dsnStr) {
-        if( empty($dsnStr) ){return false;}
-        $info = parse_url($dsnStr);
-        if($info['scheme']){
-            $dsn = array(
-            'dbms'      =>  $info['scheme'],
-            'username'  =>  isset($info['user']) ? $info['user'] : '',
-            'password'  =>  isset($info['pass']) ? $info['pass'] : '',
-            'hostname'  =>  isset($info['host']) ? $info['host'] : '',
-            'hostport'  =>  isset($info['port']) ? $info['port'] : '',
-            'database'  =>  isset($info['path']) ? substr($info['path'],1) : ''
-            );
-        }else {
-            preg_match('/^(.*?)\:\/\/(.*?)\:(.*?)\@(.*?)\:([0-9]{1, 6})\/(.*?)$/',trim($dsnStr),$matches);
-            $dsn = array (
-            'dbms'      =>  $matches[1],
-            'username'  =>  $matches[2],
-            'password'  =>  $matches[3],
-            'hostname'  =>  $matches[4],
-            'hostport'  =>  $matches[5],
-            'database'  =>  $matches[6]
-            );
-        }
-        $dsn['dsn'] =  ''; // 兼容配置信息数组
-        return $dsn;
-     }
 
     /**
      * 数据库调试 记录当前SQL
@@ -599,8 +532,6 @@ class Db {
                 $joinStr .= ' LEFT JOIN ' .$join;
             }
         }
-		//将__TABLE_NAME__这样的字符串替换成正规的表名,并且带上前缀和后缀
-		$joinStr = preg_replace("/__([A-Z_-]+)__/esU",C("DB_PREFIX").".strtolower('$1')",$joinStr);
         return $joinStr;
     }
 

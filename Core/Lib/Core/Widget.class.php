@@ -38,8 +38,7 @@ abstract class Widget {
      * @return string
      */
     protected function renderFile($templateFile='',$var='') {
-        ob_start();
-        ob_implicit_flush(0);
+        $ob = new OutpuBuffer();
         if(!file_exists_case($templateFile)){
             // 自动定位模板文件
             $name   = substr(get_class($this),0,-6);
@@ -61,7 +60,7 @@ abstract class Widget {
                 //载入模版缓存文件
                 include CACHE_PATH.md5($templateFile).TMPL_CACHFILE_SUFFIX;
             }else{
-                $tpl = ThinkInstance::get('ThinkTemplate');
+                $tpl = ThinkInstance::instance('ThinkTemplate');
                 // 编译并加载模板文件
                 $tpl->fetch($templateFile,$var);
             }
@@ -77,7 +76,7 @@ abstract class Widget {
             $tpl   =  new $class;
             $tpl->fetch($templateFile,$var);
         }
-        $content = ob_get_clean();
+        $content = $ob->get();
         return $content;
     }
 

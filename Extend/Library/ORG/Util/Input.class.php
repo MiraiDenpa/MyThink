@@ -47,7 +47,7 @@ class Input {
     );
 
     static public function getInstance() {
-        return ThinkInstance::get(__CLASS__);
+        return ThinkInstance::instance(__CLASS__);
     }
 
     /**

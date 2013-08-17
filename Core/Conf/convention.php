@@ -1,14 +1,6 @@
 <?php
 // 默认配置文件
 return array(
-	/* 项目设定 */
-	'APP_SUB_DOMAIN_DEPLOY' => false,
-	// 是否开启子域名部署
-	'APP_SUB_DOMAIN_RULES'  => array(),
-	// 子域名部署规则
-	'APP_SUB_DOMAIN_DENY'   => array(),
-	//  子域名禁用列表
-
 	/* Cookie设置 */
 	'COOKIE_EXPIRE'         => 1800,
 	// Coodie有效期
@@ -101,15 +93,18 @@ return array(
 	// 默认错误跳转对应的模板文件
 	'TMPL_ACTION_SUCCESS'   => THINK_PATH . 'Tpl/dispatch_jump.tpl',
 	// 默认成功跳转对应的模板文件
-	'TMPL_EXCEPTION_FILE'   => THINK_PATH . 'Tpl/think_exception.tpl',
+	'TMPL_EXCEPTION_FILE'   => THINK_PATH . 'Tpl/think_exception.php',
+	'TMPL_TRACE_FILE'       => THINK_PATH . 'Tpl/page_trace.php',
 	// 异常页面的模板文件
 	'TMPL_TEMPLATE_SUFFIX'  => '.html',
 	// 默认模板文件后缀
 	'TMPL_FILE_DEPR'        => '_',
 	//模板文件MODULE_NAME与ACTION_NAME之间的分割符
-
+	'TAGLIB_PRE_LOAD' => '',
+	'TAGLIB_BUILD_IN' => '',
+	
 	/* URL设置 */
-	'DEFAULT_EXTENSION'             => 'html',
+	'DEFAULT_EXTENSION'     => 'html',
 	// 默认返回格式
 	'URL_PATHINFO_DEPR'     => '/',
 	// PATHINFO模式下，各参数之间的分割符号
@@ -117,29 +112,13 @@ return array(
 	// 404 跳转页面 部署模式有效
 
 	/* 系统变量名称设置 */
-	'VAR_GROUP'             => 'g',
-	// 默认分组获取变量
-	'VAR_MODULE'            => 'm',
-	// 默认模块获取变量
-	'VAR_ACTION'            => 'a',
-	// 默认操作获取变量
 	'VAR_AJAX_SUBMIT'       => 'ajax',
 	// 默认的AJAX提交变量
 	'VAR_JSONP_HANDLER'     => 'callback',
-	'VAR_URL_PARAMS'        => '_URL_',
-	// PATHINFO URL参数变量
-
 	'HTTP_CACHE_CONTROL'    => 'private',
 	// 网页缓存控制
 
 	'SHOW_PAGE_TRACE'       => TRACE_DEBUG,
-	// 显示页面Trace信息
-	'TRACE_PAGE_TABS'       => array('BASE'      => '基本',
-									 'FILE'      => '文件',
-									 'INFO'      => '流程',
-									 'ERR|NOTIC' => '错误',
-									 'SQL'       => 'SQL',
-									 'DEBUG'     => '调试',
-	), // 页面Trace可定制的选项卡
+	'TRACE_LOG'             => !APP_DEBUG,
 	'PAGE_TRACE_SAVE'       => !APP_DEBUG,
 );

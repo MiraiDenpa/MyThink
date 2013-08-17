@@ -160,22 +160,28 @@ function require_cache($filename) {
  */
 function require_array($array,$return=false){
     foreach ($array as $file){
-        if (require_cache($file) && $return) return true;
+        if (require_once($file) && $return) return true;
     }
     if($return) return false;
 }
 
 /**
- * 导入文件
+ * 按顺序尝试导入文件
  * 第一个成功导入的文件返回
+ * 
+ * @param array $array 文件列表
+ * @param string [out] $hit 被引入的文件
+ * @return mixed
  */
-function require_one(array $array){
+function require_one(array $array, &$hit = null){
 	foreach($array as $file){
 		if(is_file($file)){
+			$hit = $file;
 			return require_once $file;
 		}
 	}
-	return false;
+	Think::halt('require_one: 找不到任何一个文件：'.implode_l("\n", $array));
+	exit();
 }
 /**
  * 批量导入文件
@@ -256,30 +262,6 @@ function add_tag_behavior($tag,$behavior,$path='') {
         $array[] =  $behavior;
     }
     C('tags.'.$tag,$array);
-}
-
-/**
- * 执行某个行为
- * @param string $name 行为名称
- * @param Mixed $params 传入的参数
- * @return void
- */
-function B($name, &$params=NULL) {
-    if(strpos($name,'/')){
-        list($name,$method) = explode('/',$name);
-    }else{
-        $method     =   'run';
-    }
-    $class      = $name.'Behavior';
-    if(APP_DEBUG) {
-        G('behaviorStart');
-    }
-    $behavior   = new $class();
-    $behavior->$method($params);
-    if(APP_DEBUG) { // 记录行为的执行日志
-        G('behaviorEnd');
-        trace($name.' Behavior ::'.$method.' [ RunTime:'.G('behaviorStart','behaviorEnd',6).'s ]','','INFO');
-    }
 }
 
 /**

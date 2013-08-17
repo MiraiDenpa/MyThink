@@ -21,6 +21,7 @@
  * @author      liu21st <liu21st@gmail.com>
  */
 class Think{
+	private static $main_out_buffer;
 
 	/**
 	 * 应用程序初始化
@@ -33,6 +34,8 @@ class Think{
 		set_error_handler(array('Think', 'appError'));
 		set_exception_handler(array('Think', 'appException'));
 		spl_autoload_register(array('Think', 'autoload'));
+
+		self::$main_out_buffer = new OutputBuffer('ContentReplace');
 	}
 
 	/**
@@ -47,68 +50,70 @@ class Think{
 		if($ret = alias_import($class)){
 			return $ret;
 		}
-		$file = $class . '.class.php';
+		$file = $class . '.php';
 		if(substr($class, -8) == 'Behavior'){ // 加载行为
 			if(require_one([
-							 CORE_PATH . 'Behavior/' . $file,
-							 EXTEND_PATH . 'Behavior/' . $file,
-							 BASE_LIB_PATH . 'Behavior/' . $file,
-							 LIB_PATH . 'Behavior/' . $file
-							 ])
+						   CORE_PATH . 'Behavior/' . $file,
+						   EXTEND_PATH . 'Behavior/' . $file,
+						   BASE_LIB_PATH . 'Behavior/' . $file,
+						   LIB_PATH . 'Behavior/' . $file
+						   ])
 			){
 				return true;
 			}
 		} elseif(substr($class, -5) == 'Model'){ // 加载模型
-			if(require_array(array(
-								  BASE_LIB_PATH . 'Model/' . $file,
-								  EXTEND_PATH . 'Model/' . $file
-							 ), true)
+			if(require_one(array(
+								LIB_PATH . 'Model/' . $file,
+								BASE_LIB_PATH . 'Model/' . $file,
+								EXTEND_PATH . 'Model/' . $file
+						   ))
 			){
 				return true;
 			}
 		} elseif(substr($class, -6) == 'Action'){ // 加载控制器
-			if(require_array(array(
-								  LIB_PATH . 'Action/' . $file,
-								  BASE_LIB_PATH . 'Model/' . $file,
-								  EXTEND_PATH . 'Action/' . $file
-							 ), true)
+			if(require_one(array(
+								LIB_PATH . 'Action/' . $file,
+								BASE_LIB_PATH . 'Action/' . $file,
+								EXTEND_PATH . 'Action/' . $file
+						   ))
 			){
 				return true;
 			}
 		} elseif(substr($class, 0, 5) == 'Cache'){ // 加载缓存驱动
-			if(require_array(array(
-								  EXTEND_PATH . 'Driver/Cache/' . $file,
-								  CORE_PATH . 'Driver/Cache/' . $file
-							 ), true)
+			if(require_one(array(
+								EXTEND_PATH . 'Driver/Cache/' . $file,
+								CORE_PATH . 'Driver/Cache/' . $file
+						   ))
 			){
 				return true;
 			}
 		} elseif(substr($class, 0, 2) == 'Db'){ // 加载数据库驱动
-			if(require_array(array(
-								  EXTEND_PATH . 'Driver/Db/' . $file,
-								  CORE_PATH . 'Driver/Db/' . $file
-							 ), true)
+			if(require_one(array(
+								EXTEND_PATH . 'Driver/Db/' . $file,
+								CORE_PATH . 'Driver/Db/' . $file
+						   ))
 			){
 				return true;
 			}
 		} elseif(substr($class, 0, 8) == 'Template'){ // 加载模板引擎驱动
-			if(require_array(array(
-								  EXTEND_PATH . 'Driver/Template/' . $file,
-								  CORE_PATH . 'Driver/Template/' . $file
-							 ), true)
+			if(require_one(array(
+								EXTEND_PATH . 'Driver/Template/' . $file,
+								CORE_PATH . 'Driver/Template/' . $file
+						   ))
 			){
 				return true;
 			}
 		} elseif(substr($class, 0, 6) == 'TagLib'){ // 加载标签库驱动
-			if(require_array(array(
-								  BASE_LIB_PATH . 'TagLib/' . $file,
-								  EXTEND_PATH . 'Driver/TagLib/' . $file,
-								  CORE_PATH . 'Driver/TagLib/' . $file
-							 ), true)
+			if(require_one(array(
+								BASE_LIB_PATH . 'TagLib/' . $file,
+								EXTEND_PATH . 'Driver/TagLib/' . $file,
+								CORE_PATH . 'Driver/TagLib/' . $file
+						   ))
 			){
 				return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -151,19 +156,20 @@ class Think{
 		case E_CORE_ERROR:
 		case E_COMPILE_ERROR:
 		case E_USER_ERROR:
-			ob_end_clean();
-			$errorStr = $errstr . ' ' . $errfile . ' 第 ' . $errline . ' 行.';
+			$halt_string =
+					'[' . error_code_to_type_str($errno) . '] ' . $errstr . xdebug_filepath_anchor(basename($errfile).':'.$errline);
 			if(LOG_RECORD){
-				Log::write("[$errno] " . $errorStr, Log::ERR);
+				Log::write('[' . error_code_to_type_str($errno) . '] ' . $errorStr, Log::ERR);
 			}
-			Think::halt($errorStr);
+			Think::halt($halt_string);
 			break;
 		case E_STRICT:
 		case E_USER_WARNING:
 		case E_USER_NOTICE:
 		default:
-			$errorStr = "[$errno] $errstr " . $errfile . " 第 $errline 行.";
-			trace($errorStr, '', 'NOTIC');
+			$halt_string =
+					'[' . error_code_to_type_str($errno) . '] ' . $errstr . xdebug_filepath_anchor(basename($errfile).':'.$errline);
+			trace($halt_string, '', 'NOTIC');
 			break;
 		}
 	}
@@ -186,57 +192,52 @@ class Think{
 			case E_CORE_ERROR:
 			case E_COMPILE_ERROR:
 			case E_USER_ERROR:
-				ob_end_clean();
 				Think::halt($e);
-				break;
+
+				return;
 			}
 		}
+		ob_flush();
 	}
 
 	/**
 	 * 错误输出
-	 * @param mixed $error 错误
+	 * @param string $msg  错误
+	 * @param bool   $html 输出的是html
 	 *
 	 * @return void
+	 * @exit
 	 */
-	public static function halt($error){
-		ob_get_clean();
-		if(!defined('APP_DEBUG')){
+	public static function halt($msg, $html = false){
+		self::$main_out_buffer = null;
+		if(!defined('APP_DEBUG')){ // 
 			header('Content-Type:text/html; charset=utf-8');
-			echo "致命错误：{$error}<br/><br/>Trace:<pre>";
+			if($html){
+				echo "致命错误：{$msg}<br/><br/>Trace:<pre>";
+			} else{
+				echo "致命错误：" . nl2br(htmlspecialchars($msg)) . "<br/><br/>Trace:<pre>";
+			}
 			debug_print_backtrace();
 			echo "</pre>";
 			die;
 		}
-		$e = array();
-		if(APP_DEBUG){
-			//调试模式下输出错误信息
-			if(!is_array($error)){
-				$trace        = debug_backtrace();
-				$e['message'] = $error;
-				$e['file']    = $trace[0]['file'];
-				$e['line']    = $trace[0]['line'];
-				ob_start();
-				debug_print_backtrace();
-				$e['trace'] = ob_get_clean();
-			} else{
-				$e = $error;
-			}
+		$trace   = debug_backtrace();
+		$content = ob_get_contents();
+		/*if(!$content){
+			echo StandardHeader('调试页面');
 		} else{
-			//否则定向到错误页面
-			$error_page = ERROR_PAGE;
-			if(!empty($error_page)){
-				redirect($error_page);
-			} else{
-				if(SHOW_ERROR_MSG){
-					$e['message'] = is_array($error)? $error['message'] : $error;
-				} else{
-					$e['message'] = ERROR_MESSAGE;
-				}
-			}
+			ob_end_clean();
+			ContentReplace($content);
+			echo $content;
 		}
-		// 包含异常页面模板
+		*/
+		$file = $trace[1]['file'];
+		$line = $trace[1]['line'];
+
 		require TMPL_EXCEPTION_FILE;
+
+		ob_flush();
+		SPT();
 		exit;
 	}
 }

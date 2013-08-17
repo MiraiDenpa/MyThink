@@ -189,7 +189,7 @@ class Http {
      * @return string
      */
     static function getHeaderInfo($header='',$echo=true) {
-        ob_start();
+		$ob = new OutpuBuffer();
         $headers   	= getallheaders();
         if(!empty($header)) {
             $info 	= $headers[$header];
@@ -199,7 +199,7 @@ class Http {
                 echo("$key:$val\n");
             }
         }
-        $output 	= ob_get_clean();
+        $output 	= $ob->get();
         if ($echo) {
             echo (nl2br($output));
         }else {

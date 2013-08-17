@@ -77,7 +77,7 @@ class Cache {
      */
     static function getInstance() {
        $param = func_get_args();
-        return ThinkInstance::get(__CLASS__,'connect',$param);
+        return ThinkInstance::instance(__CLASS__,'connect',$param);
     }
 
     /**

@@ -46,7 +46,7 @@ abstract class Action {
     public function __construct() {
         tag('action_begin',$this->config);
         //实例化视图类
-        $this->view     = ThinkInstance::get('View');           
+        $this->view     = ThinkInstance::View();           
         //控制器初始化
         if(method_exists($this,'_initialize'))
             $this->_initialize();
@@ -249,7 +249,7 @@ abstract class Action {
                 case '_server'  :   $input =& $_SERVER;    break;
                 case '_globals' :   $input =& $GLOBALS;    break;
                 default:
-                    throw_exception(__CLASS__.':'.$method.L('_METHOD_NOT_EXIST_'));
+                    Think::halt(__CLASS__.':'.$method.LANG_METHOD_NOT_EXIST);
             }
             if(!isset($args[0])) { // 获取全局变量
                 $data       =   $input; // 由VAR_FILTERS配置进行过滤
