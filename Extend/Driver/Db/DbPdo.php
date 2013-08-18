@@ -237,7 +237,7 @@ class DbPdo extends Db{
 	 */
 	public function getFields($tableName){
 		$this->initConnect(true);
-		if(DB_DESCRIBE_TABLE_SQL){
+		if(defined('DB_DESCRIBE_TABLE_SQL')){
 			// 定义特殊的字段查询SQL
 			$sql = str_replace('%table%', $tableName, DB_DESCRIBE_TABLE_SQL);
 		} else{
@@ -281,9 +281,9 @@ class DbPdo extends Db{
 	 * @access public
 	 */
 	public function getTables($dbName = ''){
-		if(DB_FETCH_TABLES_SQL){
+		if(defined('DB_FETCH_TABLES_SQL')){
 			// 定义特殊的表查询SQL
-			$sql = str_replace('%db%', $dnName, DB_FETCH_TABLES_SQL);
+			$sql = str_replace('%db%', $dbName, DB_FETCH_TABLES_SQL);
 		} else{
 			switch($this->dbType){
 			case 'ORACLE':
@@ -296,10 +296,6 @@ class DbPdo extends Db{
 				break;
 			case 'PGSQL':
 				$sql = "select tablename as Tables_in_test from pg_tables where  schemaname ='public'";
-				break;
-			case 'IBASE':
-				// 暂时不支持
-				throw_exception(L('_NOT_SUPPORT_DB_') . ':IBASE');
 				break;
 			case 'SQLITE':
 				$sql = "SELECT name FROM sqlite_master WHERE type='table' " .
