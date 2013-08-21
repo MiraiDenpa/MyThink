@@ -11,17 +11,19 @@
  * @return void
  */
 function _404($msg = '', $url = ''){
-	APP_DEBUG && throw_exception($msg);
+	// <DEBUG>
+	throw_exception($msg);
+	// </DEBUG>
 	if($msg && LOG_EXCEPTION_RECORD){
 		Log::write($msg);
 	}
 	if(empty($url) && URL_404_REDIRECT){
 		$url = URL_404_REDIRECT;
 	}
+	http_response_code(404);
 	if($url){
 		redirect($url);
 	} else{
-		send_http_status(404);
 		exit;
 	}
 }

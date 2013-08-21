@@ -6,12 +6,18 @@
  *
  * @return string
  */
-function StandardHeader($title = 'test'){
-	$ret = '<!DOCTYPE html><head><title>'.$title.'</title></head><body style="font-family: Helvetica Neue, Helvetica, Arial, sans-serif;">';
-	return $ret;
-}
-
-function StandardFooter(){
-	$ret = '';
-	return $ret;
+function StandardHeader(){
+	$head = '';
+	$head .= HTML::importFile(searchPublic('bootstrap.css'));
+	$head .= HTML::css(PUBLIC_URL.'/artDialog/skins/<?php echo art_skin();?>.css');
+	
+	$head .= HTML::importFile(searchPublic('jquery.js'));
+	$head .= HTML::importFile(searchPublic('bootstrap.js'));
+	$head .= HTML::importFile(searchPublic('jquery.artDialog.js'));
+	$head .= HTML::importFile(searchPublic('artDialog.plugins.js'));
+	if(APP_DEBUG){
+		$head .= HTML::importFile(searchPublic('less.js'));
+	}
+	
+	return $head;
 }

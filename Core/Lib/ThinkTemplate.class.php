@@ -35,46 +35,14 @@ class  ThinkTemplate{
 	 * @access public
 	 */
 	public function __construct(){
-		$this->config['template_suffix'] = '/html';
-		$this->config['cache_suffix']    = '.php';
+		$this->config['template_suffix'] = '.html';
+		$this->config['cache_suffix']    = TMPL_CACHFILE_SUFFIX;
 		$this->config['cache_path']      = CACHE_PATH;
-		$this->config['taglib_begin']    = $this->stripPreg('<');
-		$this->config['taglib_end']      = $this->stripPreg('>');
-		$this->config['tmpl_begin']      = $this->stripPreg('{');
-		$this->config['tmpl_end']        = $this->stripPreg('}');
+		$this->config['taglib_begin']    = '<';
+		$this->config['taglib_end']      = '>';
+		$this->config['tmpl_begin']      = '\\{';
+		$this->config['tmpl_end']        = '\\}';
 		$this->config['layout_item']     = TMPL_LAYOUT_ITEM;
-	}
-
-	private function stripPreg($str){
-		return str_replace([
-						   '{',
-						   '}',
-						   '(',
-						   ')',
-						   '|',
-						   '[',
-						   ']',
-						   '-',
-						   '+',
-						   '*',
-						   '.',
-						   '^',
-						   '?'
-						   ], [
-							  '\{',
-							  '\}',
-							  '\(',
-							  '\)',
-							  '\|',
-							  '\[',
-							  '\]',
-							  '\-',
-							  '\+',
-							  '\*',
-							  '\.',
-							  '\^',
-							  '\?'
-							  ], $str);
 	}
 
 	// 模板变量获取和设置
@@ -120,25 +88,14 @@ class  ThinkTemplate{
 	 * @throws ThinkExecption
 	 */
 	public function loadTemplate($tmplTemplateFile, $prefix = ''){
-		if(is_file($tmplTemplateFile)){
-			$this->templateFile = $tmplTemplateFile;
-			// 读取模板文件内容
-			$tmplContent = file_get_contents($tmplTemplateFile);
-		} else{
-			$tmplContent = $tmplTemplateFile;
-		}
+		$this->templateFile = $tmplTemplateFile;
+		// 读取模板文件内容
+		$tmplContent = file_get_contents($tmplTemplateFile);
+			
 		// 根据模版文件名定位缓存文件
-		$tmplCacheFile = $this->config['cache_path'] . $prefix . md5($tmplTemplateFile) . $this->config['cache_suffix'];
+		$tmplCacheFile =
+				$this->config['cache_path'] . $prefix . md5($tmplTemplateFile) . $this->config['cache_suffix'];
 
-		// 判断是否启用布局
-		if($this->config['layout']){
-			if(false !== strpos($tmplContent, '{__NOLAYOUT__}')){ // 可以单独定义不使用布局
-				$tmplContent = str_replace('{__NOLAYOUT__}', '', $tmplContent);
-			} else{ // 替换布局的主体内容
-				$layoutFile  = THEME_PATH . $this->config['layout'] . $this->config['template_suffix'];
-				$tmplContent = str_replace($this->config['layout_item'], $tmplContent, file_get_contents($layoutFile));
-			}
-		}
 		// 编译模板内容
 		$tmplContent = $this->compiler($tmplContent);
 		// 检测模板目录
@@ -146,7 +103,7 @@ class  ThinkTemplate{
 		if(!is_dir($dir)){
 			mkdir($dir, 0755, true);
 		}
-		//重写Cache文件
+		// 写Cache文件
 		if(false === file_put_contents($tmplCacheFile, trim($tmplContent))){
 			throw_exception(LANG_CACHE_WRITE_ERROR . ':' . $tmplCacheFile);
 		}
@@ -163,22 +120,21 @@ class  ThinkTemplate{
 	 * @return string
 	 */
 	protected function compiler($tmplContent){
-		//模板解析
+		// 模板解析
 		$tmplContent = $this->parse($tmplContent);
 		// 还原被替换的Literal标签
-		$tmplContent = preg_replace('/<!--###literal(\d+)###-->/eis', "\$this->restoreLiteral('\\1')", $tmplContent);
+		$tmplContent = preg_replace_callback('/<!--###literal(\d+)###-->/is', function ($mats){
+			return $this->restoreLiteral($mats[1]);
+		}, $tmplContent);
 		// 添加安全代码
 		$tmplContent = '<?php if (!defined(\'THINK_PATH\')) exit();?>' . $tmplContent;
-		if(!TMPL_DEBUG){
-			/* 去除html空格与换行 */
-			$find        = array('~>\s+<~', '~>(\s+\n|\r)~');
-			$replace     = array('><', '>');
-			$tmplContent = preg_replace($find, $replace, $tmplContent);
+		if(strpos($tmplContent,'<!DOCTYPE html>') !== false){
+			$tmplContent = html_whitespace($tmplContent);
 		}
 		// 优化生成的php代码
 		$tmplContent = str_replace('?><?php', '', $tmplContent);
-		
-		return TMPL_DEBUG? $tmplContent: strip_whitespace($tmplContent);
+
+		return APP_DEBUG? normalize_code($tmplContent) : strip_whitespace($tmplContent);
 	}
 
 	/**
@@ -191,6 +147,7 @@ class  ThinkTemplate{
 	 * @return string
 	 */
 	public function parse($content){
+		N('template_parse', 1);
 		// 内容为空不解析
 		if(empty($content)){
 			return '';
@@ -202,8 +159,10 @@ class  ThinkTemplate{
 		// 检查PHP语法
 		$content = $this->parsePhp($content);
 		// 首先替换literal标签内容
-		$content = preg_replace('/' . $begin . 'literal' . $end . '(.*?)' . $begin . '\/literal' . $end .
-								'/eis', "\$this->parseLiteral('\\1')", $content);
+		$content = preg_replace_callback('/' . $begin . 'literal' . $end . '(.*?)' . $begin . '\/literal' . $end .
+										 '/is', function ($mats){
+			return $this->parseLiteral($mats[1]);
+		}, $content);
 
 		// 获取需要引入的标签库列表
 		// 标签库只需要定义一次，允许引入多个一次
@@ -229,41 +188,54 @@ class  ThinkTemplate{
 			$this->parseTagLib($tag, $content, true);
 		}
 		//解析普通模板标签 {tagName}
-		$content = preg_replace('/(' . $this->config['tmpl_begin'] . ')([^\d\s' . $this->config['tmpl_begin'] .
-								$this->config['tmpl_end'] . '].+?)(' . $this->config['tmpl_end'] .
-								')/eis', "\$this->parseTag('\\2')", $content);
+		$content = preg_replace_callback('/(' . $this->config['tmpl_begin'] . ')([^\d\s' .
+										 $this->config['tmpl_begin'] . $this->config['tmpl_end'] . '].+?)(' .
+										 $this->config['tmpl_end'] . ')/is', function ($mats){
+			return $this->parseTag($mats[2]);
+		}, $content);
+
+		// 替换特殊标志符号 如 {__HEADER__} 
+		$content = preg_replace_callback('/\{__([A-Z0-9]+)__\}/', function ($mats){
+			$method = 'Compile' . ucfirst(strtolower($mats[1]));
+
+			return $method();
+		}, $content);
 
 		return $content;
 	}
 
 	// 检查PHP语法
 	protected function parsePhp($content){
-		if(ini_get('short_open_tag')){
-			// 开启短标签的情况要将<?标签用echo方式输出 否则无法正常输出xml标识
-			$content = preg_replace('/(<\?(?!php|=|$))/i', '<?php echo \'\\1\'; ?>' . "\n", $content);
-		}
-		return $content;
+		return str_replace('<?=', '<?php echo ', $content);
 	}
 
 	// 解析模板中的布局标签
 	protected function parseLayout($content){
 		// 读取模板中的布局标签
-		$find = preg_match('/' . $this->config['taglib_begin'] . 'layout\s(.+?)\s*?\/' . $this->config['taglib_end'] .
+		$find = preg_match('/' . $this->config['taglib_begin'] . 'layout\s(.+?)\s*?' . $this->config['taglib_end'] .
+						   '(.*)' . $this->config['taglib_begin'] . '\/layout' . $this->config['taglib_end'] .
 						   '/is', $content, $matches);
 		if($find){
 			//替换Layout标签
 			$content = str_replace($matches[0], '', $content);
 			//解析Layout标签
 			$array = $this->parseXmlAttrs($matches[1]);
-			if(!LAYOUT_ON || LAYOUT_NAME != $array['name']){
-				// 读取布局模板
-				$layoutFile = THEME_PATH . $array['name'] . $this->config['template_suffix'];
-				$replace    = isset($array['replace'])? $array['replace'] : $this->config['layout_item'];
-				// 替换布局的主体内容
-				$content = str_replace($replace, $content, file_get_contents($layoutFile));
+			// 读取布局模板
+			if($array['name']{0} == '!'){
+				$layoutFile = BASE_TMPL_PATH . substr($array['name'], 1) . $this->config['template_suffix'];
+			} elseif($array['name']{0} == ':'){
+				$layoutFile =
+						TMPL_PATH . ACTION_NAME . '/' . substr($array['name'], 1) . $this->config['template_suffix'];
+			} else{
+				$layoutFile = TMPL_PATH . $array['name'] . $this->config['template_suffix'];
 			}
-		} else{
-			$content = str_replace('{__NOLAYOUT__}', '', $content);
+			if(!is_file($layoutFile)){
+				throw_exception(LANG_TEMPLATE_NOT_EXIST . '(layout)[' . $layoutFile . ']');
+			}
+			$replace = isset($array['replace'])? $array['replace'] : $this->config['layout_item'];
+			// 替换布局的主体内容
+			$prepend = empty($matches[2])? '' : '<?php ' . $matches[2] . ' ?>';
+			$content = str_replace($replace, $content, $prepend . file_get_contents($layoutFile));
 		}
 
 		return $content;
@@ -301,17 +273,23 @@ class  ThinkTemplate{
 			//替换extend标签
 			$content = str_replace($matches[0], '', $content);
 			// 记录页面中的block标签
-			preg_replace('/' . $begin . 'block\sname=(.+?)\s*?' . $end . '(.*?)' . $begin . '\/block' . $end .
-						 '/eis', "\$this->parseBlock('\\1','\\2')", $content);
+			preg_replace_callback('/' . $begin . 'block\sname=(.+?)\s*?' . $end . '(.*?)' . $begin . '\/block' .
+								  $end . '/is', function ($mats){
+				return $this->parseBlock($mats[1], $mats[2]);
+			}, $content);
 			// 读取继承模板
 			$array   = $this->parseXmlAttrs($matches[1]);
 			$content = $this->parseTemplateName($array['name']);
 			// 替换block标签
-			$content = preg_replace('/' . $begin . 'block\sname=(.+?)\s*?' . $end . '(.*?)' . $begin . '\/block' .
-									$end . '/eis', "\$this->replaceBlock('\\1','\\2')", $content);
+			$content = preg_replace_callback('/' . $begin . 'block\sname=(.+?)\s*?' . $end . '(.*?)' . $begin .
+											 '\/block' . $end . '/is', function ($mats){
+				return $this->replaceBlock($mats[1], $mats[2]);
+			}, $content);
 		} else{
-			$content = preg_replace('/' . $begin . 'block\sname=(.+?)\s*?' . $end . '(.*?)' . $begin . '\/block' .
-									$end . '/eis', "stripslashes('\\2')", $content);
+			$content = preg_replace_callback('/' . $begin . 'block\sname=(.+?)\s*?' . $end . '(.*?)' . $begin .
+											 '\/block' . $end . '/is', function ($mats){
+				return stripslashes($mats[2]);
+			}, $content);
 		}
 
 		return $content;
@@ -416,8 +394,8 @@ class  ThinkTemplate{
 	 */
 	public function getIncludeTagLib(& $content){
 		//搜索是否有TagLib标签
-		$find = preg_match('/' . $this->config['taglib_begin'] . 'taglib\s(.+?)(\s*?)\/' . $this->config['taglib_end'] .
-						   '\W/is', $content, $matches);
+		$find = preg_match('/' . $this->config['taglib_begin'] . 'taglib\s(.+?)(\s*?)\/' .
+						   $this->config['taglib_end'] . '\W/is', $content, $matches);
 		if($find){
 			//替换TagLib标签
 			$content = str_replace($matches[0], '', $content);
@@ -440,10 +418,9 @@ class  ThinkTemplate{
 	 * @return string
 	 */
 	public function parseTagLib($tagLib, &$content, $hide = false){
-		$begin     = $this->config['taglib_begin'];
-		$end       = $this->config['taglib_end'];
-		$className = 'TagLib' . ucwords($tagLib);
-		$tLib      = ThinkInstance::instance($className);
+		$begin = $this->config['taglib_begin'];
+		$end   = $this->config['taglib_end'];
+		$tLib  = ThinkInstance::TagLib($tagLib);
 		foreach($tLib->getTags() as $name => $val){
 			$tags = array($name);
 			if(isset($val['alias'])){ // 别名设置
@@ -460,16 +437,19 @@ class  ThinkTemplate{
 				}
 				$n1 = empty($val['attr'])? '(\s*?)' : '\s([^' . $end . ']*)';
 				if(!$closeTag){
-					$patterns    = '/' . $begin . $parseTag . $n1 . '\/(\s*?)' . $end . '/eis';
-					$replacement = "\$this->parseXmlTag('$tagLib','$tag','$1','')";
-					$content     = preg_replace($patterns, $replacement, $content);
+					$patterns = '/' . $begin . $parseTag . $n1 . '\/(\s*?)' . $end . '/is';
+					$content  = preg_replace_callback($patterns, function ($mats) use ($tagLib, $tag){
+						return $this->parseXmlTag($tagLib, $tag, $mats[1], '');
+					}, $content);
 				} else{
 					$patterns    =
 							'/' . $begin . $parseTag . $n1 . $end . '(.*?)' . $begin . '\/' . $parseTag . '(\s*?)' .
-							$end . '/eis';
-					$replacement = "\$this->parseXmlTag('$tagLib','$tag','$1','$2')";
+							$end . '/is';
+					$replacement = function ($mats) use ($tagLib, $tag){
+						return $this->parseXmlTag($tagLib, $tag, $mats[1], $mats[2]);
+					};
 					for($i = 0; $i < $level; $i++){
-						$content = preg_replace($patterns, $replacement, $content);
+						$content = preg_replace_callback($patterns, $replacement, $content);
 					}
 				}
 			}
@@ -489,16 +469,16 @@ class  ThinkTemplate{
 	 * @return string|false
 	 */
 	public function parseXmlTag($tagLib, $tag, $attr, $content){
-		//if (MAGIC_QUOTES_GPC) {
 		$attr    = stripslashes($attr);
 		$content = stripslashes($content);
-		//}
-		if(ini_get('magic_quotes_sybase')){
-			$attr = str_replace('\"', '\'', $attr);
-		}
-		$tLib    = ThinkInstance::instance('TagLib' . ucwords(strtolower($tagLib)));
+		
+		$tLib    = ThinkInstance::TagLib($tagLib);
 		$parse   = '_' . $tag;
-		$content = trim($content);
+		$content = ltrim($content,"\n");
+		$content = rtrim($content,"\t");
+		if(\COM\MyThink\Strings::isEndWith($content, "\n")){
+			$content = substr($content, 0, -1);
+		}
 
 		return $tLib->$parse($attr, $content);
 	}
@@ -727,10 +707,10 @@ class  ThinkTemplate{
 				$parseStr = "'" . $this->templateFile . "'"; //'C("TEMPLATE_NAME")';
 				break;
 			case 'LDELIM':
-				$parseStr = 'C("TMPL_L_DELIM")';
+				$parseStr = 'TMPL_L_DELIM';
 				break;
 			case 'RDELIM':
-				$parseStr = 'C("TMPL_R_DELIM")';
+				$parseStr = 'TMPL_R_DELIM';
 				break;
 			default:
 				if(defined($vars[1])){
@@ -784,9 +764,8 @@ class  ThinkTemplate{
 				if(strpos($templateName, '@')){
 					list($group, $templateName) = explode('@', $templateName);
 					if(1 == APP_GROUP_MODE){
-						$basePath =
-								dirname(BASE_LIB_PATH) . '/' . $group . '/' . basename(TMPL_PATH) . '/' . (THEME_NAME?
-										THEME_NAME . '/' : '');
+						$basePath = dirname(BASE_LIB_PATH) . '/' . $group . '/' . basename(TMPL_PATH) .
+									'/' . (THEME_NAME? THEME_NAME . '/' : '');
 					} else{
 						$basePath = TMPL_PATH . '/' . $group . '/' . (THEME_NAME? THEME_NAME . '/' : '');
 					}

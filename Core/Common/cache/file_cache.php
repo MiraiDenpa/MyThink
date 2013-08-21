@@ -9,7 +9,8 @@
 function F($name, $value='', $path=DATA_PATH) {
 	static $_cache  = array();
 	$filename       = $path . $name . '.php';
-	if ('' !== $value) {
+	if (func_num_args()==1) {
+		N('cache_write_file', 1);
 		if (is_null($value)) {
 			// 删除缓存
 			return false !== strpos($name,'*')?array_map("unlink", glob($filename)):unlink($filename);
@@ -23,6 +24,8 @@ function F($name, $value='', $path=DATA_PATH) {
 			return file_put_contents($filename, strip_whitespace("<?php\treturn " . var_export($value, true) . ";?>"));
 		}
 	}
+	
+	N('cache_read_file', 1);
 	if (isset($_cache[$name]))
 		return $_cache[$name];
 	// 获取缓存数据

@@ -1,11 +1,24 @@
+<!DOCTYPE html>
+<head>
 <?php
-echo StandardHeader();
-if(is_array($msg)){
+$head = '';
+$head .= HTML::importFile(searchPublic('bootstrap.css'));
+$head .= HTML::css(PUBLIC_URL.'/artDialog/skins/'.art_skin().'.css');
+
+$head .= HTML::importFile(searchPublic('jquery.js'));
+$head .= HTML::importFile(searchPublic('bootstrap.js'));
+$head .= HTML::importFile(searchPublic('jquery.artDialog.js'));
+$head .= HTML::importFile(searchPublic('artDialog.plugins.js'));
+
+echo $head;
+
+if(is_array($msg)){ // old-fix
 	$trace[] = $msg;
 	extract($msg, EXTR_OVERWRITE);
 	$msg = $message;
 }
 ?>
+</head>
 <body>
 <div class="container">
 	<div class="hero-unit fixed" style="margin-top:180px;">
@@ -21,8 +34,7 @@ if(is_array($msg)){
 			</thead>
 			<?php
 			foreach($trace as $k => $item){
-				$args = [];
-				echo '<tr><td>';
+				echo '<tr><td style="vertical-align: top;">';
 				if(isset($item['file'])){
 					echo '<a href=\'' . xdebug_filepath($item['file'], isset($item['line'])? $item['line'] : 0) . '\'>';
 					echo $item['file'];
@@ -35,14 +47,21 @@ if(is_array($msg)){
 
 				echo '</td><td style="text-align: right;">';
 				echo isset($item['type'])? $item['class'] . $item['type'] . $item['function'] : $item['function'];
-				echo '(<a href="#' . $k . '">...</a>)<div style="display: none;text-align: left;">';
-				if(isset($item['args'])){
-					foreach($item['args'] as $argi){
-						$args[] = htmlspecialchars($argi);
-					}
+				echo '(';
+				if(!empty($item['args'])){
+					echo '<a href="javascript: void(0);" onclick="$(this).next().slideToggle()">...</a>';
 				}
-				echo implode("\n", $args);
-				echo '</div></tr></td>';
+				echo ')<div style="display: none;text-align: left;">';
+				if(!empty($item['args'])){
+					$args = [];
+					foreach($item['args'] as $argi){
+						$args[] = htmlspecialchars(dump_some($argi));
+					}
+					echo '<pre>';
+					echo implode("\n", $args);
+					echo '</pre>';
+				}
+				echo '</div></td></tr>';
 			}
 
 			?>
@@ -53,6 +72,3 @@ if(is_array($msg)){
 	</div>
 </div>
 </body>
-<?php
-echo StandardFooter();
-?>

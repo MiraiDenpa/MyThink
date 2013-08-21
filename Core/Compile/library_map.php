@@ -23,9 +23,9 @@ while($provider = $lib->read()){
 			if(!is_file($category_dir . $file)){
 				continue;
 			}
-			$name = str_replace('.class.php', '', $file);
+			$name = str_replace(['.class.php','.php'], ['',''], $file);
 
-			$map[strtolower("$provider\\$category\\$name")] = $provider_dir . $file;
+			$map["$provider\\$category\\$name"] = $category_dir . $file;
 		}
 		$lib_c->close();
 		// 具体文件（如Page.class.php）层 END

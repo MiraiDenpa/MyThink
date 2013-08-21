@@ -27,7 +27,7 @@ class Debug {
      */
     static public function mark($name) {
         self::$marker['time'][$name]  =  microtime(TRUE);
-        if(MEMORY_LIMIT_ON) {
+        if(MEMORY_DEBUG) {
             self::$marker['mem'][$name] = memory_get_usage();
             self::$marker['peak'][$name] = function_exists('memory_get_peak_usage')?memory_get_peak_usage(): self::$marker['mem'][$name];
         }
@@ -57,7 +57,7 @@ class Debug {
      * @return integer
      */
     static public function useMemory($start,$end) {
-        if(!MEMORY_LIMIT_ON)
+        if(!MEMORY_DEBUG)
             return '';
         if ( ! isset(self::$marker['mem'][$start]))
             return '';
@@ -74,7 +74,7 @@ class Debug {
      * @return integer
      */
     static function getMemPeak($start,$end) {
-        if(!MEMORY_LIMIT_ON)
+        if(!MEMORY_DEBUG)
             return '';
         if ( ! isset(self::$marker['peak'][$start]))
             return '';

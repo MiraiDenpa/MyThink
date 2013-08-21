@@ -1,4 +1,6 @@
 <?php
+$ret = [];
+	
 // 全部显示
 $ret['LOG_LEVEL'] = 'INFO,EMERG,CRIT,ALERT|ERR|WARN|NOTIC,DEBUG,SQL,CURL,CACHE';
 // 调试的时候不要写入磁盘

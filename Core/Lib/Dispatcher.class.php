@@ -87,17 +87,25 @@ class Dispatcher{
 			return array();
 		}
 
-		$ret               = $_GET;
-		$array             = explode(URL_PATHINFO_DEPR, $path_info);
-		$this->action_name = array_shift($array);
-		$this->method_name = array_shift($array);
+		$ret   = $_GET;
+		$array = explode(URL_PATHINFO_DEPR, $path_info);
+		if(!empty($array)){
+			$this->action_name = array_shift($array);
+		}
+		if(!empty($array)){
+			$this->method_name = array_shift($array);
+		}
 
 		$urlRule = hidef_fetch('url_rule');
 
 		if(isset($urlRule[$this->action_name][$this->method_name])){
 			foreach($urlRule[$this->action_name][$this->method_name] as $key => $value){
 				$ret[$value] = $array[$key];
+				unset($array[$key]);
 			}
+		}
+		if(!empty($array)){
+			return false;
 		}
 
 		return $ret;

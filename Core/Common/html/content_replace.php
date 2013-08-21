@@ -17,8 +17,11 @@
  * @return mixed
  */
 function ContentReplace($content){
+	/*if(!defined('ACTION_NAME')){
+		return;
+	}*/
 	if(defined('IS_AJAX') && IS_AJAX){
-		return $content;
+		return;
 	}
 	// 系统默认的特殊变量替换
 	$replace = array(

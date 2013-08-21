@@ -4,7 +4,7 @@
 <div id="think_page_trace">
 	<div id="think_page_trace_sizeable"></div>
 	<div id="think_page_trace_tab">
-		<ul>
+		<ul class="nav nav-tabs">
 			<?php foreach($debug as $level => $log){ ?>
 				<li data-level="<?php echo $level; ?>">
 					<a href="javascript:void(0);"><?php echo $level; ?></a>
@@ -15,19 +15,16 @@
 			</li>
 		</ul>
 	</div>
-	<hr style="margin-top: 0;"/>
 	<div id="think_page_trace_content">
 		<?php foreach($debug as $level => $log){
-			echo '<ul class="tab_' . $level . '">';
-			foreach($log as $label => $message){
-				?>
-				<li>
-					<span><?php echo $label; ?></span>&nbsp;:&nbsp;
-					<span><?php echo $message; ?></span>
-				</li>
-			<?php
+			echo '<table class="table table-hover table-condensed tab tab_' . $level . '"><tbody>';
+			foreach($log as $message){
+				echo "\n<tr>\n";
+				echo "\t<td>".($message[0])."</td>\n";
+				echo "\t<td style=\"width: 100%;\">".nl2br($message[1])."</td>\n";
+				echo "</tr>\n";
 			}
-			echo '</ul>';
+			echo "</tbody></table>\n";
 		} ?>
 	</div>
 </div>
@@ -60,6 +57,7 @@
 			$('#think_page_trace_close').click(function (){
 				cnt.hide();
 				open.show();
+				return false;
 			});
 
 			function resize_trace(e){
@@ -75,12 +73,15 @@
 				});
 			});
 
-			var ul = $('#think_page_trace_content ul');
-			$('#think_page_trace_tab>ul>li').click(function (){
+			var ul = $('#think_page_trace_content .tab');
+			var tab_buttons = $('#think_page_trace_tab>ul>li').click(function (){
+				tab_buttons.removeClass('active');
+				$(this).addClass('active');
 				var tab = '.tab_' + $(this).data('level');
 				ul.hide();
-				ul.filter(tab).show()
+				ul.filter(tab).show();
 			});
+			tab_buttons.first().click();;
 		} catch(e){
 			alert('ThinkPageTrace Error [later init error]: \n' + e.toString());
 			console.error(e);
@@ -132,16 +133,6 @@
 		cursor: ns-resize;
 	}
 
-	#think_page_trace_tab ul {
-		list-style: none;
-		padding: 0;
-		margin: 4px;
-	}
-
-	#think_page_trace_tab li {
-		display: inline;
-	}
-
 	#think_page_trace_content ul {
 		list-style: none;
 		padding: 0;
@@ -151,5 +142,15 @@
 
 	#think_page_trace_content li {
 		border-bottom: black 1px solid;
+	}
+	#think_page_trace_content .tab{
+		width: 100%;
+		font-size: 12px;
+	}
+	#think_page_trace_content .tab td{
+		padding: 2px;
+	}
+	#think_page_trace_content .tab td:last-child{
+		-webkit-user-select: all;
 	}
 </style>

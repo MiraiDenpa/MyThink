@@ -9,6 +9,7 @@ class ThinkInstance{
 	protected static $ACTION = array();
 	protected static $MODEL = array();
 	protected static $VIEW = array();
+	protected static $TAGLIB = array();
 
 	/**
 	 * 取得对象实例 支持调用类的静态方法
@@ -54,13 +55,13 @@ class ThinkInstance{
 		}
 		$class = $name . 'Model';
 
-		/*vvv debug vvv*/
-		/*if(!class_exists($class, false)){
+		/* <DEBUG>
+		if(!class_exists($class, false)){
 			echo "[$class] 模型文件加载成功，但没有定义正确的类型 -- 名称不符？";
 			SPT();
-		}*/
-		/*^^^ debug ^^^*/
-		
+		}
+		</DEBUG>*/
+
 		return self::$MODEL[$name] = new $class($arg1, $arg2);
 	}
 
@@ -139,6 +140,24 @@ class ThinkInstance{
 				self::$VIEW[$id] = new View();
 			}
 		}
+	}
+
+	public static function ThinkTemplate(){
+		static $cache = null;
+		if($cache){
+			return $cache;
+		}
+
+		return $cache = new ThinkTemplate();
+	}
+
+	public static function TagLib($tagLib){
+		$class = 'TagLib' . ucwords($tagLib);
+		if(isset(self::$TAGLIB[$class])){
+			return self::$TAGLIB[$class];
+		}
+
+		return self::$TAGLIB[$class] = new $class;
 	}
 }
 

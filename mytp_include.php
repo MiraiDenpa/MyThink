@@ -12,5 +12,3 @@ defined('ROOT_URL')    or define('ROOT_URL', '/'); //
 defined('RUNTIME_PATH')    or define('RUNTIME_PATH', sys_get_temp_dir().'/'.APP_NAME.'/');
 
 include THINK_PATH . 'MyThinkCompile.php';
-
-

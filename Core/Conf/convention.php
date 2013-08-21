@@ -66,10 +66,9 @@ return array(
 	'DATA_CACHE_CHECK'      => false,
 	// 数据缓存是否校验缓存
 	'DATA_CACHE_PREFIX'     => '',
+	'DEFAULT_CHARSET'       => 'utf-8',
 	// 缓存前缀
-	'DATA_CACHE_TYPE'       => 'Memcached',
-	// 数据缓存类型,支持:File|Db|Apc|Memcache|Shmop|Sqlite|Xcache|Apachenote|Eaccelerator
-
+	'MEMCACHE_CONNECT'      => 'localhost:11211',
 	/* 日志设置 */
 	'LOG_RECORD'            => false,
 	// 默认不记录日志
@@ -98,11 +97,18 @@ return array(
 	// 异常页面的模板文件
 	'TMPL_TEMPLATE_SUFFIX'  => '.html',
 	// 默认模板文件后缀
-	'TMPL_FILE_DEPR'        => '_',
+	'TMPL_FILE_DEPR'        => '/',
+	'TMPL_CACHFILE_SUFFIX'  => '.php', // 默认模板缓存后缀
+	'TMPL_DENY_FUNC_LIST'   => 'echo,exit', // 模板引擎禁用函数
+	'TMPL_VAR_IDENTIFY'     => 'array', // 模板变量识别。留空自动判断,参数为'obj'则表示对象
+	'TMPL_STRIP_SPACE'      => true, // 是否去除模板文件里面的html空格与换行
+	'TMPL_LAYOUT_ITEM'      => '{__CONTENT__}', // 布局模板的内容替换标识
+	'TMPL_CACHE_ON'         => true, // 是否开启模板编译缓存,设为false则每次都会重新编译
+	'TMPL_CACHE_TIME'       => 0, // 模板缓存有效期 0 为永久，(以数字为值，单位:秒)
+	'LAYOUT_NAME'           => 'layout', // 当前布局名称 默认为layout
 	//模板文件MODULE_NAME与ACTION_NAME之间的分割符
-	'TAGLIB_PRE_LOAD' => '',
-	'TAGLIB_BUILD_IN' => '',
-	
+	'TAGLIB_PRE_LOAD'       => '',
+	'TAGLIB_BUILD_IN'       => 'cx,phpml,header',
 	/* URL设置 */
 	'DEFAULT_EXTENSION'     => 'html',
 	// 默认返回格式
@@ -118,7 +124,5 @@ return array(
 	'HTTP_CACHE_CONTROL'    => 'private',
 	// 网页缓存控制
 
-	'SHOW_PAGE_TRACE'       => TRACE_DEBUG,
-	'TRACE_LOG'             => !APP_DEBUG,
 	'PAGE_TRACE_SAVE'       => !APP_DEBUG,
 );

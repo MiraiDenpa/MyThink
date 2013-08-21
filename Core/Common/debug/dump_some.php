@@ -1,25 +1,52 @@
 <?php
 /**
- * 
  *
- * @param     $val
- * @param int $length
+ * 可以在ob回调函数中使用
+ *
+ * @param mixed $val
+ * @param int   $length 正数结果结果
  *
  * @return string
  */
-function dump_some($val, $length = 180){
+function dump_some($val, $length = 160){
+	static $level = 0;
+	$level++;
+	if($length && $level > 3){
+		return '#[LOOP]#';
+	}
 	switch(gettype($val)){
 	case 'boolean':
-		return 'boolean('.($val?'true':'false').')';
+		$ret = 'boolean(' . ($val? 'true' : 'false') . ')';
+		break;
 	case 'string':
-		return '"'.mb_strcut($val, 0, $length, 'UTF-8').'..."';
+		if($length){
+			$ret = '"' . mb_strcut($val, 0, $length, 'UTF-8') . '..."';
+		} else{
+			$ret = '"' . $val . '"';
+		}
+		break;
 	case 'array':
-		$e = @var_export($val,true);
-		$e = str_replace("\n", '', $e);
-		return '['.count($val).'#'.mb_strcut($e, 0, $length, 'UTF-8').'...]';
+		$new_arr = [];
+		foreach($val as $k => $v){
+			$new_arr[$k] = dump_some($v, $length);
+		}
+		$ret = '['.dbl_implode(',',':',$new_arr);
+		if($length){
+			$ret = mb_strcut($ret, 0, $length, 'UTF-8') . '...('.count($val).')';
+		}
+		$ret .= ']';
+		break;
 	case 'object':
-		return 'object(#'.get_class($val).')';
+		$ret = 'object(#' . get_class($val) . ')';
+		break;
+	case 'NULL':
+		$ret = 'NULL';
+		break;
 	default:
-		return gettype($val).'(...)';
+		$ret = gettype($val) . '(...)';
+		break;
 	}
+
+	$level--;
+	return $ret;
 }

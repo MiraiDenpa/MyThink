@@ -15,7 +15,7 @@ function xdebug_filepath_anchor($file, $line = 0, $name = ''){
 		$name = $file.':'.$line;
 	}
 
-	return "<a href='{$url}'>{$name}</a>";
+	return "&nbsp;<a href='{$url}'>{$name}</a>&nbsp;";
 }
 
 function xdebug_filepath_print_backtrace($arg = 0, $limit = 0){
@@ -27,6 +27,6 @@ function xdebug_filepath_print_backtrace($arg = 0, $limit = 0){
 	$url     = str_replace('%f', '\1', $formart);
 	$url     = str_replace('%l', '\2', $url);
 	
-	echo preg_replace('#\[(.*):(\d*)\]$#m', "<a href='{$url}'>\\0</a>", $content);
+	echo preg_replace('#\[(.*):(\d*)\]$#m', "&nbsp;<a href='{$url}'>\\0</a>", $content);
 }
 

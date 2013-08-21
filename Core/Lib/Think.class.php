@@ -29,6 +29,7 @@ class Think{
 	 * @return void
 	 */
 	static public function start(){
+		trace('程序执行开始，注册处理程序。','','INFO');
 		// 设定错误和异常处理
 		register_shutdown_function(array('Think', 'checkFatalError'));
 		set_error_handler(array('Think', 'appError'));
@@ -36,6 +37,7 @@ class Think{
 		spl_autoload_register(array('Think', 'autoload'));
 
 		self::$main_out_buffer = new OutputBuffer('ContentReplace');
+		self::$main_out_buffer->end_flush = true;
 	}
 
 	/**
@@ -107,7 +109,6 @@ class Think{
 			if(require_one(array(
 								BASE_LIB_PATH . 'TagLib/' . $file,
 								EXTEND_PATH . 'Driver/TagLib/' . $file,
-								CORE_PATH . 'Driver/TagLib/' . $file
 						   ))
 			){
 				return true;
@@ -167,9 +168,8 @@ class Think{
 		case E_USER_WARNING:
 		case E_USER_NOTICE:
 		default:
-			$halt_string =
-					'[' . error_code_to_type_str($errno) . '] ' . $errstr . xdebug_filepath_anchor(basename($errfile).':'.$errline);
-			trace($halt_string, '', 'NOTIC');
+			$halt_string = $errstr .' - '. xdebug_filepath_anchor(basename($errfile).':'.$errline);
+			trace($halt_string, error_code_to_type_str($errno), 'NOTIC');
 			break;
 		}
 	}
@@ -197,7 +197,6 @@ class Think{
 				return;
 			}
 		}
-		ob_flush();
 	}
 
 	/**
@@ -223,21 +222,14 @@ class Think{
 		}
 		$trace   = debug_backtrace();
 		$content = ob_get_contents();
-		/*if(!$content){
-			echo StandardHeader('调试页面');
-		} else{
-			ob_end_clean();
-			ContentReplace($content);
-			echo $content;
-		}
-		*/
+		
 		$file = $trace[1]['file'];
 		$line = $trace[1]['line'];
 
 		require TMPL_EXCEPTION_FILE;
 
+		if(SHOW_TRACE) SPT();
 		ob_flush();
-		SPT();
 		exit;
 	}
 }

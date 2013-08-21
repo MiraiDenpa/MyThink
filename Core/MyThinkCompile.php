@@ -18,6 +18,15 @@ require __DIR__ . '/Compile/hidef.php';
 //  版本信息
 define('THINK_VERSION', '3.1.3g');
 
+// 遗留问题
+define('TMPL_L_DELIM', '{');
+define('TMPL_R_DELIM', '}');
+
+// 待移动定义
+define('STR_TRIM_BOTH', 3);
+define('STR_TRIM_LEFT', 1);
+define('STR_TRIM_RIGHT', 2);
+
 // 路径设置 可在编译入口文件中重新定义 所有路径常量都必须以/ 结尾
 defined('CORE_PATH')    or define('CORE_PATH', THINK_PATH . 'Lib/'); // 系统核心类库目录
 defined('EXTEND_PATH')  or define('EXTEND_PATH', MTP_PATH . 'Extend/'); // 系统扩展目录
@@ -50,9 +59,6 @@ defined('PUBLIC_URL')   or define('PUBLIC_URL', '/Public'); //
 defined('PHP_SELF')     or define('PHP_SELF', 'index.php');
 defined('ENTRY_FILE')   or define('ENTRY_FILE', ROOT_PATH . PHP_SELF);
 
-defined('CORE_DEBUG')   or define('CORE_DEBUG', false);
-defined('MEMORY_LIMIT_ON')   or define('MEMORY_LIMIT_ON', false);
-
 if(!is_dir(LIB_PATH) || !is_dir(CONF_PATH)){
 	echo_line('创建项目目录结构');
 	// 创建项目目录结构
@@ -66,8 +72,8 @@ if(!is_dir(RUNTIME_PATH) || !is_dir(CACHE_PATH)){
 
 /* 开始生成编译文件 */
 $compile = "<?php /* [SIG_GENERATE] */\n";
-if(!ERRORS_DEBUG) $compile .= "ini_set('display_errors', 0);";
 $compile .= "\$GLOBALS['_beginTime'] = microtime(TRUE);\n";
+if(MEMORY_DEBUG) $compile .= "\$GLOBALS['_startUseMems'] = memory_get_usage();\n";
 $compile .= "require(RUNTIME_PATH.'functions.php');\n";
 $compile .= "set_include_path(get_include_path() . PATH_SEPARATOR . VENDOR_PATH);\n";
 
@@ -101,6 +107,8 @@ echo_line('');
 echo_line("配置项目：");
 $config = merge_config(array(
 							'默认配置'                           => THINK_PATH . 'Conf/convention.php',
+							'默认调试配置'                         => APP_DEBUG?
+									THINK_PATH . 'Conf/default_debug.php' : '/not/exist',
 							'全局配置'                           => BASE_CONF_PATH . 'config.php',
 							'全局状态配置（' . APP_STATUS . '.php）' => BASE_CONF_PATH . APP_STATUS . '.php',
 							'项目配置'                           => CONF_PATH . 'config.php',
@@ -117,14 +125,12 @@ foreach($config as $n => $v){
 echo_line('');
 
 echo_line("数据库定义：");
-foreach(array_merge(glob(BASE_CONF_PATH.'db/*.php'),glob(CONF_PATH.'db/*.php')) as $file){
+foreach(array_merge(glob(BASE_CONF_PATH . 'db/*.php'), glob(CONF_PATH . 'db/*.php')) as $file){
 	$define = require $file;
-	echo_line("\t - {$define['dbmsn']}: {$define['hostname']}{$define['dsn']}");
-	hidef_save('ThinkDb'.pathinfo($file, PATHINFO_FILENAME), $define);
+	@echo_line("\t - {$define['dbms']}: {$define['hostname']}{$define['dsn']}");
+	hidef_save('ThinkDb' . pathinfo($file, PATHINFO_FILENAME), $define);
 }
 echo_line('');
-
-
 
 /* 标签回调代码 */
 echo_line('标签回调定义。');
@@ -161,10 +167,17 @@ hidef_save('ThinkDebug', $debug);
 
 /* 结束载入 */
 $compile .= "\n\n";
-$compile .= "require CORE_PATH.'Core/Think.class.php';\n";
+$compile .= "require CORE_PATH.'Think.class.php';\n";
 $compile .= "G('loadTime');// 载入时间\n";
 $compile .= "Think::Start();// 初始化\n";
+if(SHOW_TRACE){
+	$compile .= "ini_set('display_errors', 0);";
+}
+if(MEMORY_DEBUG) $compile .= "\$GLOBALS['_initUseMems'] = memory_get_usage();\n";
 $compile .= "App::run();// 启动应用\n";
+if(SHOW_TRACE){
+	$compile .= "SPT(false); // 页面Trace显示\n";
+}
 
 /* 合并整个函数库 */
 echo_line('合并函数库');
@@ -176,7 +189,7 @@ foreach($list as $file){
 	$flist[] = $file;
 	echo_line("\t - $file");
 }
-if(CORE_DEBUG){
+if(APP_DEBUG){
 	echo_line('调试模式！');
 	$funcLib = "foreach(" . var_export($flist, true) . " as \$file){\n\trequire_once \$file;\n}\n";
 	file_put_contents(RUNTIME_PATH . 'functions.php', '<?php ' . $funcLib);
@@ -203,7 +216,8 @@ echo_line('载入全局定义。');
 $GLOBALS['URL_MAP'] = require BASE_CONF_PATH . 'urlmap.php';
 if(is_file(BASE_CONF_PATH . 'urlmap-' . APP_STATUS . '.php')){
 	echo_line('载入状态定义。');
-	$GLOBALS['URL_MAP'] = array_merge($GLOBALS['URL_MAP'], require(BASE_CONF_PATH . 'urlmap-' . APP_STATUS . '.php'));
+	$GLOBALS['URL_MAP'] = array_merge($GLOBALS['URL_MAP'], require(BASE_CONF_PATH . 'urlmap-' . APP_STATUS .
+																   '.php'));
 }
 foreach($GLOBALS['URL_MAP'] as $app => $url){
 	echo_line("\t$app \t -> $url");
