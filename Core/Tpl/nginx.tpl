@@ -49,6 +49,6 @@ server{
 	error_page 404 /Error/http/404.html;
 	error_page 400 /Error/http/400.html;
 	
-	error_log <?php echo LOG_PATH; ?>error.log;
-	access_log <?php echo LOG_PATH; ?>access.log main;
+	error_log <?php echo LOG_PATH; ?>ngx-error.log;
+	access_log <?php echo LOG_PATH; ?>ngx-access.log main;
 }

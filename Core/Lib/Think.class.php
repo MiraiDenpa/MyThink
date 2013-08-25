@@ -21,6 +21,9 @@
  * @author      liu21st <liu21st@gmail.com>
  */
 class Think{
+	/**
+	 * @var OutputBuffer
+	 */
 	private static $main_out_buffer;
 
 	/**
@@ -197,6 +200,12 @@ class Think{
 				return;
 			}
 		}
+		if(Think::$main_out_buffer){
+			xdebug_debug_zval_stdout(Think::$main_out_buffer);
+			Think::$main_out_buffer->flush();
+			Think::$main_out_buffer = null;
+		}
+		
 	}
 
 	/**
@@ -208,7 +217,7 @@ class Think{
 	 * @exit
 	 */
 	public static function halt($msg, $html = false){
-		self::$main_out_buffer = null;
+		if(self::$main_out_buffer) self::$main_out_buffer->clean();
 		if(!defined('APP_DEBUG')){ // 
 			header('Content-Type:text/html; charset=utf-8');
 			if($html){
@@ -225,11 +234,15 @@ class Think{
 		
 		$file = $trace[1]['file'];
 		$line = $trace[1]['line'];
-
+		
 		require TMPL_EXCEPTION_FILE;
-
-		if(SHOW_TRACE) SPT();
-		ob_flush();
+		if(self::$main_out_buffer) self::$main_out_buffer->flush();
+		
+		if(SHOW_TRACE) SPT(false);
+		self::$main_out_buffer = null;
+		while(ob_get_level()){
+			ob_end_flush();
+		}
 		exit;
 	}
 }

@@ -159,6 +159,19 @@ class ThinkInstance{
 
 		return self::$TAGLIB[$class] = new $class;
 	}
+
+	/**
+	 * @return UrlHelper
+	 * @static
+	 */
+	public static function UrlHelper(){
+		static $c;
+		if($c){
+			return $c;
+		}
+
+		return $c = new UrlHelper();
+	}
 }
 
 /**

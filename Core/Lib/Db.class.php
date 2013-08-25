@@ -136,7 +136,7 @@ class Db{
 	 * @return string
 	 */
 	private function parseConfig($db_config = ''){
-		return hidef_fetch('ThinkDb' . $db_config);
+		return hidef_load('ThinkDb' . $db_config);
 	}
 
 	/**

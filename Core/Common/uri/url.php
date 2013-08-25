@@ -2,143 +2,32 @@
 
 /**
  * URL组装 支持不同URL模式
- * @param string $url URL表达式，格式：'[分组/模块/操作#锚点@域名]?参数1=值1&参数2=值2...'
- * @param string|array $vars 传入的参数，支持数组和字符串
- * @param string $suffix 伪静态后缀，默认为true表示获取配置值
- * @param boolean $redirect 是否跳转，如果设置为true则表示跳转到该URL地址
- * @param boolean $domain 是否显示域名
+ *
+ * @param        $app
+ * @param        $action
+ * @param        $model
+ * @param array  $vars   传入的参数
+ * @param string $suffix 文件类型(html/json/...)
+ * @param bool   $merge  如果是true，则把$_GET放进参数里
+ *
  * @return string
  */
-function U($url='',$vars='',$suffix=true,$redirect=false,$domain=false) {
-	// 解析URL
-	$info   =  parse_url($url);
-	$url    =  !empty($info['path'])?$info['path']:ACTION_NAME;
-	if(isset($info['fragment'])) { // 解析锚点
-		$anchor =   $info['fragment'];
-		if(false !== strpos($anchor,'?')) { // 解析参数
-			list($anchor,$info['query']) = explode('?',$anchor,2);
-		}
-		if(false !== strpos($anchor,'@')) { // 解析域名
-			list($anchor,$host)    =   explode('@',$anchor, 2);
-		}
-	}elseif(false !== strpos($url,'@')) { // 解析域名
-		list($url,$host)    =   explode('@',$info['path'], 2);
+function U($app = APP_NAME, $action = ACTION_NAME, $model = METHOD_NAME, $vars = [], $suffix = DEFAULT_EXTENSION, $merge = false){
+	global $helper;
+	if(!$helper){
+		$helper = ThinkInstance::UrlHelper();
 	}
-	// 解析子域名
-	if(isset($host)) {
-		$domain = $host.(strpos($host,'.')?'':strstr($_SERVER['HTTP_HOST'],'.'));
-	}elseif($domain===true){
-		$domain = $_SERVER['HTTP_HOST'];
-		if(APP_SUB_DOMAIN_DEPLOY ) { // 开启子域名部署
-			$domain = $domain=='localhost'?'localhost':'www'.strstr($_SERVER['HTTP_HOST'],'.');
-			// '子域名'=>array('项目[/分组]');
-			foreach (APP_SUB_DOMAIN_RULES as $key => $rule) {
-				if(false === strpos($key,'*') && 0=== strpos($url,$rule[0])) {
-					$domain = $key.strstr($domain,'.'); // 生成对应子域名
-					$url    =  substr_replace($url,'',0,strlen($rule[0]));
-					break;
-				}
-			}
-		}
+	if($merge){
+		$vars = array_merge($_GET, $vars);
 	}
 
-	// 解析参数
-	if(is_string($vars)) { // aaa=1&bbb=2 转换成数组
-		parse_str($vars,$vars);
-	}elseif(!is_array($vars)){
-		$vars = array();
-	}
-	if(isset($info['query'])) { // 解析地址里面参数 合并到vars
-		parse_str($info['query'],$params);
-		$vars = array_merge($params,$vars);
-	}
-
-	// URL组装
-	$depr = URL_PATHINFO_DEPR;
-	if($url) {
-		if(0=== strpos($url,'/')) {// 定义路由
-			$route      =   true;
-			$url        =   substr($url,1);
-			if('/' != $depr) {
-				$url    =   str_replace('/',$depr,$url);
-			}
-		}else{
-			if('/' != $depr) { // 安全替换
-				$url    =   str_replace('/',$depr,$url);
-			}
-			// 解析分组、模块和操作
-			$url        =   trim($url,$depr);
-			$path       =   explode($depr,$url);
-			$var        =   array();
-			$var[VAR_ACTION]       =   !empty($path)?array_pop($path):ACTION_NAME;
-			$var[VAR_MODULE]       =   !empty($path)?array_pop($path):MODULE_NAME;
-			if($maps = URL_ACTION_MAP) {
-				if(isset($maps[strtolower($var[VAR_MODULE])])) {
-					$maps    =   $maps[strtolower($var[VAR_MODULE])];
-					if($action = array_search(strtolower($var[VAR_ACTION]),$maps)){
-						$var[VAR_ACTION] = $action;
-					}
-				}
-			}
-			if($maps = URL_MODULE_MAP) {
-				if($module = array_search(strtolower($var[VAR_MODULE]),$maps)){
-					$var[VAR_MODULE] = $module;
-				}
-			}
-			if(URL_CASE_INSENSITIVE) {
-				$var[VAR_MODULE]   =   parse_name($var[VAR_MODULE]);
-			}
-			if(!APP_SUB_DOMAIN_DEPLOY && APP_GROUP_LIST) {
-				if(!empty($path)) {
-					$group                  =   array_pop($path);
-					$var[VAR_GROUP]    =   $group;
-				}else{
-					if(GROUP_NAME != DEFAULT_GROUP) {
-						$var[VAR_GROUP]=   GROUP_NAME;
-					}
-				}
-				if(URL_CASE_INSENSITIVE && isset($var[VAR_GROUP])) {
-					$var[VAR_GROUP]    =  strtolower($var[VAR_GROUP]);
-				}
-			}
-		}
-	}
-
-	if(URL_MODEL == 0) { // 普通模式URL转换
-		$url        =   __APP__.'?'.http_build_query(array_reverse($var));
-		if(!empty($vars)) {
-			$vars   =   urldecode(http_build_query($vars));
-			$url   .=   '&'.$vars;
-		}
-	}else{ // PATHINFO模式或者兼容URL模式
-		if(isset($route)) {
-			$url    =   __APP__.'/'.rtrim($url,$depr);
-		}else{
-			$url    =   __APP__.'/'.implode($depr,array_reverse($var));
-		}
-		if(!empty($vars)) { // 添加参数
-			foreach ($vars as $var => $val){
-				if('' !== trim($val))   $url .= $depr . $var . $depr . urlencode($val);
-			}
-		}
-		if($suffix) {
-			$suffix   =  $suffix===true?URL_HTML_SUFFIX:$suffix;
-			if($pos = strpos($suffix, '|')){
-				$suffix = substr($suffix, 0, $pos);
-			}
-			if($suffix && '/' != substr($url,-1)){
-				$url  .=  '.'.ltrim($suffix,'.');
-			}
-		}
-	}
-	if(isset($anchor)){
-		$url  .= '#'.$anchor;
-	}
-	if($domain) {
-		$url   =  (is_ssl()?'https://':'http://').$domain.$url;
-	}
-	if($redirect) // 直接跳转URL
-	redirect($url);
-	else
-		return $url;
+	$helper->reset();
+	$helper->setApp($app);
+	$helper->setAction($action);
+	$helper->setMethod($model);
+	$helper->setProtocol('http');
+	$helper->setParamAll($vars);
+	$helper->setSuffix($suffix);
+	
+	return $helper->getUrl();
 }

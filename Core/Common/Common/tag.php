@@ -8,7 +8,7 @@
  * @return mixed
  */
 function tag($tag, &$params=NULL) {
-	$tags       = hidef_fetch('ThinkTags');
+	$tags       = hidef_load('ThinkTags');
 	
 	if(empty($tags[$tag])){
 		return;

@@ -97,7 +97,6 @@ return array(
 	// 异常页面的模板文件
 	'TMPL_TEMPLATE_SUFFIX'  => '.html',
 	// 默认模板文件后缀
-	'TMPL_FILE_DEPR'        => '/',
 	'TMPL_CACHFILE_SUFFIX'  => '.php', // 默认模板缓存后缀
 	'TMPL_DENY_FUNC_LIST'   => 'echo,exit', // 模板引擎禁用函数
 	'TMPL_VAR_IDENTIFY'     => 'array', // 模板变量识别。留空自动判断,参数为'obj'则表示对象

@@ -12,7 +12,7 @@ class OutputBuffer{
 		if(1){
 			$level = $this->level;
 			ob_start(Closure::bind(function ($content) use ($func,$level){
-				trace('缓冲区结束，调用处理程序。' . dump_some($func), 'OB.'.$level, 'INFO');
+				trace('缓冲区刷新，调用处理程序。' . dump_some($func), 'OB.'.$level, 'INFO');
 				if(is_callable($func)){
 					return $func($content);
 				}else{

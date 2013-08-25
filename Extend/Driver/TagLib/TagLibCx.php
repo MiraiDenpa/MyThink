@@ -52,6 +52,7 @@ class TagLibCx extends TagLib{
 		'assign'     => array('attr' => 'name,value', 'close' => 0),
 		'define'     => array('attr' => 'name,value', 'close' => 0),
 		'for'        => array('attr' => 'start,end,name,comparison,step', 'level' => 3),
+		'url'        => array('attr' => 'app,action,method,params,suffix,protocol', 'close' => 0),
 	);
 
 	/**
@@ -727,5 +728,62 @@ class TagLibCx extends TagLib{
 		$parseStr .= '<?php } ?>';
 
 		return $parseStr;
+	}
+
+	/**
+	 * url标签解析
+	 * 格式： <for start="" end="" comparison="" step="" name="" />
+	 * @access public
+	 *
+	 * @param string $attr     标签属性
+	 * @param string $content  标签内容
+	 *
+	 * @return string
+	 */
+	public function _url($attr, $content){
+		$tag = $this->parseXmlAttr($attr, 'url');
+		$url = ThinkInstance::UrlHelper();
+		$url->reset();
+
+		// params,app,action,method,suffix,protocol
+		if(isset($tag['params'])){
+			$url->setParamStr($tag['params']);
+			unset($tag['params']);
+		}
+		if(isset($tag['suffix'])){
+			$url->setSuffix($tag['suffix']);
+			unset($tag['suffix']);
+		}
+		if(isset($tag['action'])){
+			$url->setAction($tag['action']);
+			unset($tag['action']);
+		}
+		if(isset($tag['app'])){
+			$url->setApp($tag['app']);
+			unset($tag['app']);
+		}
+		if(isset($tag['method'])){
+			$url->setMethod($tag['method']);
+			unset($tag['method']);
+		}
+		if(isset($tag['path'])){
+			$url->setPath($tag['path']);
+			unset($tag['path']);
+		}
+		if(isset($tag['protocol'])){
+			$url->setProtocol($tag['protocol']);
+			unset($tag['protocol']);
+		}
+
+		foreach($tag as $name => $val){
+			$url->setParam(\COM\MyThink\Strings::blocktrim($name, 'param-', STR_TRIM_LEFT), $val);
+		}
+
+		$ret = $url->getUrl();
+		if(!empty($tag)){
+			$ret = preg_replace('#%7B%24(.*?)%7D#','{\\$$1}',$ret);
+		}
+
+		return $ret;
 	}
 }

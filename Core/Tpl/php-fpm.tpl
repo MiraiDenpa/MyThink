@@ -54,5 +54,5 @@ php_value[session.save_path] = 127.0.0.1:11211
 
 php_admin_value[hidef.ini_path] = <?php echo $ini_path; ?>
 
-php_admin_value[hidef.data_path] = <?php echo $ini_path; ?>
+php_admin_value[hidef.data_path] = <?php echo $data_path; ?>
 

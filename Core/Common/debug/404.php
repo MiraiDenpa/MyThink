@@ -12,7 +12,7 @@
  */
 function _404($msg = '', $url = ''){
 	// <DEBUG>
-	throw_exception($msg);
+	Think::halt($msg);
 	// </DEBUG>
 	if($msg && LOG_EXCEPTION_RECORD){
 		Log::write($msg);

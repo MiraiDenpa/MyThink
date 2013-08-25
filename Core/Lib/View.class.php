@@ -124,7 +124,7 @@ class View{
 	public function fetch($templateFile = '', $prefix = ''){
 		N('template_show', 1);
 		trace('显示模板: '.$templateFile,'','INFO');
-		$templateFile = $this->parseTemplate($templateFile);
+		$templateFile = locateTemplate($templateFile);
 		// 模板文件不存在直接返回
 		if(!is_file($templateFile)){
 			throw_exception(LANG_TEMPLATE_NOT_EXIST . '[' . $templateFile . ']');
@@ -143,29 +143,6 @@ class View{
 
 		// 输出模板文件
 		return $content;
-	}
-
-	/**
-	 * 自动定位模板文件
-	 * @access protected
-	 *
-	 * @param string $template 模板文件规则
-	 *
-	 * @return string
-	 */
-	public function parseTemplate($template = ''){
-		// 分析模板文件规则
-		if(!$template){ // 如果模板文件名为空 按照默认规则定位
-			return TMPL_PATH . ACTION_NAME . TMPL_FILE_DEPR . METHOD_NAME . TMPL_TEMPLATE_SUFFIX;
-		} elseif($template{0} == ':'){
-			$template = substr($template, 1);
-			return TMPL_PATH . $template . TMPL_TEMPLATE_SUFFIX;
-		} elseif($template{0} == '!'){
-			$template = substr($template, 1);
-			return BASE_TMPL_PATH . $template . TMPL_TEMPLATE_SUFFIX;
-		} else{
-			return TMPL_PATH . ACTION_NAME . TMPL_FILE_DEPR . $template . TMPL_TEMPLATE_SUFFIX;
-		}
 	}
 
 	/**

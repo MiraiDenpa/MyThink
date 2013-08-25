@@ -63,7 +63,7 @@ class ThinkMemcached extends Memcached{
 		parent::__construct('memcachedb' . $id);
 
 		if(!count($this->getServerList())){
-			$config = hidef_fetch('ThinkDb' . $id);
+			$config = hidef_load('ThinkDb' . $id);
 			$this->setOptions((array)$config['params']);
 			/*<DEBUG>*/
 			$ret = /*</DEBUG>*/

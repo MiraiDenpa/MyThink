@@ -39,7 +39,7 @@ function trace($value = null, $label = null, $level = null, $record = false){
 		} else{
 			$label = trim($label);
 		}
-		$info  = dump_some($value);
+		$info  = dump_some($value, 0);
 		$level = strtoupper($level);
 		if(!isset($_trace[$level])){
 			$_trace[$level] = array();

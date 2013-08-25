@@ -3,7 +3,22 @@ header('Content-Type:text/html; charset=utf-8');
 umask(0);
 
 global $br;
-$br = PHP_SAPI == 'cli'? "\n" : '<br/>';
+if(PHP_SAPI == 'cli'){
+	$br = "\n";
+	if(0!==posix_getuid()){
+		$cmd = 'sudo php ';
+		foreach($argv as $arg){
+			$cmd .= escapeshellarg($arg);
+		}
+		echo_line("You must have root privilige...\n");
+		passthru($cmd, $ret);
+		exit($ret);
+	}
+}else{
+	$br = '<br/>';
+}
+/**
+ */
 function echo_line($msg){
 	global $br;
 	echo $msg . $br;
@@ -13,7 +28,7 @@ echo_line(" --- 开始编译 --- ");
 
 require __DIR__ . '/Compile/compile_core_files.php';
 require __DIR__ . '/Compile/merge_config.php';
-require __DIR__ . '/Compile/hidef.php';
+require __DIR__ . '/Compile/hidef_save_constant.php';
 
 //  版本信息
 define('THINK_VERSION', '3.1.3g');
@@ -64,16 +79,38 @@ if(!is_dir(LIB_PATH) || !is_dir(CONF_PATH)){
 	// 创建项目目录结构
 	require __DIR__ . '/Compile/build_app_dir.php';
 }
-if(!is_dir(RUNTIME_PATH) || !is_dir(CACHE_PATH)){
-	echo_line('创建临时文件目录结构');
-	// 创建临时文件目录结构
-	require __DIR__ . '/Compile/build_runtime_dir.php';
+
+echo_line('创建临时文件目录结构');
+// 创建临时文件目录结构
+require __DIR__ . '/Compile/build_runtime_dir.php';
+
+/* 合并整个函数库 */
+echo_line('合并函数库');
+$list  = array_merge(glob(THINK_PATH . 'Common/*/*.php'), // 内置函数
+					 glob(APP_PATH . 'Common/*.php'), // 用户定义函数
+					 glob(EXTEND_PATH . 'Function/*.php')); // Extend里定义的函数
+$flist = [];
+foreach($list as $file){
+	$flist[] = $file;
+	echo_line("\t - $file");
 }
+if(APP_DEBUG){
+	echo_line(' -- 调试模式，用include方式引入文件。');
+	$funcLib = "foreach(" . var_export($flist, true) . " as \$file){\n\trequire_once \$file;\n}\n";
+	file_put_contents(RUNTIME_PATH . 'functions.php', '<?php ' . $funcLib);
+} else{
+	$funcLib = compile_core_files($flist);
+	file_put_contents(RUNTIME_PATH . 'functions.php', '<?php ' . $funcLib);
+}
+require RUNTIME_PATH . 'functions.php';
+echo_line('');
 
 /* 开始生成编译文件 */
 $compile = "<?php /* [SIG_GENERATE] */\n";
 $compile .= "\$GLOBALS['_beginTime'] = microtime(TRUE);\n";
-if(MEMORY_DEBUG) $compile .= "\$GLOBALS['_startUseMems'] = memory_get_usage();\n";
+if(MEMORY_DEBUG){
+	$compile .= "\$GLOBALS['_startUseMems'] = memory_get_usage();\n";
+}
 $compile .= "require(RUNTIME_PATH.'functions.php');\n";
 $compile .= "set_include_path(get_include_path() . PATH_SEPARATOR . VENDOR_PATH);\n";
 
@@ -150,13 +187,6 @@ if(is_file(CONF_PATH . 'tags.php')){
 hidef_save('ThinkTags', $tags);
 echo_line('');
 
-echo_line('URL二级域名路由定义。');
-if(!is_file(BASE_CONF_PATH . 'urlmap.php')){
-	file_put_contents(BASE_CONF_PATH . 'urlmap.php', "<?php\nreturn array(\n\t\n);");
-	echo_line('$GLOBALS[URL_MAP] -- 文件不存在(BASE_CONF_PATH/urlmap.php)');
-}
-echo_line('');
-
 /* TODO 错误码定义 */
 
 /* TODO 额外定义 */
@@ -173,32 +203,13 @@ $compile .= "Think::Start();// 初始化\n";
 if(SHOW_TRACE){
 	$compile .= "ini_set('display_errors', 0);";
 }
-if(MEMORY_DEBUG) $compile .= "\$GLOBALS['_initUseMems'] = memory_get_usage();\n";
+if(MEMORY_DEBUG){
+	$compile .= "\$GLOBALS['_initUseMems'] = memory_get_usage();\n";
+}
 $compile .= "App::run();// 启动应用\n";
 if(SHOW_TRACE){
 	$compile .= "SPT(false); // 页面Trace显示\n";
 }
-
-/* 合并整个函数库 */
-echo_line('合并函数库');
-$list  = array_merge(glob(THINK_PATH . 'Common/*/*.php'), // 内置函数
-					 glob(APP_PATH . 'Common/*.php'), // 用户定义函数
-					 glob(EXTEND_PATH . 'Function/*.php')); // Extend里定义的函数
-$flist = [];
-foreach($list as $file){
-	$flist[] = $file;
-	echo_line("\t - $file");
-}
-if(APP_DEBUG){
-	echo_line('调试模式！');
-	$funcLib = "foreach(" . var_export($flist, true) . " as \$file){\n\trequire_once \$file;\n}\n";
-	file_put_contents(RUNTIME_PATH . 'functions.php', '<?php ' . $funcLib);
-} else{
-	$funcLib = compile_core_files($flist);
-	file_put_contents(RUNTIME_PATH . 'functions.php', '<?php ' . $funcLib);
-	//apc_compile_file(RUNTIME_PATH . 'functions.php');
-}
-echo_line('');
 
 echo_line('写入入口文件。');
 if(is_file(ENTRY_FILE)){
@@ -212,7 +223,13 @@ file_put_contents(ENTRY_FILE, $compile);
 //apc_compile_file(ENTRY_FILE);
 echo_line('');
 
+
+echo_line('URL二级域名路由定义。');
+if(!is_file(BASE_CONF_PATH . 'urlmap.php')){
+	echo_line('$GLOBALS[URL_MAP] -- 文件不存在(BASE_CONF_PATH/urlmap.php)');
+}
 echo_line('载入全局定义。');
+// 用GLOBAL是因为可以调用其他脚本处理，虽然暂时没有
 $GLOBALS['URL_MAP'] = require BASE_CONF_PATH . 'urlmap.php';
 if(is_file(BASE_CONF_PATH . 'urlmap-' . APP_STATUS . '.php')){
 	echo_line('载入状态定义。');
@@ -226,11 +243,36 @@ if(!isset($GLOBALS['URL_MAP'][APP_NAME])){
 	echo_line('$GLOBALS[URL_MAP][' . APP_NAME . '] -- 定义有误(BASE_CONF_PATH/urlmap.php)');
 	die();
 }
+hidef_save('urlmap', $GLOBALS['URL_MAP'], true);
+
+echo_line('URL应用内路由定义。');
+$actmap = require CONF_PATH . 'actmap.php';
+hidef_save('actmap', $actmap);
+
 echo_line("");
 
 echo_line("写入常量ini文件。");
-$ini_path = write_all_define_to_ini();
+$ini_path = RUNTIME_PATH.APP_NAME;
+$data_path = RUNTIME_PATH.'hidef';
+write_all_define_to_ini($ini_path);
 echo_line("");
+
+echo_line("编译静态文件。");
+require $alias['COM\\MyThink\\Strings'];
+// require __DIR__ . '/Compile/compile_public_path.php';
+$tmpl = file_get_contents(__DIR__ . '/Compile/compile_public_path.php');
+$tmpl = substr($tmpl, 5);
+$tmpl .= substr(file_get_contents($alias['COM\\MyThink\\Strings']), 5);
+$tmpl = '<?php
+define("PUBLIC_PATH","' . PUBLIC_PATH . '");
+define("STR_TRIM_BOTH", 3);
+define("STR_TRIM_LEFT", 1);
+define("STR_TRIM_RIGHT", 2);
+function echo_line($msg){echo $msg . "\n";}
+' . $tmpl;
+
+$tmpl = preg_replace('#^(use|namespace).*$#m','', $tmpl);
+file_put_contents(PUBLIC_PATH . '_recompile_static.php', $tmpl);
 
 /* TODO 处理路由 */
 

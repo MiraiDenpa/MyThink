@@ -47,15 +47,10 @@ function SPT($exit = true){
 		];
 	}
 
-	// 读取项目定义的Trace文件
-	$traceFile = CONF_PATH . 'trace.php';
-	if(is_file($traceFile)){
-		$base = array_merge($base, (array)include($traceFile));
-	}
 	$debug = trace();
 
 	$debug           = array_merge(['BASE' => $base], $debug);
-	$debug['INFO'][] = ['=w=','* 日志被打印，后方信息无法显示 *'];
+	$debug['INFO'][] = ['<span class="badge">=w=</span>','* 显示日志，后方信息无法获得 *'];
 
 	// 调用Trace页面模板
 	ob_start(null, 0);
@@ -65,13 +60,16 @@ function SPT($exit = true){
 	echo "\n\n<!-- ThinkPageTrace -->\n";
 	echo $content;
 	
+	if(ob_get_level()) ob_flush();
 	if($exit){
-		echo "<pre class=\"alert alert-info\">\n调用了 `ShowPageTrace();` 程序中止 || 调用堆栈：\n";
+		echo "<div class=\"container\">
+		<div class=\"well\" style=\"text-align:center;\">调用了 `ShowPageTrace();` 程序中止 || 调用堆栈：</div>";
 		xdebug_print_function_stack();
-		echo '</pre>';
+		echo '</div>';
 		if($end){
 			echo '</body>';
 		}
+		if(ob_get_level()) ob_flush();
 		exit();
 	}
 }

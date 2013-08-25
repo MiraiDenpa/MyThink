@@ -66,7 +66,7 @@ class Strings{
 	 * @param     $delimiter 分隔符
 	 * @param     $string    源字符串
 	 * @param     $start     开始位置[0,1,2...]。负数代表从后向前[-1,-2...]。
-	 * @param     $end       结束未知（也可以是负数）
+	 * @param     $end       结束位置[0,1,2...]。负数代表从后向前[-1,-2...]。
 	 * @param int $flag
 	 *
 	 * @return string 链接后的字符串

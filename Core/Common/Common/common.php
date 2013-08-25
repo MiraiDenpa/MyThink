@@ -17,47 +17,6 @@
  */
 
 /**
- * 获取模版文件 格式 项目://分组@主题/模块/操作
- * @param string $name  模版资源地址
- * @param string $layer 视图层（目录）名称
- *
- * @return string
- */
-function T($template = '', $layer = ''){
-	if(is_file($template)){
-		return $template;
-	}
-	// 解析模版资源地址
-	if(false === strpos($template, '://')){
-		$template = APP_NAME . '://' . str_replace(':', '/', $template);
-	}
-	$info  = parse_url($template);
-	$file  = $info['host'] . (isset($info['path'])? $info['path'] : '');
-	$group = isset($info['user'])? $info['user'] . '/' : (defined('GROUP_NAME')? GROUP_NAME . '/' : '');
-	$app   = $info['scheme'];
-	$layer = $layer? $layer : DEFAULT_V_LAYER;
-
-	// 获取当前主题的模版路径
-	if(($list = EXTEND_GROUP_LIST) && isset($list[$app])){ // 扩展分组
-		$baseUrl = $list[$app] . '/' . $group . $layer . '/';
-	} elseif(1 == APP_GROUP_MODE){ // 独立分组模式
-		$baseUrl = dirname(BASE_LIB_PATH) . '/' . $group . $layer . '/';
-	} else{
-		$baseUrl = TMPL_PATH . $group;
-	}
-	$depr = TMPL_FILE_DEPR;
-	// 分析模板文件规则
-	if('' == $file){
-		// 如果模板文件名为空 按照默认规则定位
-		$file = MODULE_NAME . $depr . ACTION_NAME;
-	} elseif(false === strpos($file, $depr)){
-		$file = MODULE_NAME . $depr . $file;
-	}
-
-	return $baseUrl . $file . TMPL_TEMPLATE_SUFFIX;
-}
-
-/**
  * 获取输入参数 支持过滤和默认值
  * 使用方法:
  * <code>

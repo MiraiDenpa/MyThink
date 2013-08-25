@@ -21,6 +21,7 @@ class Dispatcher{
 	public $action_name = 'Index';
 	public $method_name = 'index';
 	public $extension_name = 'html';
+	public $extra_path = [];
 
 	/**
 	 * 解析URL，然后执行操作
@@ -90,22 +91,26 @@ class Dispatcher{
 		$ret   = $_GET;
 		$array = explode(URL_PATHINFO_DEPR, $path_info);
 		if(!empty($array)){
-			$this->action_name = array_shift($array);
+			$this->action_name = strtolower(array_shift($array));
 		}
 		if(!empty($array)){
-			$this->method_name = array_shift($array);
+			$this->method_name = strtolower(array_shift($array));
 		}
 
-		$urlRule = hidef_fetch('url_rule');
+		$param_map = hidef_load('actmap');
 
-		if(isset($urlRule[$this->action_name][$this->method_name])){
-			foreach($urlRule[$this->action_name][$this->method_name] as $key => $value){
-				$ret[$value] = $array[$key];
-				unset($array[$key]);
+		if(isset($param_map[$this->action_name][$this->method_name])){
+			$param_map = $param_map[$this->action_name][$this->method_name];
+			for($loc = 0, $count = count($param_map); $loc < $count; $loc++){
+				if(!isset($array[$loc])){
+					return false;
+				}
+				$ret[$param_map[$loc][0]] = $array[$loc];
+				unset($array[$loc]);
 			}
 		}
 		if(!empty($array)){
-			return false;
+			$this->extra_path = $array;
 		}
 
 		return $ret;

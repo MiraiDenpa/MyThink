@@ -32,7 +32,7 @@ class App{
 		// URL调度
 		$_GET = $dispatcher->parse_path($_SERVER['PATH_INFO']);
 		if($_GET === false){ // 調度出錯
-			_404('无法从请求的URL定位资源（多余参数）。');
+			_404('无法从请求的URL定位资源（缺少参数）。');
 		}
 		define('ACTION_NAME', $dispatcher->action_name);
 		define('METHOD_NAME', $dispatcher->method_name);

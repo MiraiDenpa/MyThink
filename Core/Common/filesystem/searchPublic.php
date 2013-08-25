@@ -5,8 +5,8 @@ function searchPublic($name){
 		$find = [];
 		foreach($name as $item){
 			if(strpos($item, '/') !== false){
-				$find[] = '-name ' . escapeshellarg(basename($item)) . ' -a -path */' .
-						  escapeshellarg(dirname($item)) . '/*';
+				$find[] = '-name ' . escapeshellarg(basename($item)) . ' -a -path ' .
+						  escapeshellarg('*/'.dirname(trim($item,'/')) . '/*');
 			} else{
 				$find[] = '-name ' . escapeshellarg($item);
 			}
@@ -14,8 +14,8 @@ function searchPublic($name){
 		$find = implode(' -o ', $find);
 	} else{
 		if(strpos($name, '/') !== false){
-			$find = '-name ' . escapeshellarg(basename($name)) . ' -a -path */' .
-					escapeshellarg(dirname($name)) . '/*';
+			$find = '-name ' . escapeshellarg(basename($name)) . ' -a -path ' .
+					escapeshellarg('*/'.dirname(trim($name,'/')) . '/*');
 		} else{
 			$find = '-name ' . escapeshellarg($name);
 		}
@@ -24,7 +24,7 @@ function searchPublic($name){
 		return array();
 	}
 
-	$cmd = "/bin/find $path $find";
+	$cmd = "/bin/find $path \\( $find \\) -a -not -path '*/get*'";
 
 	$out = array();
 	exec($cmd, $out, $ret);

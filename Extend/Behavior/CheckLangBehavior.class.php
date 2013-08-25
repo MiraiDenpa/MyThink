@@ -72,10 +72,9 @@ class CheckLangBehavior extends Behavior {
         if (defined('GROUP_NAME')){
             if (is_file($lang_path.GROUP_NAME.'.php'))
                 L(include $lang_path.GROUP_NAME.'.php');
-            $group = GROUP_NAME.TMPL_FILE_DEPR;
         }
         // 读取当前模块语言包
-        if (is_file($lang_path.$group.strtolower(MODULE_NAME).'.php'))
-            L(include $lang_path.$group.strtolower(MODULE_NAME).'.php');
+        if (is_file($lang_path.strtolower(MODULE_NAME).'.php'))
+            L(include $lang_path.strtolower(MODULE_NAME).'.php');
     }
 }

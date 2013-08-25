@@ -12,8 +12,8 @@ function PathToUrl($path){
 					   STATIC_PATH,
 					   ROOT_PATH
 					   ], [
-						  PUBLIC_URL . '/',
-						  STATIC_URL . '/',
-						  ROOT_URL . '/'
+						  'PUBLIC_URL/',
+						  'STATIC_URL/',
+						  'ROOT_URL/'
 						  ], $path);
 }

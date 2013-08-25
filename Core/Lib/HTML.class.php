@@ -15,38 +15,33 @@ class HTML{
 			return implode_r("\n", $headers);
 		}
 		$url = PathToUrl($file);
-		if(Strings::isEndWith($file, '.min.css')){
-			return self::css($url);
-		} else if(Strings::isEndWith($file, '.css')){
-			if(!APP_DEBUG){
-				$url = Strings::endWith(Strings::blocktrim($url, '.css'), '.min.css');
-			}
-
+		if(Strings::isEndWith($file, '.css')){
 			return self::css($url);
 		} else if(Strings::isEndWith($file, '.less')){
-			if(!APP_DEBUG){
+			if(!STATIC_DEBUG){
 				$url = Strings::endWith(Strings::blocktrim($url, '.less'), '.css');
 			}
 
 			return self::css($url);
-		} else if(Strings::isEndWith($file, '.min.js')){
-			return self::script($url);
 		} else if(Strings::isEndWith($file, '.js')){
-			if(!APP_DEBUG){
-				$url = Strings::endWith(Strings::blocktrim($url, '.js'), '.min.js');
-			}
-
 			return self::script($url);
 		} else{
 			Think::halt(LANG_UNKNOWN_EXTENSION . ': ' . $file);
+			return '';
 		}
 	}
 
 	public static function css($url){
-		return '<link href="' . $url . '" rel="stylesheet" type="text/css">';
+		// href 必须在前，因为TagLibHreader依赖这个特性
+		if(Strings::isEndWith($url, '.less')){
+			return '<link href="' . $url . '" rel="stylesheet" type="text/less">';
+		}else{
+			return '<link href="' . $url . '" rel="stylesheet" type="text/css">';
+		}
 	}
 
 	public static function script($url){
+		// src 必须在前，因为TagLibHreader依赖这个特性
 		return '<script src="' . $url . '" type="text/javascript" charset="UTF-8"></script>';
 	}
 
@@ -63,7 +58,7 @@ class HTML{
 	public static function label($content, $type = 'default', $attr = ''){
 		if(is_array($attr)){
 			$attr = dbl_implode(' ', '=', array_map(function ($item){
-				return '"'.htmlentities($item).'"';
+				return '"' . htmlentities($item) . '"';
 			}, $attr));
 		}
 		if($attr){
