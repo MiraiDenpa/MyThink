@@ -1,7 +1,60 @@
 <?php
+if(isset($GLOBALS['COMPILE'])){
+	echo_line("编译静态文件。");
+
+	$array = get_defined_constants(true)['user'];
+	// 生成less变量定义文件
+	echo_line("\t生成less定义");
+	$f = PUBLIC_PATH.'basevar.less';
+	$less = '';
+	foreach($array as $name => $val){
+		if($val === '') continue;
+		if(is_string($val)) $val= var_export($val, true);
+		$less .= "@$name: $val;\n";
+	}
+	file_put_contents($f,$less);
+
+	// 生成js全局变量定义文件
+	echo_line("\t生成js定义");
+	$f = PUBLIC_PATH.'basevar.js';
+	$js = 'window.Think = '.json_encode($array).';';
+	if(APP_DEBUG){
+		echo_line("\tjs定义： 附加less");
+		$js .= "\n".file_get_contents(THINK_PATH.'Tpl/debugless.js');
+	}
+	file_put_contents($f,$js);
+	echo_line('');
+	
+	// 连接phpjs
+	echo_line("\t生成js定义");
+	$f = PUBLIC_PATH.'phpjs.js';
+	$files = array_merge(glob(PUBLIC_PATH.'phpjs/*.js'),glob(PUBLIC_PATH.'phpjs/*/*.js'));
+	foreach($files as $file){
+		file_put_contents($f,file_get_contents($file)."\n");
+	}
+	echo_line('');
+	
+	
+	require $alias['COM\\MyThink\\Strings'];
+	$tmpl = file_get_contents(__FILE__);
+	$tmpl = explode('/*[SIG]*/', $tmpl)[2];
+	$tmpl = '<?php
+		function echo_line($msg){echo $msg . "\n";}
+		require "'.RUNTIME_PATH . APP_NAME .'/const.php";
+		require "'.$alias['COM\\MyThink\\Strings'].'";
+		' . $tmpl;
+	
+	//$tmpl = preg_replace('#^(use|namespace).*$#m', '', $tmpl);
+	$tmpl = str_replace('unlink(', '@unlink(', $tmpl);
+	file_put_contents(PUBLIC_PATH . '_recompile_static.php', $tmpl);
+	
+	return;
+}
+/*[SIG]*/
+
 use \COM\MyThink\Strings;
 
-if($argv[0] == '_recompile_static.php'){
+if($argv[0] == '_recompile_static.php' && isset($argv[1])){
 	$file = $argv[1];
 	if(!is_file($file)){
 		fwrite(STDERR, "No such file: $file.");
@@ -55,7 +108,7 @@ function find($type){
 function compile_less($file){
 	$base = str_replace(PUBLIC_PATH, PUBLIC_PATH . 'getcss/', Strings::blocktrim(delVer($file), '.less'));
 	unlink($base . '.css');
-	passthru('lessc --no-ie-compat --yui-compress ' . escapeshellarg($file) . ' ' .
+	passthru('lessc --no-ie-compat --yui-compress -sm=on --rp='.escapeshellarg(PUBLIC_URL).' --include-path='.escapeshellarg(PUBLIC_PATH).' ' . escapeshellarg($file) . ' ' .
 			 escapeshellarg($base . '.css'), $ret);
 	echo_line("\t - " . $file . "\n\t\t \\lessc-> $base.css");
 

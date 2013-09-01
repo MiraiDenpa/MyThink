@@ -18,10 +18,20 @@
  * @author      liu21st <liu21st@gmail.com>
  */
 class Dispatcher{
-	public $action_name = 'Index';
-	public $method_name = 'index';
+	public $action_name = DEFAULT_ACTION;
+	public $method_name = DEFAULT_METHOD;
 	public $extension_name = 'html';
-	public $extra_path = [];
+	protected $param = [];
+	protected $GET = [];
+	protected $action = '';
+	/**
+	 * @var callable
+	 */
+	protected $callback;
+
+	public function __construct(){
+		$this->callback = [&$this, 'return_' . $this->extension_name];
+	}
 
 	/**
 	 * 解析URL，然后执行操作
@@ -46,31 +56,53 @@ class Dispatcher{
 	 * @return mixed
 	 */
 	public function run(){
-		$action = ThinkInstance::A($this->action_name);
-		if(!$action){
-			// 是否定义Empty模块
-			$action = ThinkInstance::A($this->action_name = 'Empty');
-			if(!$action){
-				_404(LANG_ACTION_NOT_EXIST . ':' . $this->action_name);
+		if(!$this->action){
+			if(!$this->action_name){
+				Think::halt('没有调用过parse_path。');
+			} else{
+				$this->action = ThinkInstance::A($this->action_name);
+				if(!$this->action_name){
+					_404(LANG_ACTION_NOT_EXIST . ':' . $this->action_name);
+				}
 			}
 		}
 
+		$this->action->setDispatcher($this);
 		$mtd = $this->method_name;
-		if(is_callable([$action, $mtd])){
-			$ret = [&$action, &$mtd];
-			tag('action_begin', $ret);
-			$ret = $action->$mtd();
-			tag('action_end', $ret);
+		$ret = [&$this->action, &$mtd];
+		tag('action_begin', $ret);
 
-			return $ret;
+		$this->action->setData($this->GET);
+		$param = $this->param;
+		switch(count($param)){
+		case 0:
+			$ret = $this->action->$mtd();
+			break;
+		case 1:
+			$ret = $this->action->$mtd($param[0]);
+			break;
+		case 2:
+			$ret = $this->action->$mtd($param[0], $param[1]);
+			break;
+		case 3:
+			$ret = $this->action->$mtd($param[0], $param[1], $param[2]);
+			break;
+		case 4:
+			$ret = $this->action->$mtd($param[0], $param[1], $param[2], $param[3]);
+			break;
+		case 5:
+			$ret = $this->action->$mtd($param[0], $param[1], $param[2], $param[3], $param[4]);
+			break;
+		default:
+			$ret = call_user_func_array([$this->action, $mtd], $param);
+			break;
 		}
-		_404(LANG_MODULE_NOT_EXIST . ':' . $this->action_name);
 
-		return false;
+		tag('action_end', $ret);
 	}
 
 	/**
-	 * 解析URL，设置属性，返回新GET（但$_GET全局变量不变
+	 * 解析URL中PATHINFO部分
 	 *
 	 * @param $path_info
 	 *
@@ -84,35 +116,115 @@ class Dispatcher{
 		$path = $part['dirname'] . '/' . $part['filename'];
 
 		$path_info = trim($path, '/ ');
-		if(empty($path_info)){
-			return array();
-		}
 
-		$ret   = $_GET;
-		$array = explode(URL_PATHINFO_DEPR, $path_info);
+		$array = $path_info? explode('/', $path_info) : [];
+
 		if(!empty($array)){
-			$this->action_name = strtolower(array_shift($array));
+			$this->action_name = ucfirst(strtolower(array_shift($array)));
+		} else{
+			$this->action_name = DEFAULT_ACTION;
 		}
 		if(!empty($array)){
 			$this->method_name = strtolower(array_shift($array));
+		} else{
+			$this->method_name = DEFAULT_METHOD;
 		}
 
-		$param_map = hidef_load('actmap');
+		$name = $this->action_name . 'Action';
+		$meta = classmeta_read($name);
 
-		if(isset($param_map[$this->action_name][$this->method_name])){
-			$param_map = $param_map[$this->action_name][$this->method_name];
-			for($loc = 0, $count = count($param_map); $loc < $count; $loc++){
-				if(!isset($array[$loc])){
-					return false;
-				}
-				$ret[$param_map[$loc][0]] = $array[$loc];
-				unset($array[$loc]);
+		if(isset($meta['method'][$this->method_name])){
+			$ref = $meta['method'][$this->method_name];
+			if($ref['all_param'] && (count($array) < $ref['must_param'] || count($array) > $ref['all_param'])){
+				return '参数数量应该在' . $ref['must_param'] . '~' . $ref['all_param'] . '之间';
 			}
-		}
-		if(!empty($array)){
-			$this->extra_path = $array;
+		} elseif(!isset($meta['method']['__call'])){
+			return LANG_MODULE_NOT_EXIST . ' : ' . $name . '::' . $this->method_name . '()';
 		}
 
-		return $ret;
+		$this->param    = $array;
+		$this->callback = [$this, 'return_' . $this->extension_name];
+		if(!is_callable($this->callback)){
+			return '无法处理的返回类型：' . $this->extension_name;
+		}
+
+		return 0;
+	}
+
+	/**
+	 * 覆盖GET 变量
+	 *
+	 * @param array $new_get
+	 *
+	 * @return void
+	 */
+	public function setData(array &$new_get){
+		$this->GET = & $new_get;
+	}
+
+	/**
+	 * 分拣显示操作
+	 * @param $templateFile
+	 * @param $vars
+	 *
+	 * @return mixed
+	 */
+	public function display($templateFile, $vars){
+		$callback = $this->callback;
+		return $callback($templateFile, extension_to_mime($this->extension_name), $vars);
+	}
+
+	/**
+	 * 显示普通html页面
+	 */
+	protected function return_html($templateFile, $contentType, $vars){
+		$view = ThinkInstance::View();
+		$view->assign($vars);
+		return $view->display($templateFile, $contentType);
+	}
+
+	/**
+	 * 返回json数据
+	 */
+	protected function return_json($t, $c, $vars){
+		header('Content-Type: ' . $c . '; charset=utf-8');
+		if(SHOW_TRACE){
+			$vars['_PAGE_TRACE_'] = grab_page_trace();
+		}
+		echo json_encode($vars);
+	}
+
+	/**
+	 * 通过jsonp返回数据
+	 */
+	protected function return_jsonp($t, $c, $vars){
+		header('Content-Type: ' . $c . '; charset=utf-8');
+		$handler = isset($_GET[VAR_JSONP_HANDLER])? $_GET[VAR_JSONP_HANDLER] : DEFAULT_JSONP_HANDLER;
+		if(SHOW_TRACE){
+			$vars['_PAGE_TRACE_'] = grab_page_trace();
+		}
+		echo $handler . '(' . json_encode($vars) . ');';
+	}
+
+	/**
+	 * 显示php序列化
+	 */
+	protected function return_php($t, $c, $vars){
+		header('Content-Type: ' . $c . '; charset=utf-8');
+		if(SHOW_TRACE){
+			$vars['_PAGE_TRACE_'] = grab_page_trace();
+		}
+		echo serialize($vars);
+	}
+
+	/**
+	 * json的别名，专用于主站
+	 */
+	protected function return_form($t, $c, $vars){
+		header('Content-Type: text/json; charset=utf-8');
+		if(SHOW_TRACE){
+			$vars['_PAGE_TRACE_'] = grab_page_trace();
+		}
+		echo json_encode($vars);
 	}
 }

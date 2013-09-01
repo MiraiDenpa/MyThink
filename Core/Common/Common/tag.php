@@ -15,7 +15,7 @@ function tag($tag, &$params=NULL) {
 	}
 	if(APP_DEBUG) {
 		G($tag.'Start');
-		trace('[ '.$tag.' ] --START--','','INFO');
+		trace('--开始--',$tag,'INFO');
 	}
 	// 执行扩展
 	foreach ($tags[$tag] as $callback) {
@@ -28,6 +28,6 @@ function tag($tag, &$params=NULL) {
 		}
 	}
 	if(APP_DEBUG) { // 记录行为的执行日志
-		trace('[ '.$tag.' ] --END-- [ RunTime:'.G($tag.'Start',$tag.'End',6).'s ]','','INFO');
+		trace('--完成-- [ RunTime:'.G($tag.'Start',$tag.'End',6).'s ]',$tag,'INFO');
 	}
 }

@@ -19,31 +19,19 @@
 class View{
 	/**
 	 * 模板输出变量
-	 * @var tVar
+	 * @var array tVar
 	 * @access protected
 	 */
 	protected $tVar = array();
 
 	/**
-	 * 模板主题
-	 * @var theme
-	 * @access protected
-	 */
-	protected $theme = '';
-
-	/**
 	 * 模板变量赋值
 	 * @access public
 	 *
-	 * @param mixed $name
-	 * @param mixed $value
+	 * @param mixed $data
 	 */
-	public function assign($name, $value = ''){
-		if(is_array($name)){
-			$this->tVar = array_merge($this->tVar, $name);
-		} else{
-			$this->tVar[$name] = $value;
-		}
+	public function assign(&$data){
+		$this->tVar = & $data;
 	}
 
 	/**
@@ -67,21 +55,18 @@ class View{
 	 * @access public
 	 *
 	 * @param string $templateFile 模板文件名
-	 * @param string $charset      模板输出字符集
-	 * @param string $contentType  输出类型
-	 * @param string $content      模板输出内容
-	 * @param string $prefix       模板缓存前缀
+	 * @param string $contentType
 	 *
 	 * @return mixed
 	 */
-	public function display($templateFile = '', $charset = '', $contentType = '', $content = '', $prefix = ''){
+	public function display($templateFile = '', $contentType = 'text/html'){
 		G('viewStartTime');
 		// 视图开始标签
 		tag('view_begin', $templateFile);
 		// 解析并获取模板内容
-		$content = $this->fetch($templateFile, $content, $prefix);
+		$content = $this->fetch($templateFile);
 		// 输出模板内容
-		$this->render($content, $charset, $contentType);
+		$this->render($content, $contentType);
 		// 视图结束标签
 		tag('view_end');
 	}
@@ -91,50 +76,42 @@ class View{
 	 * @access private
 	 *
 	 * @param string $content     输出内容
-	 * @param string $charset     模板输出字符集
 	 * @param string $contentType 输出类型
 	 *
 	 * @return mixed
 	 */
-	private function render($content, $charset = '', $contentType = ''){
-		if(empty($charset)){
-			$charset = DEFAULT_CHARSET;
-		}
+	private function render($content, $contentType = ''){
 		if(empty($contentType)){
-			$contentType = TMPL_CONTENT_TYPE;
+			$contentType = extension_to_mime(EXTENSION_NAME);
 		}
 		// 网页字符编码
-		header('Content-Type:' . $contentType . '; charset=' . $charset);
+		header('Content-Type:' . $contentType . '; charset=utf-8');
 		header('Cache-control: ' . HTTP_CACHE_CONTROL); // 页面缓存控制
-		header('X-Powered-By:ThinkPHP');
+		header('X-Powered-By:ThinkPHP-g');
 		// 输出模板文件
 		echo $content;
 	}
 
 	/**
 	 * 解析和获取模板内容 用于输出
-	 * @access public
+	 * @access   public
 	 *
 	 * @param string $templateFile 模板文件名
-	 * @param string $content      模板输出内容
-	 * @param string $prefix       模板缓存前缀
 	 *
 	 * @return string
 	 */
-	public function fetch($templateFile = '', $prefix = ''){
+	public function fetch($templateFile = ''){
 		N('template_show', 1);
-		trace('显示模板: '.$templateFile,'','INFO');
+		trace('解析模板: ' . $templateFile, '', 'INFO');
 		$templateFile = locateTemplate($templateFile);
-		// 模板文件不存在直接返回
+		// 模板文件不存在抛出异常
 		if(!is_file($templateFile)){
-			throw_exception(LANG_TEMPLATE_NOT_EXIST . '[' . $templateFile . ']');
+			Think::halt(LANG_TEMPLATE_NOT_EXIST . '[' . $templateFile . ']');
 		}
-		// 页面缓存
+
+		// 解析
 		$ob = new OutputBuffer();
-		// 视图解析标签
-		$params = array('var' => $this->tVar, 'file' => $templateFile, 'prefix' => $prefix);
-		tag('view_parse', $params);
-		// 获取并清空缓存
+		$this->parse($templateFile);
 		$content = $ob->get();
 		unset($ob);
 
@@ -146,44 +123,36 @@ class View{
 	}
 
 	/**
-	 * 设置当前输出的模板主题
-	 * @access public
+	 * 编译模板然后输出
 	 *
-	 * @param  mixed $theme 主题名称
+	 * @param $file
 	 *
-	 * @return View
+	 * @return void
 	 */
-	public function theme($theme){
-		$this->theme = $theme;
-
-		return $this;
-	}
-
-	/**
-	 * 获取当前的模板主题
-	 * @access private
-	 * @return string
-	 */
-	private function getTemplateTheme(){
-		if($this->theme){ // 指定模板主题
-			$theme = $this->theme;
+	private function parse($file){
+		$prefix        = strpos($file, BASE_TMPL_PATH) === 0? '' : APP_NAME;
+		$tmplCacheFile = CACHE_PATH . $prefix . md5($file) . TMPL_CACHFILE_SUFFIX;
+		if(TMPL_DEBUG){
+			$cache = false;
+		} elseif(!is_file($tmplCacheFile)){
+			$cache = false;
+		} elseif(filemtime($file) > filemtime($tmplCacheFile)){
+			// 模板文件如果有更新则缓存需要更新
+			$cache = false;
 		} else{
-			/* 获取模板主题名称 */
-			$theme = DEFAULT_THEME;
-			if(TMPL_DETECT_THEME){ // 自动侦测模板主题
-				$t = VAR_TEMPLATE;
-				if(isset($_GET[$t])){
-					$theme = $_GET[$t];
-				} elseif(cookie('think_template')){
-					$theme = cookie('think_template');
-				}
-				if(!in_array($theme, explode(',', THEME_LIST))){
-					$theme = DEFAULT_THEME;
-				}
-				cookie('think_template', $theme, 864000);
-			}
+			if(APP_DEBUG)trace('模板有缓存: ' . xdebug_filepath_anchor($file, 1, $file) . '[' . date('H:i:s', filemtime($file)) .
+				  '] &gt; ' . xdebug_filepath_anchor($tmplCacheFile, 1, $tmplCacheFile) . '[' .
+				  date('H:i:s', filemtime($tmplCacheFile)), '', 'INFO');
+			$cache = true;
 		}
-		define('THEME_NAME', $theme); // 当前模板主题名称
-		return $theme? $theme . '/' : '';
+		if(!$cache){ // 缓存有效
+			$tpl = ThinkInstance::ThinkTemplate();
+			// 编译并加载模板文件
+			$tpl->build($file, $this->tVar, $tmplCacheFile);
+			trace('编译目标: ' . xdebug_filepath_anchor($tmplCacheFile, 1, $tmplCacheFile) , '', 'INFO');
+		}
+
+		extract($this->tVar, EXTR_OVERWRITE);
+		include $tmplCacheFile;
 	}
 }

@@ -53,7 +53,7 @@ class ThinkInstance{
 		if(isset(self::$MODEL[$name])){
 			return self::$MODEL[$name];
 		}
-		$class = $name . 'Model';
+		$class = ucfirst($name) . 'Model';
 
 		/* <DEBUG>
 		if(!class_exists($class, false)){
@@ -97,25 +97,13 @@ class ThinkInstance{
 	 * @return Action
 	 */
 	public static function A($name){
-		$name = ucfirst($name) . 'Action';
+		$name .= 'Action';
 
 		if(isset(self::$ACTION[$name])){
 			return self::$ACTION[$name];
 		}
-		$path = apc_fetch('ThinkAction' . $name, $sucess);
 
-		if($sucess){
-			require_once $path;
-		} else{
-			require_one(array(
-							 LIB_PATH . 'Action/' . $name . '.php',
-							 BASE_LIB_PATH . 'Action/' . $name . '.php',
-							 EXTEND_PATH . 'Action/' . $name . '.php'
-						), $path);
-			apc_store('ThinkAction' . $name, $path);
-		}
-
-		if(class_exists($name, false)){
+		if(class_exists($name, true)){
 			return self::$ACTION[$name] = new $name();
 		} else{
 			return self::$ACTION[$name] = false;
@@ -171,6 +159,15 @@ class ThinkInstance{
 		}
 
 		return $c = new UrlHelper();
+	}
+	
+	public static function InStream($type){
+		return InputStream::_getInstance($type);
+	}
+	public static function OutStream($arg){
+		/*$factory = [ucfirst($type).'Stream','_getInstance'];
+
+		return $factory($arg);*/
 	}
 }
 

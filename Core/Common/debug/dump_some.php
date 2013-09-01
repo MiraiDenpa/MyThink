@@ -14,39 +14,48 @@ function dump_some($val, $length = 160){
 	if($length && $level > 3){
 		return '#[LOOP]#';
 	}
-	switch(gettype($val)){
+	$type = gettype($val);
+	$count = null;
+	switch($type){
 	case 'boolean':
-		$ret = 'boolean(' . ($val? 'true' : 'false') . ')';
+		$val = $val? 'true' : 'false';
 		break;
 	case 'string':
-		if($length){
-			$ret = '"' . mb_strcut($val, 0, $length, 'UTF-8') . '..."';
-		} else{
-			$ret = '"' . $val . '"';
-		}
+		$count = strlen($val);
+		$val = strip_tags($val);
 		break;
 	case 'array':
-		$new_arr = [];
-		foreach($val as $k => $v){
-			$new_arr[$k] = dump_some($v, $length);
-		}
-		$ret = '['.dbl_implode(',',':',$new_arr);
-		if($length){
-			$ret = mb_strcut($ret, 0, $length, 'UTF-8') . '...('.count($val).')';
-		}
-		$ret .= ']';
+		$count = count($val);
+		$val = json_encode($val, JSON_FORCE_OBJECT);
 		break;
 	case 'object':
-		$ret = 'object(#' . get_class($val) . ')';
+		/** @var  Closure  $val */
+		$type = get_class($val);
+		if($type == 'Closure'){
+			$val = '{...}';
+		}else{
+			$val = (string)$val;
+		}
+		$type = 'object::' . $type;
 		break;
 	case 'NULL':
-		$ret = 'NULL';
+		$val = 'NULL';
 		break;
 	default:
-		$ret = gettype($val) . '(...)';
+		if(!is_numeric($val)){
+			$val = 'Unknown';
+		}
 		break;
 	}
+	if($length){
+		$val = mb_strcut($val, 0, $length, 'UTF-8') . '...';
+	}
+	$ret = ' <b>#<font color="green">' . $type .'</font>'. (is_int($count)? '[<font color="red">' . $count . '</font>]' : '') . '</b> <em>&lt;' . $val . '&gt;</em>';
 
 	$level--;
+	if(!$level){
+		$ret = addcslashes($ret, "\n\t\r");
+	}
+
 	return $ret;
 }

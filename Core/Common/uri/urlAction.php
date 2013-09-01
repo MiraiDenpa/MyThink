@@ -1,25 +1,26 @@
 <?php
 
 /**
-* U3('list') U3('edit',array('id'=>1))
-* http://xxxx/CurrentApp/CurrentOp/xxxx_list
-* http://xxxx/CurrentApp/CurrentOp/xxxx_edit/id/1
-*
-* @param string $arg1
-* @param array $data
-* @param bool $merge 与当前GET混合
-* @return string
-*/
-function UA($arg1,$data = array(),$merge=true){
-$act = explode('_', ACTION_NAME);
-$actail = explode('_', $arg1);
+ * URL组装，当前action内
+ *
+ * @param        $model
+ * @param array  $vars   传入的参数
+ * @param bool   $merge  如果是true，则把$_GET放进参数里
+ *
+ * @return string
+ */
+function UI($model = METHOD_NAME, $vars = [], $merge = true){
+	global $helper;
+	if(!$helper){
+		$helper = ThinkInstance::UrlHelper();
+	}
+	if($merge){
+		$vars = array_merge($_GET, $vars);
+	}
 
-$del = count($act)-count($actail);
-if($del>0){
-$result = array_slice($act, 0, count($act)-count($actail) );
-$result = array_merge($result,$actail);
-}else{
-$result = $actail;
-}
-return URL(APP_NAME, MODULE_NAME.'/'.implode('_',$result), $data, $merge );
+	$helper->reset();
+	$helper->setMethod($model);
+	$helper->setParamAll($vars);
+
+	return $helper->getUrl();
 }

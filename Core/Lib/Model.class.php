@@ -27,7 +27,7 @@ class Model{
 	const VALUE_VALIDATE = 2; // 表单值不为空则验证
 	// 当前使用的扩展模型
 	private $_extModel = null;
-	// 当前数据库操作对象
+	/** @var DbPdo */
 	protected $db = null;
 	// 主键名称
 	protected $pk = 'id';
@@ -279,11 +279,11 @@ class Model{
 			$this->options[strtolower($method)] = $args[0];
 
 			return $this;
-		} elseif(in_array(strtolower($method), array('count', 'sum', 'min', 'max', 'avg'), true)){
+		} elseif(in_array(strtolower($method), ['count', 'sum', 'min', 'max', 'avg'], true)){
 			// 统计查询的实现
 			$field = isset($args[0])? $args[0] : '*';
-
-			return $this->getField(strtoupper($method) . '(' . $field . ') AS tp_' . $method);
+			$ret   = $this->getField(strtoupper($method) . '(' . $field . ') AS tp_' . $method);
+			return strpos($ret, ',')? floatval($ret) : intval($ret);
 		} elseif(strtolower(substr($method, 0, 5)) == 'getby'){
 			// 根据某个字段获取记录
 			$field         = parse_name(substr($method, 5));
@@ -299,8 +299,12 @@ class Model{
 		} elseif(isset($this->_scope[$method])){ // 命名范围的单独调用支持
 			return $this->scope($method, $args[0]);
 		} else{
-			throw_exception(__CLASS__ . ':' . $method . L('_METHOD_NOT_EXIST_'));
-
+			$class = get_class($this);
+			Think::halt(xdebug_filepath_anchor(find_one([
+														LIB_PATH . 'Model/' . $class . '.php',
+														BASE_LIB_PATH . 'Model/' . $file . '.php',
+														EXTEND_PATH . 'Model/' . $file . '.php'
+														]), 0, $class . ':' . $method) . LANG_METHOD_NOT_EXIST, true);
 			return null;
 		}
 	}
@@ -1704,7 +1708,7 @@ class Model{
 	 * @param mixed $where 条件表达式
 	 * @param mixed $parse 预处理参数
 	 *
-	 * @return Model
+	 * @return $this
 	 */
 	public function where($where, $parse = null){
 		if(!is_null($parse) && is_string($where)){

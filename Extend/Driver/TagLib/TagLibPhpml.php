@@ -12,9 +12,9 @@ class TagLibPhpml extends TagLib{
 			'must' => 'value',
 			'close' => 1
 		),
-		'textarea' => array(
-			'attr' => 'id,name,data-width,data-height',
-			'must' => 'id,data-width,data-height',
+		'richtext' => array(
+			'attr' => 'id,name,width,height',
+			'must' => 'id',
 			'close' => 1
 		),
 	);
@@ -57,11 +57,11 @@ class TagLibPhpml extends TagLib{
 		return $parseStr;
 	}
 
-	public function _textarea($attr,$content){
+	public function _richtext($attr,$content){
 		$attArr = $this->parseXmlAttr($attr, 'textarea');
 
 		$textArea = "<textarea {$attr} data-init=\"editor\">{$content}</textarea>";
-		$script = "<Header:KindEdit /><script type=\"text/javascript\">
+		$script = "<script type=\"text/javascript\">
 		
 		
 		</script>";

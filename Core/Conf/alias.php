@@ -18,15 +18,18 @@ return array(
 	'Cache'          => CORE_PATH . 'Cache.class.php',
 	'Db'             => CORE_PATH . 'Db.class.php',
 	'Dispatcher'     => CORE_PATH . 'Dispatcher.class.php',
+	'Error'          => CORE_PATH . 'Error.class.php',
 	'Log'            => CORE_PATH . 'Log.class.php',
 	'Model'          => CORE_PATH . 'Model.class.php',
 	'OutputBuffer'   => CORE_PATH . 'OutputBuffer.class.php',
 	'Think'          => CORE_PATH . 'Think.class.php',
 	'ThinkException' => CORE_PATH . 'ThinkException.class.php',
 	'ThinkInstance'  => CORE_PATH . 'ThinkInstance.class.php',
+	'UrlHelper'      => CORE_PATH . 'UrlHelper.class.php',
 	'View'           => CORE_PATH . 'View.class.php',
 	'Widget'         => CORE_PATH . 'Widget.class.php',
 	'ThinkTemplate'  => CORE_PATH . 'ThinkTemplate.class.php',
 	'TagLib'         => CORE_PATH . 'TagLib.class.php',
 	'HTML'           => CORE_PATH . 'HTML.class.php',
+	'InputStream'    => CORE_PATH . 'InputStream.class.php'
 );

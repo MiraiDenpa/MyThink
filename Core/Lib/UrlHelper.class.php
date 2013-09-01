@@ -14,14 +14,17 @@ class UrlHelper{
 	protected $paramstr = '';
 	protected $path = '';
 
-	private static $urlm;
+	protected $urlm;
 
 	/**
 	 *
 	 */
-	public function __construct(){
-		if(!self::$urlm){
-			self::$urlm = hidef_load('urlmap');
+	public function __construct($urlm=null){
+		if($urlm){
+			$this->urlm = $urlm;
+		}
+		if(!$this->urlm){
+			$this->urlm = hidef_load('urlmap');
 		}
 	}
 
@@ -106,11 +109,11 @@ class UrlHelper{
 	public function getUrl(){
 		/* A://B */
 		// <DEBUG>
-		if(!isset(self::$urlm[$this->app])){
+		if(!isset($this->urlm[$this->app])){
 			Think::halt('URL_MAP[' . $this->app . '] -- 定义有误(BASE_CONF_PATH/urlmap.php)');
 		}
 		// </DEBUG>
-		$domain   = self::$urlm[$this->app];
+		$domain   = $this->urlm[$this->app];
 		$protocol = $this->protocol;
 		if($protocol){
 			$perfix = $protocol . '://' . $domain;

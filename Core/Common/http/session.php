@@ -32,7 +32,7 @@ function session($name,$value='') {
 				$hander->execute();
 			}else {
 				// 类没有定义
-				throw_exception(L('_CLASS_NOT_EXIST_').': ' . $class);
+				Think::halt(LANG_CLASS_NOT_EXIST.': ' . $class);
 			}
 		}
 		// 启动session

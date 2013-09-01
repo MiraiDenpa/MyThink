@@ -11,8 +11,9 @@ function write_all_define_to_ini($ini_path){
 
 	ksort($consts);
 	$def = '';
-	foreach($consts as $k => $v){
-		if(is_int($v) || is_long($v)){
+	foreach($consts as $k => &$v){
+		if(is_int($v) || is_long($v) || (is_numeric($v) && (intval($v) == floatval($v))) || $v === '0' ){
+			$v = intval($v);
 			$def .= "int {$k} = {$v}\n";
 		} elseif(is_bool($v)){
 			$def .= "bool {$k} = " . ($v? 'true' : 'false') . "\n";
@@ -26,12 +27,12 @@ function write_all_define_to_ini($ini_path){
 		mkdir(RUNTIME_PATH . APP_NAME, 0777, true);
 	}
 	file_put_contents($ini_path . '/const.ini', $def);
-	if(APP_DEBUG){
-		echo_line("写入常量调试符号。");
-		$defines = '';
-		foreach($consts as $k => $v){
-			$defines .= "define('{$k}', " . var_export($v, true) . ");\n";
-		}
-		file_put_contents(RUNTIME_PATH . APP_NAME . '/const.php', "<?php /* 调试文件 */\n" . $defines);
+	
+	// 用于IDE代码补全、常量文件生成
+	echo_line("写入常量调试符号。");
+	$defines = '';
+	foreach($consts as $k => $v){
+		$defines .= "define('{$k}', " . var_export($v, true) . ");\n";
 	}
+	file_put_contents(RUNTIME_PATH . APP_NAME . '/const.php', "<?php /* 调试文件 */\n" . $defines);
 }

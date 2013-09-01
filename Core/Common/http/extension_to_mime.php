@@ -1,0 +1,68 @@
+<?php
+/**
+ * @param $ext
+ *
+ * @return string
+ */
+function extension_to_mime($ext){
+	static $mime = [
+		'html'       => 'text/html',
+		'css'        => 'text/css',
+		'xml'        => 'text/xml',
+		'less'       => 'text/less',
+		'js'         => 'text/javascript',
+		'json'         => 'text/json',
+		'manifest'   => 'text/cache-manifest',
+		'php'       => 'text/php',
+		'gif'        => 'image/gif',
+		'jpeg'       => 'image/jpeg',
+		'jpg'        => 'image/jpeg',
+		'atom'       => 'application/atom+xml',
+		'rss'        => 'application/rss+xml',
+		'mml'        => 'text/mathml',
+		'txt'        => 'text/plain',
+		'wml'        => 'text/vnd.wap.wml',
+		'htc'        => 'text/x-component',
+		'png'        => 'image/png',
+		'tiftiff'    => 'image/tiff',
+		'wbmp'       => 'image/vnd.wap.wbmp',
+		'ico'        => 'image/x-icon',
+		'jng'        => 'image/x-jng',
+		'bmp'        => 'image/x-ms-bmp',
+		'svg'        => 'image/svg+xml',
+		'doc'        => 'application/msword',
+		'pdf'        => 'application/pdf',
+		'psepsai'    => 'application/postscript',
+		'rtf'        => 'application/rtf',
+		'7z'         => 'application/x-7z-compressed',
+		'cco'        => 'application/x-cocoa',
+		'run'        => 'application/x-makeself',
+		'plpm'       => 'application/x-perl',
+		'prcpdb'     => 'application/x-pilot',
+		'rar'        => 'application/x-rar-compressed',
+		'rpm'        => 'application/x-redhat-package-manager',
+		'sea'        => 'application/x-sea',
+		'swf'        => 'application/x-shockwave-flash',
+		'sit'        => 'application/x-stuffit',
+		'tcltk'      => 'application/x-tcl',
+		'xhtml'      => 'application/xhtml+xml',
+		'zip'        => 'application/zip',
+		'midmidikar' => 'audio/midi',
+		'mp3'        => 'audio/mpeg',
+		'ogg'        => 'audio/ogg',
+		'm4a'        => 'audio/x-m4a',
+		'ra'         => 'audio/x-realaudio',
+		'3gpp3gp'    => 'video/3gpp',
+		'mp4'        => 'video/mp4',
+		'mpegmpg'    => 'video/mpeg',
+		'mov'        => 'video/quicktime',
+		'flv'        => 'video/x-flv',
+		'm4v'        => 'video/x-m4v',
+		'mng'        => 'video/x-mng',
+		'asxasf'     => 'video/x-ms-asf',
+		'wmv'        => 'video/x-ms-wmv',
+		'avi'        => 'video/x-msvideo',
+	];
+
+	return isset($mime[$ext])? $mime[$ext] : 'application/octet-stream';
+}

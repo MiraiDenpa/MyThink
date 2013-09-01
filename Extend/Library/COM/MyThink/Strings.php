@@ -232,10 +232,11 @@ class Strings{
 			}
 		}
 		if($flag&STR_TRIM_RIGHT){
-			while(strpos($string, $pattern) === strlen($string)-$pSize){
+			while(strpos($string, $pattern) === strlen($string) - $pSize){
 				$string = substr($string, 0, -$pSize);
 			}
 		}
 		return $string;
 	}
+
 }

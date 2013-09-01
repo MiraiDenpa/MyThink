@@ -1,0 +1,64 @@
+<layout name="!mainStruct" xmlns="http://www.w3.org/1999/html">
+	$title=$message.' - 未来电波';
+</layout>
+
+<AppendHeader>
+	<script type="text/javascript">
+		var total = intval('{$timeout}');
+		function refresh(){
+			var jmp = $('#jumper');
+			if(!jmp.length){
+				clearInterval(tv);
+				return;
+			}
+			if(total){
+				jmp.html('' + total + '秒后跳转');
+			} else{
+				jmp.html('正在跳转...');
+				clearInterval(tv);
+				if({$__APP_DEBUG__}){
+					$.dialog.alert('跳转到 ' + jmp.parent().attr('href')).title('调试模式');
+				} else{
+					window.location.href = jmp.parent().attr('href');
+					$('body').css('opacity', 0);
+				}
+			}
+		}
+		var tv = setInterval(function (){
+			total--;
+			refresh();
+		}, 1000);
+		$(refresh);
+	</script>
+</AppendHeader>
+
+<div class="container">
+	<div class="jumbotron fixed" style="margin:40px;">
+		<div class="clearfix row">
+			<h2>
+				<span class="glyphicon glyphicon-warning-sign" style="margin-right: 10px;margin-left: 20px"></span>
+
+				错误{$code}　－　{$message}
+			</h2>
+		</div>
+		<div class="row">
+			<div class="well" style="height: 300px">
+				<span class="text-muted">额外信息：</span>
+				<div>{$name}</div>
+				
+				<h3 class="text-warning">{$extra}</h3>
+
+				<div>{$info}</div>
+			</div>
+
+			<div id="actions" class="col-md-12 panel panel-footer text-center">
+				<a href="/" class="btn btn-primary btn-lg pull-left">&lt;&lt; 回首页</a>
+				{$jumpurl}
+				&nbsp;
+				<div class="pull-right">
+					{$redirect}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

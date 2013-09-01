@@ -12,7 +12,7 @@ function xdebug_filepath_anchor($file, $line = 0, $name = ''){
 	$url     = str_replace('%f', $file, $formart);
 	$url     = str_replace('%l', $line, $url);
 	if(!$name){
-		$name = $file.':'.$line;
+		$name = basename($file).':'.$line;
 	}
 
 	return "&nbsp;<a href='{$url}'>{$name}</a>&nbsp;";

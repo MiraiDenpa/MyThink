@@ -1,34 +1,48 @@
 <?php
-function html_whitespace($content, $force = false){
-	
-	// <DEBUG>
-	if(!$force){
-		$content = str_replace("\n\n", "\n", $content);
-		$content = str_replace("\n\n", "\n", $content);
-		$content = str_replace("\n\n", "\n", $content);
-	}else{
-		// </DEBUG>
-		$find        = array('#^\s+<#ms','#>\s+$#ms');
-		$replace     = array('<','>');
-		$content = preg_replace($find, $replace, $content);
-		// <DEBUG>
+/**
+ * 清理HTML代码，删除所有不必要的空格和各种注释
+ *
+ * @param string $content
+ *
+ * @return string
+ */
+function html_whitespace($content){
+	$cache_replace = [];
+	if(preg_match_all('#(<script.*?>)(.*?)</script>#s', $content, $mats)){
+		foreach($mats[2] as $id => $script){
+			if(!trim($script)){
+				continue;
+			}
+			$minize = script_whitespace($script);
+
+			$cid                 = md5(rand()) . '-js' . $id;
+			$cache_replace[$cid] = $minize;
+			$content             = str_replace($mats[0][$id], $mats[1][$id] . $cid . '</script>', $content);
+		}
 	}
-	// </DEBUG>
-	
-	/* 去除html空格与换行 */
-	if($force){
-		$content = str_replace(">\n", '>', $content);
+	if(preg_match_all('#(<style.*?>)(.*?)</style>#s', $content, $mats)){
+		foreach($mats[2] as $id => $script){
+			if(!trim($script)){
+				continue;
+			}
+			$minize = style_whitespace($script);
+
+			$cid                 = md5(rand()) . '-css' . $id;
+			$cache_replace[$cid] = $minize;
+			$content             = str_replace($mats[0][$id], $mats[1][$id] . $cid . '</style>', $content);
+		}
 	}
-	
-	if(!STATIC_DEBUG){
-		// inline style & js
-		$content = preg_replace_callback('#<style type="text/css".*?>.*?</style>#s', function($mats){
-			return "\n".preg_replace('#\s+#s',' ',$mats[0]);
-		}, $content);
-		$content = preg_replace_callback('#<script type="text/javascript".*?>.*?</script>#s', function($mats){
-			return "\n".preg_replace('#\n\s*#s',' ',$mats[0]);
-		}, $content);
-	}
-	
+
+	$search  = [
+		'#^\s+#is',
+		'#\s+(<[a-z!/])#is',
+	];
+	$replace = [
+		'',
+		'\1',
+	];
+	$content = preg_replace($search, $replace, $content);
+	$content = str_replace(array_keys($cache_replace), array_values($cache_replace), $content);
+
 	return $content;
 }

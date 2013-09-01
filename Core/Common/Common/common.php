@@ -122,57 +122,6 @@ function I($name, $default = '', $filter = null){
 }
 
 /**
- * 批量导入文件 成功则返回
- * @param array   $array  文件数组
- * @param boolean $return 加载成功后是否返回
- *
- * @return boolean
- */
-function require_array($array, $return = false){
-	foreach($array as $file){
-		if(require_once ($file) && $return){
-			return true;
-		}
-	}
-	if($return){
-		return false;
-	}
-}
-
-/**
- * 按顺序尝试导入文件
- * 第一个成功导入的文件返回
- *
- * @param array $array 文件列表
- * @param       string [out] $hit 被引入的文件
- *
- * @return mixed
- */
-function require_one(array $array, &$hit = null){
-	foreach($array as $file){
-		if(is_file($file)){
-			$hit = $file;
-
-			return require_once $file;
-		}
-	}
-	Think::halt('require_one: 找不到任何一个文件：' . implode_l("\n", $array));
-	exit();
-}
-
-/**
- * 批量导入文件
- * 导入全部文件，不返回
- */
-function require_all(array $array){
-	foreach($array as $file){
-		if(is_file($file)){
-			require_once $file;
-		}
-	}
-}
-
-/**
  * 基于命名空间方式导入函数库
  * load('@.Util.Array')
  *

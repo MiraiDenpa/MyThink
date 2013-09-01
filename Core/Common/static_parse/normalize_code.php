@@ -1,8 +1,8 @@
 <?php
 /**
- * 
+ * 清理PHP代码，删除所有不必要的空格和非文档注释
  *
- * @param string $code
+ * @param string $content
  *
  * @return string
  */
@@ -16,7 +16,6 @@ function normalize_code($content){
 		} else{
 			switch($tokens[$i][0]){
 			case T_COMMENT:
-				//过滤各种PHP注释
 				break;
 			case T_OPEN_TAG_WITH_ECHO:
 				$stripStr .= "<?php echo ";

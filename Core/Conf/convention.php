@@ -59,14 +59,13 @@ return array(
 	// SQL执行日志记录
 
 	/* 数据缓存设置 */
-	'DATA_CACHE_TIME'       => 0,
-	// 数据缓存有效期 0表示永久缓存
+	'DATA_CACHE_TIME'       => 1800,
+	// 数据缓存有效期(秒) 0表示永久缓存
 	'DATA_CACHE_COMPRESS'   => false,
 	// 数据缓存是否压缩缓存
 	'DATA_CACHE_CHECK'      => false,
 	// 数据缓存是否校验缓存
 	'DATA_CACHE_PREFIX'     => '',
-	'DEFAULT_CHARSET'       => 'utf-8',
 	// 缓存前缀
 	'MEMCACHE_CONNECT'      => 'localhost:11211',
 	/* 日志设置 */
@@ -123,5 +122,7 @@ return array(
 	'HTTP_CACHE_CONTROL'    => 'private',
 	// 网页缓存控制
 
-	'PAGE_TRACE_SAVE'       => !APP_DEBUG,
+	'PAGE_TRACE_SAVE'       => false,
+	'DEFAULT_ACTION'        => 'Empty',
+	'DEFAULT_METHOD'        => 'index',
 );

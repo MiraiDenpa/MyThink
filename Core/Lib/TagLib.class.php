@@ -84,7 +84,8 @@ class TagLib{
 	 * TagLib标签属性分析 返回标签属性数组
 	 * @access public
 	 *
-	 * @param string $tagStr 标签内容
+	 * @param string $attr 属性字符串
+	 * @param string $tag  标签名称
 	 *
 	 * @return array
 	 */
@@ -94,27 +95,33 @@ class TagLib{
 		$xml  = '<tpl><tag ' . $attr . ' /></tpl>';
 		$xml  = simplexml_load_string($xml);
 		if(!$xml){
-			throw_exception(LANG_XML_TAG_ERROR . '<' . $tag . '/> : ' . $attr);
+			Think::halt(LANG_XML_TAG_ERROR . '<' . $tag . '/> : ' . $attr);
 		}
-		$xml   = (array)($xml->tag->attributes());
+		$ltag = strtolower($tag);
+		$xml  = (array)($xml->tag->attributes());
+		if(empty($xml['@attributes'])){
+			return [];
+		}
 		$array = array_change_key_case($xml['@attributes']);
-		if($array){
-			$attrs = explode(',', $this->tags[strtolower($tag)]['attr']);
-			if(isset($this->tags[strtolower($tag)]['must'])){
-				$must = explode(',', $this->tags[strtolower($tag)]['must']);
-			} else{
-				$must = array();
-			}
-			foreach($attrs as $name){
-				if(isset($array[$name])){
-					$array[$name] = str_replace('___', '&', $array[$name]);
-				} elseif(false !== array_search($name, $must)){
-					throw_exception(LANG_PARAM_ERROR . '<' . $tag . '/> :' . $name);
-				}
-			}
-
-			return $array;
+		if($this->tags[$ltag]['attr']){
+			$attrs = explode(',', $this->tags[$ltag]['attr']);
+		} else{
+			$attrs = [];
 		}
+		if(isset($this->tags[$ltag]['must'])){
+			$must = explode(',', $this->tags[$ltag]['must']);
+		} else{
+			$must = array();
+		}
+		foreach($attrs as $name){
+			if(isset($array[$name])){
+				$array[$name] = str_replace('___', '&', $array[$name]);
+			} elseif(false !== array_search($name, $must)){
+				Think::halt(LANG_PARAM_ERROR . '<' . $tag . '/> :' . $name);
+			}
+		}
+
+		return $array;
 	}
 
 	/**
@@ -136,10 +143,10 @@ class TagLib{
 			$condition = preg_replace('/\$(\w+)\.(\w+)\s/is', '$\\1->\\2 ', $condition);
 			break;
 		default: // 自动判断数组或对象 只支持二维
-			$condition = preg_replace('/\$(\w+)\.(\w+)\s/is', '(is_array($\\1)?$\\1["\\2"]:$\\1->\\2) ', $condition);
+			$condition = preg_replace('/\$(\w+)\.(\w+)\s/is', '(is_array($\\1)?$\\1[\'\\2\']:$\\1->\\2) ', $condition);
 		}
-		if(false !== strpos($condition, '$Think')){
-			$condition = preg_replace('/(\$Think.*?)\s/ies', "\$this->parseThinkVar('\\1');", $condition);
+		if(false !== strpos($condition, '$__')){
+			$condition = preg_replace_callback('/(\$__*?)\s/is', 'parseGlobalVar', $condition);
 		}
 
 		return $condition;
@@ -154,9 +161,9 @@ class TagLib{
 	 * @return string
 	 */
 	public function autoBuildVar($name){
-		if('Think.' == substr($name, 0, 6)){
+		if('__' == substr($name, 0, 2)){
 			// 特殊变量
-			return $this->parseThinkVar($name);
+			return parseGlobalVar($name);
 		} elseif(strpos($name, '.')){
 			$vars = explode('.', $name);
 			$var  = array_shift($vars);
@@ -165,9 +172,9 @@ class TagLib{
 				$name = '$' . $var;
 				foreach($vars as $key => $val){
 					if(0 === strpos($val, '$')){
-						$name .= '["{' . $val . '}"]';
+						$name .= '[' . $val . ']';
 					} else{
-						$name .= '["' . $val . '"]';
+						$name .= '[' . var_export($val, true) . ']';
 					}
 				}
 				break;
@@ -178,7 +185,12 @@ class TagLib{
 				}
 				break;
 			default: // 自动判断数组或对象 只支持二维
-				$name = 'is_array($' . $var . ')?$' . $var . '["' . $vars[0] . '"]:$' . $var . '->' . $vars[0];
+				if(0 === strpos($vars[0], '$')){
+					$name .= '[' . $vars[0] . ']';
+				} else{
+					$name .= '[' . var_export($vars[0], true) . ']';
+				}
+				$name = 'is_array($' . $var . ')?$' . $var . '[' . $name . ']:$' . $var . '->' . $vars[0];
 			}
 		} elseif(!defined($name)){
 			$name = '$' . $name;
@@ -196,77 +208,38 @@ class TagLib{
 	 *
 	 * @return string
 	 */
-	public function parseThinkVar($varStr){
-		$vars     = explode('.', $varStr);
-		$vars[1]  = strtoupper(trim($vars[1]));
+	public function parseGlobalVar($varStr){
+		$vars     = explode('.', substr($varStr, 2));
+		$vars[0]  = strtoupper(trim($vars[0]));
 		$parseStr = '';
-		if(count($vars) >= 3){
-			$vars[2] = trim($vars[2]);
-			switch($vars[1]){
-			case 'SERVER':
-				$parseStr = '$_SERVER[\'' . $vars[2] . '\']';
+		if(count($vars) >= 1){
+			$vars[1] = trim($vars[1]);
+			switch($vars[0]){
+			case 'C':
+				$parseStr = strtoupper($vars[1]);
 				break;
-			case 'GET':
-				$parseStr = '$_GET[\'' . $vars[2] . '\']';
+			case 'L':
+				$parseStr = 'LANG_' . strtoupper($vars[1]);
 				break;
-			case 'POST':
-				$parseStr = '$_POST[\'' . $vars[2] . '\']';
-				break;
-			case 'COOKIE':
-				if(isset($vars[3])){
-					$parseStr = '$_COOKIE[\'' . $vars[2] . '\'][\'' . $vars[3] . '\']';
-				} elseif(COOKIE_PREFIX){
-					$parseStr = '$_COOKIE[\'' . COOKIE_PREFIX . $vars[2] . '\']';
-				} else{
-					$parseStr = '$_COOKIE[\'' . $vars[2] . '\']';
-				}
-				break;
-			case 'SESSION':
-				if(isset($vars[3])){
-					$parseStr = '$_SESSION[\'' . $vars[2] . '\'][\'' . $vars[3] . '\']';
-				} elseif(SESSION_PREFIX){
-					$parseStr = '$_SESSION[\'' . SESSION_PREFIX . '\'][\'' . $vars[2] . '\']';
-				} else{
-					$parseStr = '$_SESSION[\'' . $vars[2] . '\']';
-				}
-				break;
-			case 'ENV':
-				$parseStr = '$_ENV[\'' . $vars[2] . '\']';
-				break;
-			case 'REQUEST':
-				$parseStr = '$_REQUEST[\'' . $vars[2] . '\']';
-				break;
-			case 'CONST':
-				$parseStr = strtoupper($vars[2]);
-				break;
-			case 'LANG':
-				$parseStr = 'L("' . $vars[2] . '")';
-				break;
-			case 'CONFIG':
-				$parseStr = 'C("' . $vars[2] . '")';
-				break;
+			default:
+				trigger_error('未知全局变量名：' . $vars[0], E_USER_NOTICE);
 			}
-		} else if(count($vars) == 2){
-			switch($vars[1]){
+		} else if(count($vars) == 1){
+			switch($vars[0]){
 			case 'NOW':
-				$parseStr = "date('Y-m-d g:i a',time())";
+				$parseStr = "date('Y-m-d g:i a')";
 				break;
-			case 'VERSION':
-				$parseStr = 'THINK_VERSION';
-				break;
-			case 'TEMPLATE':
-				$parseStr = 'TEMPLATE_NAME';
-				break;
-			case 'LDELIM':
+			case 'DLEFT':
 				$parseStr = 'TMPL_L_DELIM';
 				break;
-			case 'RDELIM':
+			case 'DRIGHT':
 				$parseStr = 'TMPL_R_DELIM';
 				break;
 			default:
-				if(defined($vars[1])){
-					$parseStr = $vars[1];
+				if(\COM\MyThink\Strings::isEndWith($vars[0], '__')){
+					return strtoupper(trim($vars[0], '_'));
 				}
+				trigger_error('未知全局变量名：' . $vars[0], E_USER_NOTICE);
 			}
 		}
 

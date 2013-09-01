@@ -32,93 +32,16 @@ class Think{
 	 * @return void
 	 */
 	static public function start(){
-		trace('程序执行开始，注册处理程序。','','INFO');
+		trace('程序执行开始，注册处理程序。', '', 'INFO');
 		// 设定错误和异常处理
 		register_shutdown_function(array('Think', 'checkFatalError'));
 		set_error_handler(array('Think', 'appError'));
 		set_exception_handler(array('Think', 'appException'));
-		spl_autoload_register(array('Think', 'autoload'));
+		//spl_autoload_register(array('Think', 'autoload'));
 
-		self::$main_out_buffer = new OutputBuffer('ContentReplace');
+		header('Content-Type: text/html; charset=utf8');
+		self::$main_out_buffer            = new OutputBuffer('ContentReplace');
 		self::$main_out_buffer->end_flush = true;
-	}
-
-	/**
-	 * 自动加载
-	 *
-	 * @param $class
-	 *
-	 * @return bool
-	 */
-	public static function autoload($class){
-		// 检查是否存在别名定义
-		if($ret = alias_import($class)){
-			return $ret;
-		}
-		$file = $class . '.php';
-		if(substr($class, -8) == 'Behavior'){ // 加载行为
-			if(require_one([
-						   CORE_PATH . 'Behavior/' . $file,
-						   EXTEND_PATH . 'Behavior/' . $file,
-						   BASE_LIB_PATH . 'Behavior/' . $file,
-						   LIB_PATH . 'Behavior/' . $file
-						   ])
-			){
-				return true;
-			}
-		} elseif(substr($class, -5) == 'Model'){ // 加载模型
-			if(require_one(array(
-								LIB_PATH . 'Model/' . $file,
-								BASE_LIB_PATH . 'Model/' . $file,
-								EXTEND_PATH . 'Model/' . $file
-						   ))
-			){
-				return true;
-			}
-		} elseif(substr($class, -6) == 'Action'){ // 加载控制器
-			if(require_one(array(
-								LIB_PATH . 'Action/' . $file,
-								BASE_LIB_PATH . 'Action/' . $file,
-								EXTEND_PATH . 'Action/' . $file
-						   ))
-			){
-				return true;
-			}
-		} elseif(substr($class, 0, 5) == 'Cache'){ // 加载缓存驱动
-			if(require_one(array(
-								EXTEND_PATH . 'Driver/Cache/' . $file,
-								CORE_PATH . 'Driver/Cache/' . $file
-						   ))
-			){
-				return true;
-			}
-		} elseif(substr($class, 0, 2) == 'Db'){ // 加载数据库驱动
-			if(require_one(array(
-								EXTEND_PATH . 'Driver/Db/' . $file,
-								CORE_PATH . 'Driver/Db/' . $file
-						   ))
-			){
-				return true;
-			}
-		} elseif(substr($class, 0, 8) == 'Template'){ // 加载模板引擎驱动
-			if(require_one(array(
-								EXTEND_PATH . 'Driver/Template/' . $file,
-								CORE_PATH . 'Driver/Template/' . $file
-						   ))
-			){
-				return true;
-			}
-		} elseif(substr($class, 0, 6) == 'TagLib'){ // 加载标签库驱动
-			if(require_one(array(
-								BASE_LIB_PATH . 'TagLib/' . $file,
-								EXTEND_PATH . 'Driver/TagLib/' . $file,
-						   ))
-			){
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	/**
@@ -157,24 +80,31 @@ class Think{
 		switch($errno){
 		case E_ERROR:
 		case E_PARSE:
+		case E_RECOVERABLE_ERROR:
+		case E_DEPRECATED:
+		case E_USER_DEPRECATED:
 		case E_CORE_ERROR:
 		case E_COMPILE_ERROR:
 		case E_USER_ERROR:
-			$halt_string =
-					'[' . error_code_to_type_str($errno) . '] ' . $errstr . xdebug_filepath_anchor(basename($errfile).':'.$errline);
+			$halt_string = '[' . error_code_to_type_str($errno) . '] ' . $errstr;
 			if(LOG_RECORD){
-				Log::write('[' . error_code_to_type_str($errno) . '] ' . $errorStr, Log::ERR);
+				Log::write('[' . error_code_to_type_str($errno) . '] ' . $errstr . ' ON ' . $errfile . ':' .
+						   $errline, Log::ERR);
 			}
-			Think::halt($halt_string);
+			Think::halt($halt_string, true, $errfile, $errline);
 			break;
-		case E_STRICT:
-		case E_USER_WARNING:
-		case E_USER_NOTICE:
+		case E_WARNING:
+			if(strpos($errstr, 'Missing argument') === 0){
+				$errstr = preg_replace_callback('#called in (.*?) on line (\d+)#', function ($mats){
+					return xdebug_filepath_anchor($mats[1], $mats[2]);
+				}, $errstr);
+			}
+			break;
 		default:
-			$halt_string = $errstr .' - '. xdebug_filepath_anchor(basename($errfile).':'.$errline);
-			trace($halt_string, error_code_to_type_str($errno), 'NOTIC');
 			break;
 		}
+		$halt_string = $errstr . ' - ' . xdebug_filepath_anchor($errfile, $errline);
+		trace($halt_string, error_code_to_type_str($errno), 'NOTIC');
 	}
 
 	/**
@@ -200,24 +130,52 @@ class Think{
 				return;
 			}
 		}
+
+		SPT(false);
 		if(Think::$main_out_buffer){
-			xdebug_debug_zval_stdout(Think::$main_out_buffer);
+			//var_dump(Think::$main_out_buffer);
 			Think::$main_out_buffer->flush();
 			Think::$main_out_buffer = null;
 		}
-		
 	}
 
 	/**
-	 * 错误输出
-	 * @param string $msg  错误
-	 * @param bool   $html 输出的是html
+	 * 输出 ** 用户不正确的输入引起的 ** 错误
+	 * @param int    $code
+	 * @param string $extra_msg
+	 *
+	 * @return void
+	 * @static
+	 */
+	public static function fail_error($code, $extra_msg = ''){
+		global $dispatcher;
+		$e                      = new Error($code);
+		$data['message']  = $e->getMessage();
+		$data['extra']  = $extra_msg;
+		$data['redirect'] = $e->getUrl();
+		$data['code']     = $e->getCode();
+		$data['info']     = $e->getInfo();
+		$data['name']     = $e->getName();
+		$data['where']    = $e->getWhere();
+		$dispatcher->display('!user_error', $data);
+		exit;
+	}
+
+	/**
+	 * 输出 ** 编程问题引起的 ** 错误
+	 * @param string     $msg  错误
+	 * @param bool       $html 输出的是html
+	 *
+	 * @param string     $file 显示错误发生于这个文件
+	 * @param string|int $line
 	 *
 	 * @return void
 	 * @exit
 	 */
-	public static function halt($msg, $html = false){
-		if(self::$main_out_buffer) self::$main_out_buffer->clean();
+	public static function halt($msg, $html = false, $file = '', $line = ''){
+		if(self::$main_out_buffer){
+			self::$main_out_buffer->clean();
+		}
 		if(!defined('APP_DEBUG')){ // 
 			header('Content-Type:text/html; charset=utf-8');
 			if($html){
@@ -231,14 +189,23 @@ class Think{
 		}
 		$trace   = debug_backtrace();
 		$content = ob_get_contents();
-		
-		$file = $trace[1]['file'];
-		$line = $trace[1]['line'];
-		
+
+		if(!$file){
+			$file = $trace[1]['file'];
+		}
+		if(!$line){
+			$line = $trace[1]['line'];
+		}
+
 		require TMPL_EXCEPTION_FILE;
-		if(self::$main_out_buffer) self::$main_out_buffer->flush();
-		
-		if(SHOW_TRACE) SPT(false);
+		if(self::$main_out_buffer){
+			self::$main_out_buffer->flush();
+		}
+
+		if(SHOW_TRACE){
+			define('FORCE_TRACE', true);
+			SPT(false);
+		}
 		self::$main_out_buffer = null;
 		while(ob_get_level()){
 			ob_end_flush();

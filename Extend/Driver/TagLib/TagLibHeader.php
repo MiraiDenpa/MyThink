@@ -4,51 +4,59 @@
  * 将内容送进头部
  */
 class TagLibHeader extends TagLib{
+	protected $super_head = '';
 	protected $prepend = '';
 	protected $append = '';
 
 	protected $tags = array(
-		'AppendHeader'  => array(
+		'addheader'  => [
+			'attr'  => 'browserlib',
+			'must'  => '',
+			'close' => 1
+		],
+		'browserlib' => [
 			'attr'  => '',
 			'must'  => '',
 			'close' => 1
-		),
-		'PrependHeader' => array(
-			'attr'  => '',
-			'must'  => '',
-			'close' => 1
-		),
-		'BrowserLib'    => array(
-			'attr'  => '',
-			'must'  => '',
-			'close' => 1
-		),
+		],
 	);
 
 	/**
-	 * 在标准头部前方添加
-	 * 用来添加css
+	 * 在标准头添加内容
+	 * 解析 script style meta link base
+	 * 其余的标签原样返回
 	 *
 	 * @param $attr    空
 	 * @param $content 要添加的内容
 	 *
-	 * @return void
+	 * @return string
 	 */
-	public function _PrependHeader($attr, $content){
-		$this->prepend .= $content . "\n";
-	}
+	public function _AddHeader($attr, $content){
+		$tag = $this->parseXmlAttr($attr, 'AddHeader');
+		if(isset($tag['browserlib'])){
+			$this->_BrowserLib('', str_replace(',', "\n", $tag['browserlib']));
+		}
+		preg_match_all('#<(script|style)[^>]*>.*</\1>#is', $content, $mats);
+		foreach($mats[1] as $id => $type){
+			if($type == 'script'){
+				$this->append .= $mats[0][$id];
+			} else{
+				$this->prepend .= $mats[0][$id];
+			}
+			$content = str_replace($mats[0][$id], '', $content);
+		}
+		preg_match_all('#<(meta|base)[^>]*/?>(</\1>)?#is', $content, $mats);
+		foreach($mats[0] as $tag){
+			$this->super_head .= $tag;
+			$content = str_replace($tag, '', $content);
+		}
+		preg_match_all('#<(link)[^>]*/?>(</\1>)?#is', $content, $mats);
+		foreach($mats[0] as $tag){
+			$this->prepend .= $tag;
+			$content = str_replace($tag, '', $content);
+		}
 
-	/**
-	 * 在标准头部后方添加
-	 * 用于js
-	 *
-	 * @param $attr    空
-	 * @param $content 要添加的内容
-	 *
-	 * @return void
-	 */
-	public function _AppendHeader($attr, $content){
-		$this->append .= $content . "\n";
+		return trim($content);
 	}
 
 	/**
@@ -77,13 +85,12 @@ class TagLibHeader extends TagLib{
 		}
 
 		$content = HTML::importFile(searchPublic($css));
-		if($content){
-			$this->_PrependHeader('', trim($content));
-		}
-
-		$content = HTML::importFile(searchPublic($js));
-		if($content){
-			$this->_AppendHeader('', trim($content));
+		$content .= HTML::importFile(searchPublic($js));
+		if(trim($content)){
+			$ret = $this->_AddHeader('', trim($content));
+			if($ret){
+				Think::halt('无法添加头部：多余内容' . dump_some($ret));
+			}
 		}
 	}
 
@@ -91,37 +98,61 @@ class TagLibHeader extends TagLib{
 	 * 用来获得头部的输出函数，只用于CompileHeader函数
 	 * FIXME 需要解耦合
 	 *
+	 * @param $type
+	 *  script | style
+	 *
 	 * @return string
 	 */
-	public function getHeader(){
-		$content = \COM\MyThink\Strings::tabMultiline(str_replace('<!--/-->', $this->prepend, TagLibHeader::StandardHeader()) .
-													  $this->append);
-		if(STATIC_DEBUG){
-			return trim($content);
+	public function getHeader($type){
+		$content = TagLibHeader::StandardHeader($type);
+
+		if($this->super_head){
+			$content = $this->super_head."\n<!-- SuperHead -->\n".$content;
+			$this->super_head = '';
+		}
+		
+		if($type == 'script'){
+			$ret          = trim($content) . $this->append;
+			$this->append = '';
 		} else{
+			$ret           = trim($content) . $this->prepend;
+			$this->prepend = '';
+		}
+		if(!STATIC_DEBUG){
 			return trim($this->concatStatic($content));
 		}
+		return $ret;
 	}
 
 	/**
 	 * 返回标准头部
 	 *
-	 * @param $title
+	 * @param $type
+	 * sctipt | style
 	 *
 	 * @return string
 	 */
-	public static function StandardHeader(){
+	protected static function StandardHeader($type){
+		static $send = [];
 		$head = '';
-		$head .= HTML::importFile(searchPublic('bootstrap.css'));
-		$head .= HTML::css(PUBLIC_URL . '/artDialog/skins/<?php echo art_skin();?>.css');
-		$head .= '<!--/-->';
-		$head .= HTML::importFile(searchPublic('jquery.js'));
-		$head .= HTML::importFile(searchPublic('bootstrap.js'));
-		$head .= HTML::importFile(searchPublic('jquery.artDialog.js'));
-		$head .= HTML::importFile(searchPublic('artDialog.plugins.js'));
-		if(APP_DEBUG){
-			$head .= HTML::importFile(searchPublic(['debugless.js', 'less.js']));
+		if(!isset($send[$type])){
+			$send[$type] = 1;
+			if($type == 'style'){
+				$head .= HTML::importFile(searchPublic('bootstrap.css'));
+				$head .= HTML::css(PUBLIC_URL . '/artDialog/skins/<?php echo art_skin();?>.css');
+				$head .= HTML::importFile(searchPublic('global.less'));
+				$head .= "\n<!-- Standard Header CSS -->";
+			} else{
+				$head .= HTML::importFile(searchPublic(['global.js', 'phpjs.js', 'basevar.js', 'jquery.js']));
+				$head .= HTML::importFile(searchPublic(['bootstrap.js', 'jquery.artDialog.js']));
+				$head .= HTML::importFile(searchPublic('artDialog.plugins.js'));
+				if(APP_DEBUG){
+					$head .= HTML::importFile(searchPublic(['less.js']));
+				}
+				$head .= "\n<!-- Standard Header JS -->";
+			}
 		}
+		$head .= HTML::getExtraHeader($type);
 
 		return $head;
 	}

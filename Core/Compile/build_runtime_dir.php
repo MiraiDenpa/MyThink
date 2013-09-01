@@ -18,4 +18,7 @@ if(!is_dir(TEMP_PATH)){
 if(!is_dir(DATA_PATH)){
 	mkdir(DATA_PATH, 0777, true); // 数据文件目录
 }
+if(!is_dir(CACHE_PATH.'meta')){
+	mkdir(CACHE_PATH.'meta', 0777, true); // 类型信息缓存
+}
 

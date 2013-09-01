@@ -48,11 +48,13 @@ class TagLibCx extends TagLib{
 		'notpresent' => array('attr' => 'name', 'level' => 3),
 		'defined'    => array('attr' => 'name', 'level' => 3),
 		'notdefined' => array('attr' => 'name', 'level' => 3),
-		'import'     => array('attr' => 'file,href,type,value,basepath', 'close' => 0, 'alias' => 'load,css,js'),
 		'assign'     => array('attr' => 'name,value', 'close' => 0),
 		'define'     => array('attr' => 'name,value', 'close' => 0),
 		'for'        => array('attr' => 'start,end,name,comparison,step', 'level' => 3),
 		'url'        => array('attr' => 'app,action,method,params,suffix,protocol', 'close' => 0),
+		'script'     => ['attr' => 'type,wrap,globals,declare', 'must' => 'type', 'close' => 1],
+		'style'      => ['attr' => 'type', 'must' => 'type', 'close' => 1],
+		//'formdescript' => ['attr' => 'template', 'must' => 'template', 'close' => 1],
 	);
 
 	/**
@@ -93,10 +95,17 @@ class TagLibCx extends TagLib{
 		if(isset($_iterateParseCache[$cacheIterateId])){
 			return $_iterateParseCache[$cacheIterateId];
 		}
-		$tag      = $this->parseXmlAttr($attr, 'volist');
-		$name     = $tag['name'];
-		$id       = $tag['id'];
-		$empty    = isset($tag['empty'])? $tag['empty'] : '';
+		$tag   = $this->parseXmlAttr($attr, 'volist');
+		$name  = $tag['name'];
+		$id    = $tag['id'];
+		$empty = isset($tag['empty'])? $tag['empty'] : '';
+		if($empty{0} == ':'){
+			$empty = substr($empty, 1);
+		} elseif(strpos($empty, 'LANG_') === 0){
+			$empty = substr($empty, 1);
+		} elseif($empty{0} != '$'){
+			$empty = var_export($empty, true);
+		}
 		$key      = !empty($tag['key'])? $tag['key'] : 'key';
 		$index    = !empty($tag['index'])? $tag['index'] : 'i';
 		$mod      = isset($tag['mod'])? $tag['mod'] : null;
@@ -111,7 +120,7 @@ class TagLibCx extends TagLib{
 		$parseStr .= "if(is_array({$name})):\n"; // -- 1
 		$parseStr .= "\t\${$index} = 0;\n";
 		$parseStr .= "\tif( count({$name})==0 ):\n";
-		$parseStr .= "\t\techo \"{$empty}\";\n";
+		$parseStr .= "\t\techo {$empty};\n";
 		$parseStr .= "\telse:\n";
 		$parseStr .= "\t\tforeach({$name} as \${$key}=>\${$id}):\n";
 		if($mod){
@@ -120,14 +129,14 @@ class TagLibCx extends TagLib{
 		$parseStr .= "\t\t\t++\${$index};\n?>";
 		$parseStr .= $this->tpl->parse($content);
 		$parseStr .= "\n<?php\n\t\tendforeach;\n";
-		$parseStr .= "\tendif;\nelse:\n\techo \"{$empty}\";\nendif; ?>\n";
+		$parseStr .= "\tendif;\nelse:\n\techo {$empty};\nendif; ?>\n";
 		$_iterateParseCache[$cacheIterateId] = $parseStr;
 
 		if(!empty($parseStr)){
 			return $parseStr;
 		}
 
-		return;
+		return '';
 	}
 
 	/**
@@ -270,10 +279,10 @@ class TagLibCx extends TagLib{
 			$values = explode('|', $value);
 			$value  = '';
 			foreach($values as $val){
-				$value .= 'case "' . addslashes($val) . '": ';
+				$value .= 'case ' . var_export($val, true) . ': ';
 			}
 		} else{
-			$value = 'case "' . $value . '": ';
+			$value = 'case ' . var_export($value, true) . ': ';
 		}
 		$parseStr = '<?php ' . $value . ' ?>' . $content;
 		$isBreak  = isset($tag['break'])? $tag['break'] : '';
@@ -326,7 +335,7 @@ class TagLibCx extends TagLib{
 		if('$' == substr($value, 0, 1)){
 			$value = $this->autoBuildVar(substr($value, 1));
 		} else{
-			$value = '"' . $value . '"';
+			$value = var_export($value, true);
 		}
 		$parseStr = '<?php if((' . $name . ') ' . $type . ' ' . $value . '): ?>' . $content . '<?php endif; ?>';
 
@@ -519,7 +528,7 @@ class TagLibCx extends TagLib{
 	public function _defined($attr, $content){
 		$tag      = $this->parseXmlAttr($attr, 'defined');
 		$name     = $tag['name'];
-		$parseStr = '<?php if(defined("' . $name . '")): ?>' . $content . '<?php endif; ?>';
+		$parseStr = '<?php if(defined(' . var_export($name, true) . ')): ?>' . $content . '<?php endif; ?>';
 
 		return $parseStr;
 	}
@@ -530,101 +539,6 @@ class TagLibCx extends TagLib{
 		$parseStr = '<?php if(!defined("' . $name . '")): ?>' . $content . '<?php endif; ?>';
 
 		return $parseStr;
-	}
-
-	/**
-	 * import 标签解析 <import file="Js.Base" />
-	 * <import file="Css.Base" type="css" />
-	 * @access public
-	 *
-	 * @param string  $attr     标签属性
-	 * @param string  $content  标签内容
-	 * @param boolean $isFile   是否文件方式
-	 * @param string  $type     类型
-	 *
-	 * @return string
-	 */
-	public function _import($attr, $content, $isFile = false, $type = ''){
-		$tag      = $this->parseXmlAttr($attr, 'import');
-		$file     = isset($tag['file'])? $tag['file'] : $tag['href'];
-		$parseStr = '';
-		$endStr   = '';
-		// 判断是否存在加载条件 允许使用函数判断(默认为isset)
-		if(isset($tag['value'])){
-			$varArray = explode('|', $tag['value']);
-			$name     = array_shift($varArray);
-			$name     = $this->autoBuildVar($name);
-			if(!empty($varArray)){
-				$name = $this->tpl->parseVarFunction($name, $varArray);
-			} else{
-				$name = 'isset(' . $name . ')';
-			}
-			$parseStr .= '<?php if(' . $name . '): ?>';
-			$endStr = '<?php endif; ?>';
-		}
-		if($isFile){
-			// 根据文件名后缀自动识别
-			$type = $type? $type : (!empty($tag['type'])? strtolower($tag['type']) : null);
-			// 文件方式导入
-			$array = explode(',', $file);
-			foreach($array as $val){
-				if(!$type || isset($reset)){
-					$type = $reset = strtolower(substr(strrchr($val, '.'), 1));
-				}
-				switch($type){
-				case 'js':
-					$parseStr .= '<script type="text/javascript" src="' . $val . '"></script>';
-					break;
-				case 'css':
-					$parseStr .= '<link rel="stylesheet" type="text/css" href="' . $val . '" />';
-					break;
-				case 'php':
-					$parseStr .= '<?php require_cache("' . $val . '"); ?>';
-					break;
-				}
-			}
-		} else{
-			// 命名空间导入模式 默认是js
-			$type     = $type? $type : (!empty($tag['type'])? strtolower($tag['type']) : 'js');
-			$basepath = !empty($tag['basepath'])? $tag['basepath'] : __ROOT__ . '/Public';
-			// 命名空间方式导入外部文件
-			$array = explode(',', $file);
-			foreach($array as $val){
-				list($val, $version) = explode('?', $val);
-				switch($type){
-				case 'js':
-					$parseStr .= '<script type="text/javascript" src="' . $basepath . '/' .
-								 str_replace(array('.', '#'), array('/', '.'), $val) . '.js' .
-								 ($version? '?' . $version : '') . '"></script>';
-					break;
-				case 'css':
-					$parseStr .= '<link rel="stylesheet" type="text/css" href="' . $basepath . '/' .
-								 str_replace(array('.', '#'), array('/', '.'), $val) . '.css' .
-								 ($version? '?' . $version : '') . '" />';
-					break;
-				case 'php':
-					$parseStr .= '<?php import("' . $val . '"); ?>';
-					break;
-				}
-			}
-		}
-
-		return $parseStr . $endStr;
-	}
-
-	// import别名 采用文件方式加载(要使用命名空间必须用import) 例如 <load file="__PUBLIC__/Js/Base.js" />
-	public function _load($attr, $content){
-		return $this->_import($attr, $content, true);
-	}
-
-	// import别名使用 导入css文件 <css file="__PUBLIC__/Css/Base.css" />
-	public function _css($attr, $content){
-		return $this->_import($attr, $content, true, 'css');
-	}
-
-	// import别名使用 导入js文件 <js file="__PUBLIC__/Js/Base.js" />
-	public function _js($attr, $content){
-		return $this->_import($attr, $content, true, 'js');
 	}
 
 	/**
@@ -644,7 +558,7 @@ class TagLibCx extends TagLib{
 		if('$' == substr($tag['value'], 0, 1)){
 			$value = $this->autoBuildVar(substr($tag['value'], 1));
 		} else{
-			$value = '\'' . $tag['value'] . '\'';
+			$value = var_export($tag['value'], true);
 		}
 		$parseStr = '<?php ' . $name . ' = ' . $value . '; ?>';
 
@@ -664,11 +578,11 @@ class TagLibCx extends TagLib{
 	 */
 	public function _define($attr, $content){
 		$tag  = $this->parseXmlAttr($attr, 'define');
-		$name = '\'' . $tag['name'] . '\'';
+		$name = var_export($tag['name'], true);
 		if('$' == substr($tag['value'], 0, 1)){
 			$value = $this->autoBuildVar(substr($tag['value'], 1));
 		} else{
-			$value = '\'' . $tag['value'] . '\'';
+			$value = var_export($tag['value'], true);
 		}
 		$parseStr = '<?php define(' . $name . ', ' . $value . '); ?>';
 
@@ -732,7 +646,7 @@ class TagLibCx extends TagLib{
 
 	/**
 	 * url标签解析
-	 * 格式： <for start="" end="" comparison="" step="" name="" />
+	 * 格式： <url app="{$var}" action="Login" method="index" path="" protocol="http" suffix="html" params="varname" param-A="{$a}"/>
 	 * @access public
 	 *
 	 * @param string $attr     标签属性
@@ -781,9 +695,75 @@ class TagLibCx extends TagLib{
 
 		$ret = $url->getUrl();
 		if(!empty($tag)){
-			$ret = preg_replace('#%7B%24(.*?)%7D#','{\\$$1}',$ret);
+			$ret = preg_replace('#%7B%24(.*?)%7D#', '{\\$$1}', $ret);
 		}
 
 		return $ret;
+	}
+
+	/**
+	 * 预处理script标签
+	 *
+	 * @param $attr
+	 * @param $content
+	 *
+	 * @return string
+	 */
+	public function _script($attr, $content){
+		$tag = $this->parseXmlAttr($attr, 'script');
+		if(!STATIC_DEBUG){
+			$content = script_whitespace($content);
+		}
+		if(isset($tag['src']) || $tag['type'] != 'text/javascript' || !isset($tag['wrap']) || !$tag['wrap']){
+			return false;
+		}
+
+		$wrap    = $tag['wrap'];
+		$globals = isset($tag['globals'])? $tag['globals'] : '';
+		$declare = isset($tag['declare'])? 'var ' . $tag['declare'] . ";\n" : '';
+
+		if(STATIC_DEBUG){
+			$content = "\n" . $content . "\n";
+		}
+		switch($wrap){
+		case 'ready':
+			return '<script type="text/javascript">"use strict";' . $declare . '$(function(){' . $content .
+				   '});</script>';
+		case 'closure':
+			return '<script type="text/javascript">"use strict";' . $declare . '(function(' . $globals . '){' .
+				   $content . '})(' . $globals . ');</script>';
+		default:
+			Think::halt('&lt;script&gt; 中使用了未知的wrap属性。');
+			return '';
+		}
+	}
+
+	public function _style($attr, $content){
+		$tag = $this->parseXmlAttr($attr, 'style');
+		if(isset($tag['parse'])){
+			return false;
+		}
+		if(!STATIC_DEBUG && $tag['type'] == 'text/less'){
+			$content = "\n" . $content . "\n"; // TODO 编译less
+		} else{
+			$content = "\n" . $content . "\n";
+		}
+		$content = broswer_css_perfix($content);
+		return '<style type="text/css" parse="">' . $content . '</style>';
+	}
+
+	/**
+	 * 处理表单
+	 *
+	 * @param $attr
+	 * @param $content
+	 *
+	 * @return string
+	 */
+	public function _formdescript($attr, $content){
+		$tag = $this->parseXmlAttr($attr, 'formdescript');
+		$tpl = $tag['template'];
+		unset($tag['template']);
+		return HTML::form($content, $tpl, $tag);
 	}
 }

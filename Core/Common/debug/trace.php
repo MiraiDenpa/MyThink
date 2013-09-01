@@ -28,18 +28,22 @@ function trace($value = null, $label = null, $level = null, $record = false){
 		if($label){
 			if(TRACE_DEBUG){
 				$safetrace = xdebug_get_function_stack();
-				$trace = str_replace("\n", '', $trace);
-				$label = HTML::label($label, $lv, [
+				$trace = str_replace("\n", '', $safetrace);
+				$label = HTML::smlabel($label, $lv, [
 												  'title'   => $trace,
 												  'onclick' => '$.dialog.alert($(this).attr(\'title\').replace(/\n/g, \'<br/>\'))'
 												  ]);
 			} else{
-				$label = HTML::label($label, $lv);
+				$label = HTML::smlabel($label, $lv);
 			}
 		} else{
 			$label = trim($label);
 		}
-		$info  = dump_some($value, 0);
+		if(!is_string($value)){
+			$info  = dump_some($value, 0);
+		}else{
+			$info = $value;
+		}
 		$level = strtoupper($level);
 		if(!isset($_trace[$level])){
 			$_trace[$level] = array();

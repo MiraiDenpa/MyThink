@@ -65,6 +65,8 @@ class Db{
 	protected $selectSql = 'SELECT%DISTINCT% %FIELD% FROM %TABLE%%JOIN%%WHERE%%GROUP%%HAVING%%ORDER%%LIMIT% %UNION%%COMMENT%';
 	// 参数绑定
 	protected $bind = array();
+	// 数组，这些字段默认 = 用 LIKE 代替
+	protected $like_fields;
 
 	/**
 	 * 取得数据库类实例
@@ -82,15 +84,24 @@ class Db{
 	 * 加载数据库 支持配置文件或者 DSN
 	 * @access public
 	 *
-	 * @param mixed $db_config 数据库配置信息
+	 * @param mixed $config 数据库配置信息
 	 *
 	 * @return string
 	 */
-	public function factory($db_config = ''){
+	public function factory($config = ''){
 		// 读取数据库配置
-		$db_config = $this->parseConfig($db_config);
+		$db_config = $this->parseConfig($config);
 		if(empty($db_config['dbms'])){
-			throw_exception(LANG_NO_DB_CONFIG . ': ' . $db_config);
+			$file = '';
+			$line = 0;
+			foreach(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $level){
+				if($level['file'] && strpos($level['file'], THINK_PATH) === false){
+					$file = $level['file'];
+					$line = $level['line'];
+					break;
+				}
+			}
+			Think::halt(LANG_NO_DB_CONFIG . ': ' . $config, false, $file, $line);
 		}
 		// 数据库类型
 		$this->dbType = ucwords(strtolower($db_config['dbms']));
@@ -148,7 +159,7 @@ class Db{
 	 * @return void
 	 */
 	protected function initConnect($master = true){
-		if(1 == DB_DEPLOY_TYPE)// 采用分布式数据库
+		if(1 == DB_DEPLOY_TYPE) // 采用分布式数据库
 		{
 			$this->_linkID = $this->multiConnect($master);
 		} else // 默认单数据库
@@ -176,7 +187,7 @@ class Db{
 		// 数据库读写是否分离
 		if(DB_RW_SEPARATE){
 			// 主从式采用读写分离
-			if($master)// 主服务器写入
+			if($master) // 主服务器写入
 			{
 				$r = floor(mt_rand(0, DB_MASTER_NUM - 1));
 			} else{
@@ -513,7 +524,7 @@ class Db{
 			}
 		} else{
 			//对字符串类型字段采用模糊匹配
-			if(DB_LIKE_FIELDS && preg_match('/(' . DB_LIKE_FIELDS . ')/i', $key)){
+			if($this->like_fields && false !== array_search($key, $this->like_fields)){
 				$val = '%' . $val . '%';
 				$whereStr .= $key . ' LIKE ' . $this->parseValue($val);
 			} else{
@@ -719,13 +730,13 @@ class Db{
 				$values[] = $val[1];
 			} elseif(is_scalar($val) || is_null(($val))){ // 过滤非标量数据
 				$fields[] = $this->parseKey($key);
-				if(DB_BIND_PARAM && 0 !== strpos($val, ':')){
+				/*if(0 !== strpos($val, ':')){
 					$name     = md5($key);
 					$values[] = ':' . $name;
 					$this->bindParam($name, $val);
-				} else{
+				} else{*/
 					$values[] = $this->parseValue($val);
-				}
+				//}
 			}
 		}
 		$sql = ($replace? 'REPLACE' : 'INSERT') . ' INTO ' . $this->parseTable($options['table']) . ' (' .
@@ -810,8 +821,9 @@ class Db{
 		$sql         = $this->buildSelectSql($options);
 		$cache       = isset($options['cache'])? $options['cache'] : false;
 		if($cache){ // 查询缓存检测
+			$cas   = isset($options['cas'])? $options['cas'] : $this->model;
 			$key   = is_string($cache['key'])? $cache['key'] : md5($sql);
-			$value = SAS($cache['cas'], $key);
+			$value = SAS($cas, $key);
 			if(false !== $value){
 				return $value;
 			}
@@ -847,15 +859,15 @@ class Db{
 		}
 		if(DB_SQL_BUILD_CACHE){ // SQL创建缓存
 			$key   = md5(serialize($options));
-			$value = S($key);
-			if(false !== $value){
+			$value = apc_fetch($key, $success);
+			if($success){
 				return $value;
 			}
 		}
 		$sql = $this->parseSql($this->selectSql, $options);
 		$sql .= $this->parseLock(isset($options['lock'])? $options['lock'] : false);
 		if(isset($key)){ // 写入SQL创建缓存
-			S($key, $sql, array('expire' => 0, 'length' => DB_SQL_BUILD_LENGTH, 'queue' => DB_SQL_BUILD_QUEUE));
+			apc_store($key, $sql);
 		}
 
 		return $sql;
