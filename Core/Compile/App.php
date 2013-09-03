@@ -6,6 +6,7 @@ $dispatcher = new Dispatcher();
 tag('app_init', $dispatcher);
 // 定义当前请求的系统常量
 define('REQUEST_METHOD', $_SERVER['REQUEST_METHOD']);
+//define('NOW',$_SERVER['REQUEST_TIME']);
 // URL调度
 $error = $dispatcher->parse_path($_SERVER['PATH_INFO']);
 $dispatcher->setData($_GET);

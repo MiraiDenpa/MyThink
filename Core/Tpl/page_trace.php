@@ -96,10 +96,11 @@
 		margin-left: 20px;
 		cursor: pointer;
 	}
+
 	#think_page_trace_content li.ajaxbtn.active {
 		background: #C5D3FD;
 	}
-	
+
 	#think_page_trace_content .ajaxline {
 		display: none;
 	}
@@ -237,9 +238,13 @@
 
 					ajaxNote = $('<li>').prependTo(notes).addClass('think_page_trace_icons_error').attr('title', 'ajax错误数，点击锁定').click(function (){
 						lockAjax = !lockAjax;
+						if(lockAjax){
+							ajaxNote.css('background', 'rgb(255, 94, 94)').attr('title', 'ajax错误数，点击解锁');
+						} else{
+							ajaxNote.css('background', '').attr('title', 'ajax错误数，点击锁定');
+						}
 					});
 
-					
 					ajaxButtons.on('click', '.ajaxbtn', function (){
 						ajaxButtons.find('.ajaxbtn').removeClass('active');
 						lastAjax = $(this).addClass('active').data('index');

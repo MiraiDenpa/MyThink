@@ -727,7 +727,7 @@ class TagLibCx extends TagLib{
 		}
 		switch($wrap){
 		case 'ready':
-			return '<script type="text/javascript">"use strict";' . $declare . '$(function(){' . $content .
+			return '<script type="text/javascript">"use strict";' . $declare . '$(function($){' . $content .
 				   '});</script>';
 		case 'closure':
 			return '<script type="text/javascript">"use strict";' . $declare . '(function(' . $globals . '){' .

@@ -32,7 +32,7 @@ foreach($error as $code => &$info){
 		'name'    => $name,
 		'message' => $info[1],
 		'info'    => $info[2],
-		'url'     => $info[3],
+		'url'     => isset($info[3])?$info[3]:[],
 	];
 	define($name, $code);
 }

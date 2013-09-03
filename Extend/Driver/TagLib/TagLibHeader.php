@@ -4,6 +4,8 @@
  * 将内容送进头部
  */
 class TagLibHeader extends TagLib{
+	protected $define = '';
+
 	protected $super_head = '';
 	protected $prepend = '';
 	protected $append = '';
@@ -21,6 +23,14 @@ class TagLibHeader extends TagLib{
 		],
 	);
 
+	/** */
+	public function __construct(){
+		parent::__construct();
+		$this->define            = require PUBLIC_PATH . 'BrowserLib.php';
+		$files                   = $this->parseDependence($this->define['globals']);
+		$this->define['globals'] = HTML::importFile($files);
+	}
+
 	/**
 	 * 在标准头添加内容
 	 * 解析 script style meta link base
@@ -36,24 +46,36 @@ class TagLibHeader extends TagLib{
 		if(isset($tag['browserlib'])){
 			$this->_BrowserLib('', str_replace(',', "\n", $tag['browserlib']));
 		}
-		preg_match_all('#<(script|style)[^>]*>.*</\1>#is', $content, $mats);
+		$is_prepend = isset($tag['prepend']);
+		$super_head = $append = $prepend = '';
+		preg_match_all('#<(script|style)[^>]*>.*?</\1>#is', $content, $mats);
 		foreach($mats[1] as $id => $type){
 			if($type == 'script'){
-				$this->append .= $mats[0][$id];
+				$append .= $mats[0][$id];
 			} else{
-				$this->prepend .= $mats[0][$id];
+				$prepend .= $mats[0][$id];
 			}
 			$content = str_replace($mats[0][$id], '', $content);
 		}
 		preg_match_all('#<(meta|base)[^>]*/?>(</\1>)?#is', $content, $mats);
 		foreach($mats[0] as $tag){
-			$this->super_head .= $tag;
+			$super_head .= $tag;
 			$content = str_replace($tag, '', $content);
 		}
 		preg_match_all('#<(link)[^>]*/?>(</\1>)?#is', $content, $mats);
 		foreach($mats[0] as $tag){
-			$this->prepend .= $tag;
+			$prepend .= $tag;
 			$content = str_replace($tag, '', $content);
+		}
+
+		if($is_prepend){
+			$this->prepend    = $prepend . $this->prepend;
+			$this->append     = $append . $this->append;
+			$this->super_head = $super_head . $this->super_head;
+		} else{
+			$this->prepend .= $prepend;
+			$this->append .= $append;
+			$this->super_head .= $super_head;
 		}
 
 		return trim($content);
@@ -70,24 +92,13 @@ class TagLibHeader extends TagLib{
 	 * @return void
 	 */
 	public function _BrowserLib($attr, $content){
-		$arr = explode("\n", $content);
-		$css = $js = [];
-		foreach($arr as $file){
-			$file = trim($file);
-			if(empty($file)){
-				continue;
-			}
-			if(\COM\MyThink\Strings::isEndWith($file, '.js')){
-				$js[] = $file;
-			} else{
-				$css[] = $file;
-			}
-		}
+		$arr     = explode("\n", $content);
+		$arr     = array_map('trim', $arr);
+		$files   = $this->parseDependence($arr);
+		$content = HTML::importFile($files);
 
-		$content = HTML::importFile(searchPublic($css));
-		$content .= HTML::importFile(searchPublic($js));
 		if(trim($content)){
-			$ret = $this->_AddHeader('', trim($content));
+			$ret = $this->_AddHeader('prepend="true"', trim($content));
 			if($ret){
 				Think::halt('无法添加头部：多余内容' . dump_some($ret));
 			}
@@ -104,13 +115,19 @@ class TagLibHeader extends TagLib{
 	 * @return string
 	 */
 	public function getHeader($type){
-		$content = TagLibHeader::StandardHeader($type);
+		$content = HTML::getExtraHeader($type);
+
+		static $hsend = false;
+		if(!$hsend){
+			$this->_AddHeader('prepend="true"', $this->define['globals']);
+			$hsend = true;
+		}
 
 		if($this->super_head){
-			$content = $this->super_head."\n<!-- SuperHead -->\n".$content;
+			$content          = $this->super_head . "\n<!-- SuperHead -->\n" . $content;
 			$this->super_head = '';
 		}
-		
+
 		if($type == 'script'){
 			$ret          = trim($content) . $this->append;
 			$this->append = '';
@@ -119,42 +136,10 @@ class TagLibHeader extends TagLib{
 			$this->prepend = '';
 		}
 		if(!STATIC_DEBUG){
-			return trim($this->concatStatic($content));
+			return trim($this->concatStatic($ret));
+		} else{
+			return str_replace(['><', "\n\t</"], [">\n\t<", '</'], $ret);
 		}
-		return $ret;
-	}
-
-	/**
-	 * 返回标准头部
-	 *
-	 * @param $type
-	 * sctipt | style
-	 *
-	 * @return string
-	 */
-	protected static function StandardHeader($type){
-		static $send = [];
-		$head = '';
-		if(!isset($send[$type])){
-			$send[$type] = 1;
-			if($type == 'style'){
-				$head .= HTML::importFile(searchPublic('bootstrap.css'));
-				$head .= HTML::css(PUBLIC_URL . '/artDialog/skins/<?php echo art_skin();?>.css');
-				$head .= HTML::importFile(searchPublic('global.less'));
-				$head .= "\n<!-- Standard Header CSS -->";
-			} else{
-				$head .= HTML::importFile(searchPublic(['global.js', 'phpjs.js', 'basevar.js', 'jquery.js']));
-				$head .= HTML::importFile(searchPublic(['bootstrap.js', 'jquery.artDialog.js']));
-				$head .= HTML::importFile(searchPublic('artDialog.plugins.js'));
-				if(APP_DEBUG){
-					$head .= HTML::importFile(searchPublic(['less.js']));
-				}
-				$head .= "\n<!-- Standard Header JS -->";
-			}
-		}
-		$head .= HTML::getExtraHeader($type);
-
-		return $head;
 	}
 
 	/**
@@ -165,9 +150,8 @@ class TagLibHeader extends TagLib{
 	 * @return mixed
 	 */
 	private function concatStatic($content){
-		$PUB_URL = preg_quote(PUBLIC_URL);
-		$hash    = md5(time());
-		$js      = $css = '';
+		$hash = md5(time());
+		$js   = $css = '';
 
 		// js 部分
 		if(preg_match_all('#<script src="(PUBLIC_URL.*?)"[^>]*?></script>#', $content, $mats)){
@@ -194,5 +178,74 @@ class TagLibHeader extends TagLib{
 		}
 
 		return str_replace(['JS' . $hash, 'CSS' . $hash], [$js, $css], $content);
+	}
+
+	/** */
+	protected function parseDependence(array $files){
+		$files  = array_values($files);
+		$define = & $this->define;
+		static $cache = [];
+		$key   = 0;
+		$count = count($files);
+		for(; $key < $count; $key++){
+			$basefile = $files[$key];
+			if($basefile{0} === '/'){
+				continue;
+			}
+			if(isset($cache[$basefile])){
+				array_splice($files, $key, 1);
+				$count = count($files);
+				$key--;
+				continue;
+			}
+			$cache[$basefile] = true;
+			$found            = false;
+			$changed          = false;
+			$inject           = [];
+			if(isset($define['libraries'][$basefile])){ // 库文件
+				$inject  = (array)$define['libraries'][$basefile];
+				$changed = $found = true;
+			}
+			if(isset($define['requirements'][$basefile])){ // 依赖文件
+				$inject  = array_merge($inject, (array)$define['requirements'][$basefile]);
+				$changed = $found = true;
+			}
+			if(isset($define['fileset'][$basefile])){ // 名称引入文件
+				$inject[] = (string)$define['fileset'][$basefile];
+				$found    = true;
+			}
+			if(isset($define['component'][$basefile])){ // 名称引入文件
+				$inject  = array_merge($inject, (array)$define['component'][$basefile]);
+				$found    = true;
+			}
+			array_splice($files, $key, 1, $inject);
+			$count = count($files);
+			if($changed){
+				$key--;
+			}
+			if(!$found){
+				Think::halt('无法解析静态依赖：' . $basefile);
+			}
+		}
+
+		return array_filter(array_map(function ($val){
+			if($val{0} == '/'){
+				return PUBLIC_URL . $val;
+			} else{
+				return null;
+			}
+		}, $files));
+	}
+
+	/** */
+	protected function parseLibraries($name){
+		if(!isset($this->define['libraries'][$name])){
+			Think::halt('未定义类库：' . $name);
+		}
+		$deps = $this->define['libraries'][$name];
+		foreach($deps as $depfile){
+			$deps += $this->parseDependence($depfile);
+		}
+		return array_unique($deps);
 	}
 }

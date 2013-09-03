@@ -43,6 +43,7 @@ class Model{
 	protected $trueTableName = '';
 	// 最近错误信息
 	protected $error = '';
+	protected $errorCode = '';
 	// 字段信息
 	protected $fields = array();
 	// 数据信息
@@ -1472,6 +1473,15 @@ class Model{
 	 */
 	public function getError(){
 		return $this->error;
+	}
+	
+	/**
+	 * 返回模型的错误信息
+	 * @access public
+	 * @return string
+	 */
+	public function getErrorCode(){
+		return $this->errorCode;
 	}
 
 	/**

@@ -3,6 +3,26 @@ abstract class InputStream{
 	protected $_DATA;
 	protected $parsed;
 	protected $is_array;
+	protected $is_opt = [];
+
+	/** @var callable */
+	protected $callback_error = ['Think', 'fail_error'];
+
+	/**
+	 * 替换默认错误回调
+	 * @param callable $handler
+	 *
+	 * @return $this
+	 */
+	public function handel(callable $handler){
+		$this->callback_error = $handler;
+		return $this;
+	}
+
+	public static function _getInstance($type){
+		$type = (ucfirst($type) . 'InputStream');
+		return new $type;
+	}
 
 	/**
 	 * 返回所有处理过的元素的数组
@@ -33,10 +53,29 @@ abstract class InputStream{
 	 * @return $this
 	 */
 	public function optional($name, $default = ''){
-		if(!isset($this->_DATA[$name])){
-			$this->parsed[$name] = $default;
-		} else{
+		if(isset($this->_DATA[$name])){
 			$this->parsed[$name] = $this->_DATA[$name];
+		} else{
+			$this->is_opt[$name]       = true;
+			$this->parsed[$name] = $default;
+		}
+		return $this;
+	}
+
+	/**
+	 * 批量处理可选变量
+	 * @param $names
+	 *
+	 * @return $this
+	 */
+	public function optionalAll($names){
+		foreach($names as $name => $default){
+			if(isset($this->_DATA[$name])){
+				$this->parsed[$name] = $this->_DATA[$name];
+			} else{
+				$this->is_opt[$name]       = true;
+				$this->parsed[$name] = $default;
+			}
 		}
 		return $this;
 	}
@@ -49,8 +88,10 @@ abstract class InputStream{
 	 */
 	public function optionalArray($name){
 		if(!isset($this->_DATA[$name])){
+			$this->is_opt[$name]       = true;
 			$this->parsed[$name] = [];
 		} elseif(!is_array($this->_DATA[$name])){
+			$this->is_opt[$name]       = true;
 			$this->parsed[$name] = [];
 		} else{
 			$this->parsed[$name] = $this->_DATA[$name];
@@ -67,9 +108,11 @@ abstract class InputStream{
 	 */
 	public function required($name){
 		if(!isset($this->_DATA[$name])){
-			Think::fail_error(ERR_INPUT_REQUIRE, $name);
+			$call = $this->callback_error;
+			$call(ERR_INPUT_REQUIRE, $name);
 		} elseif(is_array($this->_DATA[$name])){
-			Think::fail_error(ERR_INPUT_TYPE, $name);
+			$call = $this->callback_error;
+			$call(ERR_INPUT_TYPE, $name);
 		}
 		$this->parsed[$name] = $this->_DATA[$name];
 		return $this;
@@ -84,9 +127,11 @@ abstract class InputStream{
 	public function requireAll($names){
 		foreach($names as $name){
 			if(!isset($this->_DATA[$name])){
-				Think::fail_error(ERR_INPUT_REQUIRE, $name);
+				$call = $this->callback_error;
+				$call(ERR_INPUT_REQUIRE, $name);
 			} elseif(is_array($this->_DATA[$name])){
-				Think::fail_error(ERR_INPUT_TYPE, $name);
+				$call = $this->callback_error;
+				$call(ERR_INPUT_TYPE, $name);
 			}
 			$this->parsed[$name] = $this->_DATA[$name];
 		}
@@ -101,9 +146,11 @@ abstract class InputStream{
 	 */
 	public function requiredArray($name){
 		if(!isset($this->_DATA[$name])){
-			Think::fail_error(ERR_INPUT_REQUIRE, $name);
+			$call = $this->callback_error;
+			$call(ERR_INPUT_REQUIRE, $name);
 		} elseif(!is_array($this->_DATA[$name])){
-			Think::fail_error(ERR_INPUT_TYPE, $name);
+			$call = $this->callback_error;
+			$call(ERR_INPUT_TYPE, $name);
 		}
 		$is_array[$name]     = true;
 		$this->parsed[$name] = $this->_DATA[$name];
@@ -120,13 +167,17 @@ abstract class InputStream{
 	 * @return $this
 	 */
 	public function filter($name, $filter, $args = null){
+		if(isset($this->is_opt[$name])){
+			return $this;
+		}
 		if(is_int($filter)){
 			$ret = filter_var($this->parsed[$name], $filter, $args);
 		} else{
 			$ret = $this->_filter($this->parsed[$name], $filter, $args);
 		}
 		if(false === $ret){
-			Think::fail_error(ERR_INPUT_DENY, $name);
+			$call = $this->callback_error;
+			$call(ERR_INPUT_DENY, $name);
 		} else{
 			$this->parsed[$name] = $ret;
 		}
@@ -142,9 +193,13 @@ abstract class InputStream{
 	 * @return $this
 	 **/
 	public function filter_callback($name, callable $cb){
+		if(isset($this->is_opt[$name])){
+			return $this;
+		}
 		$ret = filter_var($this->parsed[$name], FILTER_CALLBACK, ['options' => $cb]);
 		if(!$ret){
-			Think::fail_error(ERR_INPUT_DENY, $name);
+			$call = $this->callback_error;
+			$call(ERR_INPUT_DENY, $name);
 		}
 		return $this;
 	}
@@ -158,9 +213,13 @@ abstract class InputStream{
 	 * @return $this
 	 **/
 	public function sanitize_callback($name, callable $cb){
+		if(isset($this->is_opt[$name])){
+			return $this;
+		}
 		$ret = filter_var($this->parsed[$name], FILTER_CALLBACK, ['options' => $cb]);
 		if(false === $ret){
-			Think::fail_error(ERR_INPUT_DENY, $name);
+			$call = $this->callback_error;
+			$call(ERR_INPUT_DENY, $name);
 		}
 		$this->parsed[$name] = $ret;
 		return $this;
@@ -196,12 +255,10 @@ abstract class InputStream{
 	 * @return $this
 	 */
 	public function content($name){
+		if(isset($this->is_opt[$name])){
+			return $this;
+		}
 		// TODO 完成
 		return $this;
-	}
-
-	public static function _getInstance($type){
-		$type = (ucfirst($type) . 'InputStream');
-		return new $type;
 	}
 }

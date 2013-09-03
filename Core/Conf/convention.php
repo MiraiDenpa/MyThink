@@ -4,12 +4,8 @@ return array(
 	/* Cookie设置 */
 	'COOKIE_EXPIRE'         => 1800,
 	// Coodie有效期
-	'COOKIE_DOMAIN'         => '',
-	// Cookie有效域名
 	'COOKIE_PATH'           => '/',
 	// Cookie路径
-	'COOKIE_PREFIX'         => '',
-	// Cookie前缀 避免冲突
 
 	'DEFAULT_APP'           => '@',
 	// 默认项目名称，@表示当前项目

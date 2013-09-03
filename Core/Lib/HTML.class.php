@@ -55,10 +55,9 @@ class HTML{
 		if(Strings::isEndWith($file, '.css')){
 			return self::css($url);
 		} else if(Strings::isEndWith($file, '.less')){
-			if(!STATIC_DEBUG){
+			if(!LESS_DEBUG){
 				$url = Strings::endWith(Strings::blocktrim($url, '.less'), '.css');
 			}
-
 			return self::css($url);
 		} else if(Strings::isEndWith($file, '.js')){
 			return self::script($url);

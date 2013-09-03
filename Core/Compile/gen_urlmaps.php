@@ -19,4 +19,9 @@ if(!isset($GLOBALS['URL_MAP'][APP_NAME])){
 }
 hidef_save('urlmap', $GLOBALS['URL_MAP'], true);
 
+if(!defined('COOKIE_DOMAIN')){
+	define('COOKIE_DOMAIN', '.' . $GLOBALS['URL_MAP'][APP_NAME]);
+}
+echo_line("Cookie Domain: ".COOKIE_DOMAIN);
+
 echo_line("");
