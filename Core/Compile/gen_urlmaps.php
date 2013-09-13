@@ -6,9 +6,9 @@ if(!is_file(BASE_CONF_PATH . 'urlmap.php')){
 echo_line('载入全局定义。');
 // 用GLOBAL是因为可以调用其他脚本处理，虽然暂时没有
 $GLOBALS['URL_MAP'] = require BASE_CONF_PATH . 'urlmap.php';
-if(is_file(BASE_CONF_PATH . 'urlmap-' . APP_STATUS . '.php')){
+if(is_file(BASE_CONF_PATH . APP_STATUS . '/urlmap.php')){
 	echo_line('载入状态定义。');
-	$GLOBALS['URL_MAP'] = array_merge($GLOBALS['URL_MAP'], require(BASE_CONF_PATH . 'urlmap-' . APP_STATUS . '.php'));
+	$GLOBALS['URL_MAP'] = array_merge($GLOBALS['URL_MAP'], require(BASE_CONF_PATH . APP_STATUS . '/urlmap.php'));
 }
 foreach($GLOBALS['URL_MAP'] as $app => $url){
 	echo_line("\t$app \t -> $url");

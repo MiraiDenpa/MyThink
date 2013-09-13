@@ -1,11 +1,11 @@
 <?php
+define('REQUEST_METHOD', $_SERVER['REQUEST_METHOD']);
 /** @var Dispatcher $dispatcher */
 global $dispatcher;
 $dispatcher = new Dispatcher();
 // 项目初始化标签
 tag('app_init', $dispatcher);
 // 定义当前请求的系统常量
-define('REQUEST_METHOD', $_SERVER['REQUEST_METHOD']);
 //define('NOW',$_SERVER['REQUEST_TIME']);
 // URL调度
 $error = $dispatcher->parse_path($_SERVER['PATH_INFO']);

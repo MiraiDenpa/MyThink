@@ -32,18 +32,23 @@ abstract class Action{
 	 * @var array
 	 */
 	protected $data;
+	/**
+	 * @var array
+	 */
+	protected $meta;
 
 	protected $tVar = [];
-	
+
 	/**
-	 * FIXME ugly code
-	 *
-	 * @param Dispatcher $new
-	 *
-	 * @return void
+	 * @param Dispatcher $dispatcher
 	 */
-	public function setDispatcher(&$new){
-		$this->dispatcher = & $new;
+	public function __construct(Dispatcher &$dispatcher){
+		$this->dispatcher = & $dispatcher;
+		$this->meta       = & $dispatcher->getMeta();
+		foreach($this->meta['traits'] as $trait){
+			$method = '__' . $trait;
+			$this->$method();
+		}
 	}
 
 	public function setData(&$new){
@@ -88,7 +93,6 @@ abstract class Action{
 		return $this->dispatcher->display($templateFile, $this->tVar);
 	}
 
-
 	/**
 	 * 模板变量赋值
 	 * @access protected
@@ -105,15 +109,14 @@ abstract class Action{
 	}
 
 	/**
-	 * 取得模板显示变量的值
-	 * @access protected
+	 * @param Model  $mdl
+	 * @param string $jumpUrl
+	 * @param int    $jumptimeout
 	 *
-	 * @param string $name 模板显示变量
-	 *
-	 * @return mixed
+	 * @return null
 	 */
-	public function getVar($name = ''){
-		return $this->view->get($name);
+	protected function modelError(Model $mdl, $jumpUrl = '', $jumptimeout = 5){
+		return $this->error($mdl->getErrorCode(), $mdl->getError(), $jumpUrl, $jumptimeout);
 	}
 
 	/**
@@ -121,23 +124,31 @@ abstract class Action{
 	 * @access protected
 	 *
 	 * @param int    $code        错误码
-	 * @param string $extra     额外信息
+	 * @param string $extra       额外信息
 	 * @param string $jumpUrl     页面跳转地址
 	 * @param int    $jumptimeout 跳转等待时间
 	 *
 	 * @return null
 	 */
 	protected function error($code, $extra = '', $jumpUrl = '', $jumptimeout = 5){
+		if(!empty($this->tVar)){
+			$this->tVar = ['extra' => $this->tVar];
+		}
 		$e                      = new Error($code);
 		$this->tVar['message']  = $e->getMessage();
 		$this->tVar['redirect'] = $e->getUrl();
-		$this->tVar['jumpurl']  = $jumpUrl? $jumpUrl : '';
-		$this->tVar['timeout']  = $jumptimeout;
-		$this->tVar['extra']  = $extra;
-		$this->tVar['code']     = $e->getCode();
-		$this->tVar['name']     = $e->getName();
-		$this->tVar['info']     = $e->getInfo();
-		$this->tVar['where']    = $e->getWhere();
+		if(is_string($jumpUrl)){
+			$this->tVar['jumpurl'] = $jumpUrl? $jumpUrl : '';
+		} else{
+			$this->tVar['jumpurl']  = $jumpUrl[1];
+			$this->tVar['jumpname'] = $jumpUrl[0];
+		}
+		$this->tVar['timeout'] = $jumptimeout;
+		$this->tVar['extra']   = $extra;
+		$this->tVar['code']    = $e->getCode();
+		$this->tVar['name']    = $e->getName();
+		$this->tVar['info']    = $e->getInfo();
+		$this->tVar['where']   = $e->getWhere();
 		$this->display('!user_error');
 		return null;
 	}
@@ -153,11 +164,19 @@ abstract class Action{
 	 * @return null
 	 */
 	protected function success($message, $jumpUrl = '', $jumptimeout = 2){
-		$this->tVar['message']  = $message;
-		$this->tVar['jumpurl']  = $jumpUrl? $jumpUrl : '';
-		$this->tVar['timeout']  = $jumptimeout;
-		$this->tVar['code']     = 0;
+		if(!empty($this->tVar)){
+			$this->tVar = ['extra' => $this->tVar];
+		}
+		$this->tVar['message'] = $message;
+		if(is_string($jumpUrl)){
+			$this->tVar['jumpurl'] = $jumpUrl? $jumpUrl : '';
+		} else{
+			$this->tVar['jumpurl']  = $jumpUrl[1];
+			$this->tVar['jumpname'] = $jumpUrl[0];
+		}
+		$this->tVar['timeout'] = $jumptimeout;
+		$this->tVar['code']    = 0;
 		$this->display('!success');
-		return null;
+		return true;
 	}
 }

@@ -85,6 +85,7 @@ class ReflectionArray{
 		$meta['namespace'] = $ref->getNamespaceName();
 		$meta['parent']    = $ref->getParentClass();
 		$meta['file']    = $ref->getFileName();
+		$meta['traits']    = $ref->getTraitNames();
 
 		$meta['interfase'] = $ref->getInterfaceNames();
 

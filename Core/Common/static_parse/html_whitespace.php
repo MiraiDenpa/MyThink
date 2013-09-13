@@ -17,7 +17,7 @@ function html_whitespace($content){
 
 			$cid                 = md5(rand()) . '-js' . $id;
 			$cache_replace[$cid] = $minize;
-			$content             = str_replace($mats[0][$id], $mats[1][$id] . $cid . '</script>', $content);
+			$content             = str_replace($mats[0][$id],  "\n".$mats[1][$id] . $cid . '</script>', $content);
 		}
 	}
 	if(preg_match_all('#(<style.*?>)(.*?)</style>#s', $content, $mats)){
@@ -29,9 +29,10 @@ function html_whitespace($content){
 
 			$cid                 = md5(rand()) . '-css' . $id;
 			$cache_replace[$cid] = $minize;
-			$content             = str_replace($mats[0][$id], $mats[1][$id] . $cid . '</style>', $content);
+			$content             = str_replace($mats[0][$id], "\n".$mats[1][$id] . $cid . '</style>', $content);
 		}
 	}
+	$content = str_replace(array_keys($cache_replace), array_values($cache_replace), $content);
 
 	$search  = [
 		'#^\s+#is',
@@ -42,7 +43,6 @@ function html_whitespace($content){
 		'\1',
 	];
 	$content = preg_replace($search, $replace, $content);
-	$content = str_replace(array_keys($cache_replace), array_values($cache_replace), $content);
-
+	
 	return $content;
 }

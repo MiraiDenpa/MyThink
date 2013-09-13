@@ -60,10 +60,11 @@
 					echo isset($item['type'])? $item['class'] . $item['type'] . $item['function'] : $item['function'];
 					echo '(';
 					if(!empty($item['args'])){
-						echo '<a href="javascript: void(0);" onclick="$(this).next().slideToggle()">...</a>';
+						echo '<a href="javascript: void(0);" onclick="$(this).parent(/*td*/).parent(/*tr*/).next().toggle()">...</a>';
 					}
-					echo ')<div style="display: none;text-align: left;">';
+					echo ')</td></tr>';
 					if(!empty($item['args'])){
+						echo '<tr style="display: none;text-align: left;"><td colspan="2">';
 						$args = [];
 						foreach($item['args'] as $argi){
 							$args[] = dump_some($argi);
@@ -71,8 +72,8 @@
 						echo '<pre>';
 						echo implode("\n", $args);
 						echo '</pre>';
+						echo '</td></tr>';
 					}
-					echo '</div></td></tr>';
 				}
 
 				?>

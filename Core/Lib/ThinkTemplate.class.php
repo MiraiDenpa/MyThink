@@ -135,10 +135,10 @@ class  ThinkTemplate{
 		$tmplContent = preg_replace_callback('/<!--###literal(\d+)###-->/is', function ($mats){
 			return $this->restoreLiteral($mats[1]);
 		}, $tmplContent);
-		
+
 		// 优化生成的php代码
 		$tmplContent = str_replace('?><?php', '', $tmplContent);
-		return TMPL_READABLE ? html_beautify($tmplContent, true) : html_whitespace($tmplContent, true);
+		return TMPL_READABLE? html_beautify($tmplContent, true) : html_whitespace($tmplContent, true);
 	}
 
 	/**
@@ -182,11 +182,11 @@ class  ThinkTemplate{
 		if(!empty($this->tagLib)){
 			$tagLibs = array_merge($tagLibs, $this->tagLib);
 		}
-		
+
 		$this->parseTagLibAll($tagLibs, $content);
-		
+
 		$this->parseReplace($content);
-		
+
 		$this->parseTagLibAll($tagLibs, $content);
 
 		//解析普通模板标签 {tagName}
@@ -201,13 +201,14 @@ class  ThinkTemplate{
 
 	/**
 	 * @param $content
+	 *
 	 * @return void
 	 */
 	protected function parseReplace(&$content){
 		// 替换特殊标志符号 如 {__STYLES__} 
-		while( preg_match_all('/\{__([A-Z0-9]+)__\}/', $content,$mats) ){
+		while(preg_match_all('/\{__([A-Z0-9]+)__\}/', $content, $mats)){
 			foreach($mats[1] as $i => $fnName){
-				$method = 'TaglibReplace' . ucfirst(strtolower($fnName));
+				$method  = 'TaglibReplace' . ucfirst(strtolower($fnName));
 				$content = str_replace($mats[0][$i], $method(), $content);
 			}
 		}
@@ -413,6 +414,7 @@ class  ThinkTemplate{
 			}
 		} while($count);
 	}
+
 	/**
 	 * TagLib库解析
 	 * @access public
@@ -464,10 +466,14 @@ class  ThinkTemplate{
 						}
 						$content = str_replace($mats[0][$i], $ret, $content, $cnt);
 						$count += $cnt;
-					}// 模板html标签匹配循环
-				}// 递归深度循环
-			}//别名循环
-		}// taglib->tag循环
+					}
+					// 模板html标签匹配循环
+				}
+				// 递归深度循环
+			}
+			//别名循环
+		}
+		// taglib->tag循环
 	}
 
 	/**
@@ -537,20 +543,23 @@ class  ThinkTemplate{
 	 * @access public
 	 *
 	 * @param string $varStr 变量数据
+	 * @param bool   $echo   生成代标签的php代码
 	 *
 	 * @return string
 	 */
-	public function parseVar($varStr){
+	public function parseVar($varStr, $echo = true){
 		$varStr = trim($varStr);
 		static $_varParseList = array();
 		//如果已经解析过该变量字串，则直接返回变量值
-		if(isset($_varParseList[$varStr])){
-			return $_varParseList[$varStr];
+		if(isset($_varParseList[$varStr . $echo])){
+			return $_varParseList[$varStr . $echo];
 		}
-		$parseStr  = '';
+		$parseStr = 'null';
+
 		$varExists = true;
 		if(!empty($varStr)){
-			$varArray = explode('|', $varStr);
+			$castArr  = explode(':', $varStr);
+			$varArray = explode('|', $castArr[0]);
 			//取得变量名称
 			$var = array_shift($varArray);
 			if('__' == substr($var, 0, 2)){
@@ -576,11 +585,27 @@ class  ThinkTemplate{
 			if(count($varArray) > 0){
 				$name = $this->parseVarFunction($name, $varArray);
 			}
-			$parseStr = '<?php echo (' . $name . '); ?>';
+			// 对变量进行转换
+			$parse1 = '';
+			$parse2 = '';
+			if(count($castArr) > 1){
+				switch(strtolower(trim($castArr[1]))){
+				case 'json':
+					$parse1 = 'json_encode(';
+					$parse2 = TMPL_READABLE? ', JSON_PRETTY_PRINT)' : ')';
+					break;
+				default:
+					Think::halt('未知的转换选项： ' . $castArr[1]);
+				}
+			}
+			$parseStr = '(' . $parse1 . $name . $parse2 . ')';
 		}
 		$_varParseList[$varStr] = $parseStr;
-
-		return $parseStr;
+		if($echo){
+			return '<?php echo ' . $parseStr . '; ?>';
+		} else{
+			return $parseStr;
+		}
 	}
 
 	/**

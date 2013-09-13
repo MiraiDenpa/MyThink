@@ -104,14 +104,14 @@ class Model{
 	protected $page = null;
 	protected $perPage = 20;
 
+	protected $cache_cas = 'sql';
+
 	/**
 	 * 架构函数
 	 * 取得DB类的实例对象 字段检查
 	 * @access public
 	 *
 	 * @param string $name        模型名称
-	 * @param string $tablePrefix 表前缀
-	 * @param mixed  $connection  数据库连接信息
 	 */
 	public function __construct($name = ''){
 		if(func_num_args() > 2){
@@ -290,13 +290,17 @@ class Model{
 			$field         = parse_name(substr($method, 5));
 			$where[$field] = $args[0];
 
-			return $this->where($where)->find();
+			return $this
+				   ->where($where)
+				   ->find();
 		} elseif(strtolower(substr($method, 0, 10)) == 'getfieldby'){
 			// 根据某个字段获取记录的某个值
 			$name         = parse_name(substr($method, 10));
 			$where[$name] = $args[0];
 
-			return $this->where($where)->getField($args[1]);
+			return $this
+				   ->where($where)
+				   ->getField($args[1]);
 		} elseif(isset($this->_scope[$method])){ // 命名范围的单独调用支持
 			return $this->scope($method, $args[0]);
 		} else{
@@ -428,27 +432,13 @@ class Model{
 	}
 
 	/**
-	 * 通过Select方式添加记录
-	 * @access public
+	 * 清除这个对象的缓存
 	 *
-	 * @param string $fields  要插入的数据表字段名
-	 * @param string $table   要插入的数据表名
-	 * @param array  $options 表达式
-	 *
-	 * @return boolean
-	public function selectAdd($fields='',$table='',$options=array()) {
-	// 分析表达式
-	$options =  $this->_parseOptions($options);
-	// 写入数据到数据库
-	if(false === $result = $this->db->selectInsert($fields?$fields:$options['field'],$table?$table:$this->getTableName(),$options)){
-	// 数据库插入操作失败
-	$this->error = L('_OPERATION_WRONG_');
-	return false;
-	}else {
-	// 插入成功
-	return $result;
+	 * @return void
+	 */
+	function clear(){
+		SAS($this->cache_cas, null);
 	}
-	}*/
 
 	/**
 	 * 保存数据
@@ -522,6 +512,8 @@ class Model{
 			if(!empty($this->data) && isset($this->data[$this->getPk()])){
 				return $this->delete($this->data[$this->getPk()]);
 			} else{
+				// 当前数据对象也空，错误
+				$this->error = 'Empty where delete.';
 				return false;
 			}
 		}
@@ -541,9 +533,13 @@ class Model{
 		if(is_array($options['where']) && isset($options['where'][$pk])){
 			$pkValue = $options['where'][$pk];
 		}
+		if(empty($options['where'])){
+			Think::fail_error(ERR_DELETE_TABEL);
+		}
 		if(false === $this->doCallback('before_delete', $data, $options)){
 			return false;
 		}
+
 		$result = $this->db->delete($options);
 		if(false !== $result){
 			$data = array();
@@ -1224,7 +1220,10 @@ class Model{
 			if(!empty($data[$this->getPk()])){ // 完善编辑的时候验证唯一
 				$map[$this->getPk()] = array('neq', $data[$this->getPk()]);
 			}
-			if($this->where($map)->find()){
+			if($this
+			   ->where($map)
+			   ->find()
+			){
 				return false;
 			}
 
@@ -1368,7 +1367,7 @@ class Model{
 	 *
 	 * @return Model
 	 */
-	public function db($linkNum = '', $config = '', $params = array()){
+	protected function db($linkNum = '', $config = '', $params = array()){
 		if('' === $linkNum && $this->db){
 			return $this->db;
 		}
@@ -1376,7 +1375,7 @@ class Model{
 		static $_db = array();
 		if(!isset($_db[$linkNum]) || (isset($_db[$linkNum]) && $config && $_linkNum[$linkNum] != $config)){
 			// 创建一个新的实例
-			$_db[$linkNum] = Db::getInstance($config);
+			$_db[$linkNum] = ThinkInstance::Db($config);
 		} elseif(null === $config){
 			$_db[$linkNum]->close(); // 关闭数据库连接
 			unset($_db[$linkNum]);
@@ -1474,7 +1473,7 @@ class Model{
 	public function getError(){
 		return $this->error;
 	}
-	
+
 	/**
 	 * 返回模型的错误信息
 	 * @access public
@@ -1634,13 +1633,12 @@ class Model{
 	 *
 	 * @param string|bool $key
 	 * @param integer     $expire
-	 * @param string      $cas_key
 	 *
 	 * @return Model
 	 */
-	public function cache($key = true, $expire = DATA_CACHE_TIME, $cas = 'sql'){
+	public function cache($key = true, $expire = DATA_CACHE_TIME){
 		if(false !== $key){
-			$this->options['cache'] = array('key' => $key, 'expire' => $expire, 'cas' => $cas);
+			$this->options['cache'] = array('key' => $key, 'expire' => $expire, 'cas' => $this->cache_cas);
 		}
 
 		return $this;
@@ -1730,7 +1728,16 @@ class Model{
 			$where = vsprintf($where, $parse);
 		} elseif(is_object($where)){
 			$where = get_object_vars($where);
+		} elseif(is_null($parse) && is_array($where) && isset($where[0])){
+			if(array_keys($where) === range(0, count($where) - 1)){
+				$where = array($this->getPk() => array('IN', $where));
+			} else{
+				$where = array();
+			}
+		} elseif(is_null($parse) && is_string($where) || is_int($where)){
+			$where = array($this->getPk() => $where);
 		}
+
 		if(is_string($where) && '' != $where){
 			$map            = array();
 			$map['_string'] = $where;
@@ -1811,22 +1818,24 @@ class Model{
 	 * @param string $page_var_name
 	 * 分页如果需要修改参数，要添加到GET变量里
 	 *
-	 * @return void
+	 * @return $this
 	 */
 	public function page($page_var_name = 'p'){
 		static $not_init = true;
 		if($not_init){
-			$this->register_callback('options_filter', function (&$data, &$options){
+			$this->register_callback('before_select', function ($data, &$options){
 				if(!isset($options['pager']) || !$options['pager']){
 					return;
 				}
-				$this->options = $options;
-				$total         = $this->count();
-				$this->page    = new Page($total, $this->perPage, array(), $options['pager']);
+				$this->options    = $options;
+				$total            = $this->count();
+				$this->page       = new Page($total, $this->perPage, array(), $options['pager']);
+				$options['limit'] = $this->page->firstRow . ',' . $this->perPage;
 			});
 			$not_init = false;
 		}
 		$this->options['pager'] = $page_var_name;
+		return $this;
 	}
 
 	/**
@@ -1868,7 +1877,7 @@ class Model{
 			return true;
 		}
 		foreach($this->callback[$type] as $cb){
-			$ret = call_user_func_array($cb, array(&$data, &$opt));
+			$ret = $cb($data, $opt);
 			if(false === $ret){
 				return $ret;
 			}

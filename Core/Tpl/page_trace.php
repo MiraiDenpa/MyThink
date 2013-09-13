@@ -1,4 +1,10 @@
 <style type="text/css">
+	#think_page_trace_show{
+		z-index: 10005;
+	}
+	.modal-backdrop{
+		 z-index: 10001;
+	 }
 	#think_page_trace {
 		z-index: 10000;
 		-webkit-user-select: none;
@@ -157,6 +163,22 @@
 		<?php echo G('beginTime', 'viewEndTime') . 's '; ?>
 	</div>
 </div>
+<div id="think_page_trace_show" class="modal fade">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title">调用堆栈</h4>
+			</div>
+			<div id="think_page_trace_show_body" class="modal-body">
+				
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary">关闭</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 <script type="text/javascript">
 	try{
 		if(typeof $ == 'undefined'){
@@ -174,7 +196,7 @@
 	}
 	function ready(){
 		if(0 == $('link').length){ // 没有css
-			$('head').append('<link href="http://pub.mirai/bootstrap/css/bootstrap.css" rel="stylesheet" type="text/css">');
+			$('head').append('<link href="<?php echo PUBLIC_URL;?>/bootstrap/css/bootstrap.css" rel="stylesheet" type="text/css">').append('<script src="<?php echo PUBLIC_URL;?>/bootstrap/js/bootstrap.js" type="text/javascript"></'+'script>');
 		}
 		try{
 			var cnt = $('#think_page_trace');
@@ -269,6 +291,13 @@
 					ajaxNote.text('?');
 				}
 			});
+
+			var trace_show = $('#think_page_trace_show');
+			var trace_body = $('#think_page_trace_show_body');
+			window.trace_show = function(obj){
+				trace_body.html($(obj).data('trace'));
+				trace_show.modal();
+			};
 		} catch(e){
 			alert('ThinkPageTrace Error [later init error]: \n' + e.toString());
 			console.error(e);

@@ -29,13 +29,13 @@ class Error extends ThinkException{
 	}
 
 	public function getUrl(){
-		$r = apc_fetch('ThinkError' . $this->code, $success);
-		if(!$success){
+		$r = S('ThinkError' . $this->code);
+		if(!$r){
 			$r = '';
 			foreach((array)$this->info['url'] as $title => $url){
 				$r .= '<a href="' . $url . '" class="btn btn-lg btn-default">' . $title . '</a>';
 			}
-			apc_store('ThinkError' . $this->code, $r);
+			S('ThinkError' . $this->code, $r);
 		}
 		return $r;
 	}

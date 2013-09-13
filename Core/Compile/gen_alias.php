@@ -5,7 +5,9 @@ $alias = merge_config(array(
 						   '第三方类定义' => __DIR__ . '/library_map.php',
 						   '用户定义'   => CONF_PATH . 'alias.php',
 					  ));
-foreach($alias as $k => $v){
-	echo_line("\t - $k \t-> $v");
+if(APP_DEBUG){
+	foreach($alias as $k => $v){
+		echo_line("\t - $k \t-> $v");
+	}
 }
 return 'global $_think_import_alias;$_think_import_alias = ' . var_export($alias, true) . ';';

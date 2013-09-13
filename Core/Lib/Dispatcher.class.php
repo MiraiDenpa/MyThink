@@ -20,8 +20,12 @@
 class Dispatcher{
 	public $action_name = DEFAULT_ACTION;
 	public $method_name = DEFAULT_METHOD;
+	public $default_action = false;
+	public $default_method = false;
+	public $request_method = REQUEST_METHOD;
 	public $extension_name = 'html';
 	protected $param = [];
+	protected $meta;
 	protected $GET = [];
 	protected $action = '';
 	/**
@@ -30,7 +34,11 @@ class Dispatcher{
 	protected $callback;
 
 	public function __construct(){
-		$this->callback = [&$this, 'return_' . $this->extension_name];
+		if($this->extension_name == 'form'){
+			$this->callback = [&$this, 'return_json'];
+		} else{
+			$this->callback = [&$this, 'return_' . $this->extension_name];
+		}
 	}
 
 	/**
@@ -60,14 +68,13 @@ class Dispatcher{
 			if(!$this->action_name){
 				Think::halt('没有调用过parse_path。');
 			} else{
-				$this->action = ThinkInstance::A($this->action_name);
+				$this->action = ThinkInstance::A($this->action_name, $this);
 				if(!$this->action_name){
 					_404(LANG_ACTION_NOT_EXIST . ':' . $this->action_name);
 				}
 			}
 		}
 
-		$this->action->setDispatcher($this);
 		$mtd = $this->method_name;
 		$ret = [&$this->action, &$mtd];
 		tag('action_begin', $ret);
@@ -101,6 +108,10 @@ class Dispatcher{
 		tag('action_end', $ret);
 	}
 
+	public function &getMeta(){
+		return $this->meta;
+	}
+
 	/**
 	 * 解析URL中PATHINFO部分
 	 *
@@ -123,15 +134,17 @@ class Dispatcher{
 			$this->action_name = ucfirst(strtolower(array_shift($array)));
 		} else{
 			$this->action_name = DEFAULT_ACTION;
+			$this->default_action = true;
 		}
 		if(!empty($array)){
-			$this->method_name = strtolower(array_shift($array));
+			$this->method_name = array_shift($array);
 		} else{
-			$this->method_name = DEFAULT_METHOD;
+			$this->method_name    = DEFAULT_METHOD;
+			$this->default_method = true;
 		}
 
 		$name = $this->action_name . 'Action';
-		$meta = classmeta_read($name);
+		$meta = $this->meta = classmeta_read($name);
 
 		if(isset($meta['method'][$this->method_name])){
 			$ref = $meta['method'][$this->method_name];
@@ -142,8 +155,12 @@ class Dispatcher{
 			return LANG_MODULE_NOT_EXIST . ' : ' . $name . '::' . $this->method_name . '()';
 		}
 
-		$this->param    = $array;
-		$this->callback = [$this, 'return_' . $this->extension_name];
+		$this->param = $array;
+		if($this->extension_name == 'form'){
+			$this->callback = [&$this, 'return_json'];
+		} else{
+			$this->callback = [&$this, 'return_' . $this->extension_name];
+		}
 		if(!is_callable($this->callback)){
 			return '无法处理的返回类型：' . $this->extension_name;
 		}
@@ -180,51 +197,59 @@ class Dispatcher{
 	protected function return_html($templateFile, $contentType, $vars){
 		$view = ThinkInstance::View();
 		$view->assign($vars);
-		return $view->display($templateFile, $contentType);
+		$view->display($templateFile, $contentType);
+
+		if(SHOW_TRACE){
+			SPT(false);
+		}
+		return null;
 	}
 
 	/**
 	 * 返回json数据
 	 */
 	protected function return_json($t, $c, $vars){
+		Think::clear_ob();
 		header('Content-Type: ' . $c . '; charset=utf-8');
 		if(SHOW_TRACE){
 			$vars['_PAGE_TRACE_'] = grab_page_trace();
 		}
-		echo json_encode($vars);
+		$ret = json_encode($vars);
+
+		if(!$ret){
+			Think::fail_error(ERR_JSON_SERIALIZE);
+		} else{
+			echo $ret;
+		}
 	}
 
 	/**
 	 * 通过jsonp返回数据
 	 */
 	protected function return_jsonp($t, $c, $vars){
+		Think::clear_ob();
 		header('Content-Type: ' . $c . '; charset=utf-8');
 		$handler = isset($_GET[VAR_JSONP_HANDLER])? $_GET[VAR_JSONP_HANDLER] : DEFAULT_JSONP_HANDLER;
 		if(SHOW_TRACE){
 			$vars['_PAGE_TRACE_'] = grab_page_trace();
 		}
-		echo $handler . '(' . json_encode($vars) . ');';
+
+		if(!$vars){
+			Think::fail_error(ERR_JSON_SERIALIZE);
+		} else{
+			echo $handler . '(' . json_encode($vars) . ');';
+		}
 	}
 
 	/**
 	 * 显示php序列化
 	 */
 	protected function return_php($t, $c, $vars){
+		Think::clear_ob();
 		header('Content-Type: ' . $c . '; charset=utf-8');
 		if(SHOW_TRACE){
 			$vars['_PAGE_TRACE_'] = grab_page_trace();
 		}
 		echo serialize($vars);
-	}
-
-	/**
-	 * json的别名，专用于主站
-	 */
-	protected function return_form($t, $c, $vars){
-		header('Content-Type: text/json; charset=utf-8');
-		if(SHOW_TRACE){
-			$vars['_PAGE_TRACE_'] = grab_page_trace();
-		}
-		echo json_encode($vars);
 	}
 }

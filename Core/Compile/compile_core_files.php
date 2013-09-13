@@ -16,10 +16,14 @@ function compile_core_files(array $filearr){
 		}
 	}
 	foreach($filearr as $filename){
-		echo_line("\t - " . $filename);
+		if(APP_DEBUG){
+			echo_line("\t - " . $filename);
+		}
 		$content = file_get_contents($filename);
 		// 替换预编译指令
-		if(!APP_DEBUG)$content = preg_replace('#<DEBUG>(.*?)</DEBUG>#s', '', $content);
+		if(!APP_DEBUG){
+			$content = preg_replace('#<DEBUG>(.*?)</DEBUG>#s', '', $content);
+		}
 		$content = substr(trim($content), 5);
 		if('?>' == substr($content, -2)){
 			$content = substr($content, 0, -2);
@@ -30,9 +34,9 @@ function compile_core_files(array $filearr){
 			$fn    = basename($filename);
 			foreach($lines as &$line){
 				$linen++;
-				if(strpos($line, " *")===0){
+				if(strpos($line, " *") === 0){
 					$line = str_pad("   {$fn}:{$linen}   ", $lonest_name, ' ', STR_PAD_RIGHT) . $line;
-				}else{
+				} else{
 					$line = str_pad("/* {$fn}:{$linen} */", $lonest_name, ' ', STR_PAD_RIGHT) . $line;
 				}
 			}

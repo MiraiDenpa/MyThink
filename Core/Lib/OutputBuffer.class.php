@@ -9,7 +9,7 @@ class OutputBuffer{
 		trace('打开缓冲区。', 'OB.'.$this->level, 'INFO');
 
 		// <DEBUG>
-		if(1){
+		if(APP_DEBUG){
 			$level = $this->level;
 			ob_start(Closure::bind(function ($content) use ($func,$level){
 				trace('缓冲区刷新，调用处理程序。' . dump_some($func), 'OB.'.$level, 'INFO');

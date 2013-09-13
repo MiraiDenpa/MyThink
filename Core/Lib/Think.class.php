@@ -37,7 +37,6 @@ class Think{
 		register_shutdown_function(array('Think', 'checkFatalError'));
 		set_error_handler(array('Think', 'appError'));
 		set_exception_handler(array('Think', 'appException'));
-		//spl_autoload_register(array('Think', 'autoload'));
 
 		header('Content-Type: text/html; charset=utf8');
 		self::$main_out_buffer            = new OutputBuffer('ContentReplace');
@@ -51,6 +50,10 @@ class Think{
 	 * @param mixed $e 异常对象
 	 */
 	static public function appException($e){
+		if(is_a($e, 'MongoException')){
+			self::fail_error(ERR_NO_SQL, $e->getMessage());
+			return;
+		}
 		$error            = array();
 		$error['message'] = $e->getMessage();
 		$trace            = $e->getTrace();
@@ -80,7 +83,6 @@ class Think{
 		switch($errno){
 		case E_ERROR:
 		case E_PARSE:
-		case E_RECOVERABLE_ERROR:
 		case E_DEPRECATED:
 		case E_USER_DEPRECATED:
 		case E_CORE_ERROR:
@@ -130,10 +132,8 @@ class Think{
 				return;
 			}
 		}
-
-		SPT(false);
+		
 		if(Think::$main_out_buffer){
-			//var_dump(Think::$main_out_buffer);
 			Think::$main_out_buffer->flush();
 			Think::$main_out_buffer = null;
 		}
@@ -157,6 +157,7 @@ class Think{
 		$data['info']     = $e->getInfo();
 		$data['name']     = $e->getName();
 		$data['where']    = $e->getWhere();
+		$data['timeout']    = 0;
 		$dispatcher->display('!user_error', $data);
 		exit;
 	}
@@ -211,5 +212,9 @@ class Think{
 			ob_end_flush();
 		}
 		exit;
+	}
+	
+	public static function clear_ob(){
+		self::$main_out_buffer->clean();
 	}
 }

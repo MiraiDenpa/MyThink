@@ -34,6 +34,7 @@ if(isset($GLOBALS['COMPILE'])){
 	$tmpl = explode('/*[SIG]*/', $tmpl)[2];
 	$tmpl = '<?php
 		function echo_line($msg){echo $msg . "\n";}
+		require "' . RUNTIME_PATH . 'functions.php";
 		require "' . RUNTIME_PATH . APP_NAME . '/const.php";
 		require "' . $alias['COM\\MyThink\\Strings'] . '";
 		' . $tmpl;
@@ -48,6 +49,7 @@ if(isset($GLOBALS['COMPILE'])){
 
 use \COM\MyThink\Strings;
 
+/**  */
 function export_php($data){
 	$export = var_export($data, true);
 	return preg_replace([
@@ -55,12 +57,15 @@ function export_php($data){
 						'#\s+array\s+\(#',
 						'#array \(#',
 						'#\)#'
-						], [
-						   ' []',
-						   ' [',
-						   ' [',
-						   ']'
-						   ], $export);
+						],
+						[
+						' []',
+						' [',
+						' [',
+						']'
+						],
+						$export
+	);
 }
 
 if($argv[0] == '_recompile_static.php' && isset($argv[1])){
@@ -71,8 +76,6 @@ if($argv[0] == '_recompile_static.php' && isset($argv[1])){
 	}
 	if(Strings::isEndWith($file, '.js')){
 		$ret = compile_js($file);
-	} elseif(Strings::isEndWith($file, '.coffee')){
-		$ret = compile_coffee($file);
 	} elseif(Strings::isEndWith($file, '.css')){
 		$ret = compile_css($file);
 	} elseif(Strings::isEndWith($file, '.less')){
@@ -92,129 +95,116 @@ if(!is_dir(PUBLIC_PATH . 'getcss')){
 }
 
 // Run Actions
-if(!is_file(__DIR__ . '/BrowserLib.components.php')){
-	touch(__DIR__ . '/BrowserLib.components.php');
+if(!is_file(PUBLIC_PATH . 'BrowserLib.components.php')){
+	touch(PUBLIC_PATH . 'BrowserLib.components.php');
 }
 $fileset = [];
-require __DIR__ . '/BrowserLib.components.php';
-require __DIR__ . '/BrowserLib.php';
+require PUBLIC_PATH . 'BrowserLib.components.php';
+require PUBLIC_PATH . 'BrowserLib.php';
 $mergeIndex = function ($arr) use (&$fileset){
-	array_walk($arr, function ($val) use (&$fileset){
-		$val = str_replace(__DIR__ . '/', '', $val);
-		$pth = explode('/', $val);
-		if(count($pth) == 1){
-			$name = trim($val, '/');
-		} else{
-			$name = $pth[0] . '/' . basename($val);
+	array_walk($arr,
+		function ($val) use (&$fileset){
+			$val = str_replace(PUBLIC_PATH . '', '', $val);
+			$pth = explode('/', $val);
+			if(count($pth) == 1){
+				$name = trim($val, '/');
+			} else{
+				$name = $pth[0] . '/' . basename($val);
+			}
+			$val            = '/' . trim($val, '/');
+			$fileset[$name] = $val;
 		}
-		$val            = '/' . trim($val, '/');
-		$fileset[$name] = $val;
-	});
+	);
 };
 $mergeIndex($files = find('js'));
-//array_map('compile_js', $files);
-$mergeIndex($files = find('coffee'));
-//array_map('compile_coffee', $files);
+$line_js = array_map('compile_js', $files);
 $mergeIndex($files = find('css'));
-//array_map('compile_css', $files);
+$line_css = array_map('compile_css', $files);
 $mergeIndex($files = find('less'));
-//array_map('compile_less', $files);
+$line_less = array_map('compile_less', $files);
+
+$bash_script = array_merge(['#!/bin/bash', 'cd `dirname $BASH_SOURCE`'], $line_css, $line_less, $line_js);
+$bash_script = implode("\n", $bash_script);
+$bash_script = str_replace(PUBLIC_PATH, './', $bash_script);
+file_put_contents(PUBLIC_PATH . 'recompile.bash', $bash_script);
+chmod(PUBLIC_PATH . 'recompile.bash', 0777);
+
+file_put_contents(PUBLIC_PATH . 'lastmodify.timestamp', time());
 
 // phpjs
 $jslib = [];
 foreach($fileset as $key => $file){
-	if( Strings::isStartWith($key,'jslib/') ){
-		$jslib[explode('.',basename($key))[0]] = $file;
+	if(Strings::isStartWith($key, 'jslib/')){
+		$jslib[explode('.', basename($key))[0]] = $file;
 	}
-	if( Strings::isStartWith($key,'phpjs/') ){
+	if(Strings::isStartWith($key, 'phpjs/')){
 		$jslib['phpjs'][] = $file;
 	}
-	if( Strings::isStartWith($key,'jslib-gt/') ){
-		$key = Strings::blocktrim($file, '/jslib-gt/', STR_TRIM_LEFT);
-		$key = explode('/',$key)[0];
-		$jslib[$key][] = 'jslib-gt/'.basename($file);
+	if(Strings::isStartWith($key, 'jslib-gt/')){
+		$key           = Strings::blocktrim($file, '/jslib-gt/', STR_TRIM_LEFT);
+		$key           = explode('/', $key)[0];
+		$jslib[$key][] = 'jslib-gt/' . basename($file);
 	}
 }
-/* 从组件解决依赖
-$requirements = [];
-foreach($components as $parent => $chilrens ){
-	foreach($chilrens as $file){
-		
-	}
-}*/
 
 ksort($fileset);
 $php = '<?php $fileset =  ' . export_php($fileset) . ";\n";
 
 $php .= '$libraries = ' . export_php($jslib) . ";\n";
 
-file_put_contents(__DIR__ . '/BrowserLib.components.php', $php);
+file_put_contents(PUBLIC_PATH . 'BrowserLib.components.php', $php);
 
 /* Support */
+/**  */
 function find($type){
 	$files = [];
-	exec('/bin/find ' . escapeshellarg(PUBLIC_PATH) . ' -name \'*.' . $type .
-		 "' -a -not -path '*/get*' ", $files, $ret);
+	exec('/bin/find ' . escapeshellarg(PUBLIC_PATH) . ' -name \'*.' . $type . "' -a -not -path '*/get*' ",
+		 $files,
+		 $ret
+	);
 
 	return $files;
 }
 
+/**  */
 function compile_less($file){
-	$base = str_replace(PUBLIC_PATH, PUBLIC_PATH . 'getcss/', Strings::blocktrim(delVer($file), '.less'));
-	unlink($base . '.css');
-	passthru('lessc --no-ie-compat --yui-compress -sm=on --rp=' . escapeshellarg(PUBLIC_URL) . ' --include-path=' .
-			 escapeshellarg(PUBLIC_PATH) . ' ' . escapeshellarg($file) . ' ' . escapeshellarg($base . '.css'), $ret);
-	echo_line("\t - " . $file . "\n\t\t \\lessc-> $base.css");
-
-	return $ret;
+	$base = PUBLIC_PATH . 'getcss/' . pubfile_guid($file);
+	$prel = str_replace(PUBLIC_PATH, PUBLIC_URL . '/', dirname($file));
+	$cmd  = 'lessc --no-ie-compat --yui-compress -sm=on --rp=' . escapeshellarg($prel . '/') . ' --include-path=' .
+			escapeshellarg(PUBLIC_PATH) . ' ' . escapeshellarg($file) . ' ' . escapeshellarg($base . '.css');
+	$cmd  = 'echo -e "\033[38;5;10m正在编译 ' . $base . '.css\n\t\t-> ' . $cmd . '\033[0m"' . "\n" . $cmd;
+	$cmd .= "\nif [ $? -ne 0 ]; then\n\techo -e '\033[38;5;9m失败，原样复制...\033[0m';cp -f " . escapeshellarg($file) . ' ' .
+			escapeshellarg($base . '.css') . "\nfi";
+	return $cmd;
 }
 
+/**  */
 function compile_css($file){
-	if(Strings::isEndWith($file, '.min.css')){
-		$base = PUBLIC_PATH . 'getcss/' . basename(Strings::blocktrim(delVer($file), '.min.css'));
-		unlink($base . '.min.css');
-		$ret = copy($file, $base . '.css');
-		echo_line("\t - " . $file . "\n\t\t \\copy-> $base.css");
-	} else{
-		$base = PUBLIC_PATH . 'getcss/' . basename(Strings::blocktrim(delVer($file), '.css'));
-		unlink($base . '.css');
-		passthru('uglifycss ' . escapeshellarg($file) . ' > ' . escapeshellarg($base . '.css'), $ret);
-		echo_line("\t - " . $file . "\n\t\t \\uglifycss-> $base.css");
-	}
-
-	return $ret;
+	$base = PUBLIC_PATH . 'getcss/' . pubfile_guid($file);
+	$prel = str_replace(PUBLIC_PATH, PUBLIC_URL . '/', dirname($file));
+	$cmd  = 'lessc --yui-compress -sm=on --rp=' . escapeshellarg($prel . '/') . ' ' . escapeshellarg($file) .
+			' > ' . escapeshellarg($base . '.css');
+	$cmd  = 'echo -e "\033[38;5;10m正在压缩 ' . $base . '.css\n\t\t-> ' . $cmd . '\033[0m"' . "\n" . $cmd;
+	$cmd .= "\nif [ $? -ne 0 ]; then\n\techo -e '\033[38;5;9m失败，原样复制...\033[0m';cp -f " . escapeshellarg($file) . ' ' .
+			escapeshellarg($base . '.css') . "\nfi";
+	return $cmd;
 }
 
+/**  */
 function compile_js($file){
-	if(Strings::isEndWith($file, '.min.js')){
-		$base = PUBLIC_PATH . 'getjs/' . basename(Strings::blocktrim(delVer($file), '.min.js'));
-		unlink($base . '.js');
-		$ret = copy($file, $base . '.js');
-		echo_line("\t - " . $file . "\n\t\t \\copy-> $base.js");
-	} else{
-		$base = PUBLIC_PATH . 'getjs/' . basename(Strings::blocktrim(delVer($file), '.js'));
-		unlink($base . '.js');
-		passthru('uglifyjs2 ' . escapeshellarg($file) . ' -o ' . escapeshellarg($base . '.js'), $ret);
-		echo_line("\t - " . $file . "\n\t\t \\uglifyjs2-> $base.js");
-	}
-
-	return $ret;
+	$base = PUBLIC_PATH . 'getjs/' . pubfile_guid($file);
+	//$cmd  = 'unlink ' . escapeshellarg($base . '.js') . " 2>/dev/null\n";
+	$run = 'yuicompressor --type js --nomunge --line-break 200 ' . escapeshellarg($file) .
+		   ' -o ' . escapeshellarg($base . '.js');
+	$cmd = 'echo -e "\033[38;5;10m正在压缩 ' . $base . '.css\n\t\t-> ' . $run . '\033[0m"' . "\n";
+	$cmd .= 'ERR=$(' . $run . ' 2>&1 >/dev/tty)';
+	$cmd .= "\nif [ -n \"\$ERR\" ]; then\n\techo -e '\033[38;5;9m'\${ERR}'\\n失败，原样复制...\033[0m';cp -f " .
+			escapeshellarg($file) . ' ' . escapeshellarg($base . '.js') . "\nfi";
+	return $cmd;
 }
 
-function compile_coffee($file){
-	echo_line("\t - " . $file);
-	$base = str_replace(PUBLIC_PATH, PUBLIC_PATH . 'getjs/', Strings::blocktrim(delVer($file), '.coffee'));
-	$dir  = dirname($base);
-	if(!is_dir($dir)){
-		mkdir($dir, 0777, true);
-	}
-	unlink($base . '.js');
-	passthru('coffee -b -c -p ' . escapeshellarg($file) . ' | uglifyjs2 -o ' . escapeshellarg($base . '.js'), $ret);
-	echo_line("\t - " . $file . "\n\t\t \\coffee|uglifyjs2-> $base.js");
-
-	return $ret;
-}
-
+/**  */
 function delVer($file){
 	return preg_replace('#[-_][0-9]+\.[0-9]+\.[0-9]+#', '', $file);
 }
+

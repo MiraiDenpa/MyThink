@@ -49,20 +49,28 @@ class ThinkInstance{
 	 *
 	 * @return Model
 	 */
-	public static function D($name, $arg1 = null, $arg2 = null){
+	public static function &D($name, $arg1 = null, $arg2 = null){
 		if(isset(self::$MODEL[$name])){
 			return self::$MODEL[$name];
 		}
 		$class = ucfirst($name) . 'Model';
-
 		/* <DEBUG>
 		if(!class_exists($class, false)){
 			echo "[$class] 模型文件加载成功，但没有定义正确的类型 -- 名称不符？";
 			SPT();
 		}
 		</DEBUG>*/
+		self::$MODEL[$name] = new $class($arg1, $arg2);
+		return self::$MODEL[$name];
+	}
 
-		return self::$MODEL[$name] = new $class($arg1, $arg2);
+	public static function &Db($config){
+		static $c = [];
+		if(isset($c[$config])){
+			return $c[$config];
+		}
+		$c[$config] = Db::factory($config);
+		return $c[$config];
 	}
 
 	/**
@@ -74,7 +82,7 @@ class ThinkInstance{
 	 *
 	 * @return Model
 	 */
-	public static function M($name = '', $connection = ''){
+	public static function &M($name = '', $connection = ''){
 		static $_model = array();
 		if(strpos($name, ':')){
 			list($class, $name) = explode(':', $name);
@@ -92,22 +100,22 @@ class ThinkInstance{
 	/**
 	 * 实例化Action
 	 *
-	 * @param string $name   Action资源地址
+	 * @param string     $name    Action资源地址
+	 * @param Dispatcher $param   Action初始化参数（当前action的meta）
 	 *
 	 * @return Action
 	 */
-	public static function A($name){
+	public static function &A($name, Dispatcher &$param){
 		$name .= 'Action';
 
-		if(isset(self::$ACTION[$name])){
-			return self::$ACTION[$name];
+		if(!isset(self::$ACTION[$name])){
+			if(class_exists($name, true)){
+				self::$ACTION[$name] = new $name($param);
+			} else{
+				self::$ACTION[$name] = false;
+			}
 		}
-
-		if(class_exists($name, true)){
-			return self::$ACTION[$name] = new $name();
-		} else{
-			return self::$ACTION[$name] = false;
-		}
+		return self::$ACTION[$name];
 	}
 
 	/**
@@ -118,53 +126,54 @@ class ThinkInstance{
 	 * @return View
 	 * @static
 	 */
-	public static function View($id = null){
+	public static function &View($id = null){
 		if(!$id){
-			return new View();
+			$e = new View();
+			return $e;
 		} else{
-			if(isset(self::$VIEW[$id])){
-				return self::$VIEW[$id];
-			} else{
+			if(!isset(self::$VIEW[$id])){
 				self::$VIEW[$id] = new View();
 			}
 		}
+		return self::$VIEW[$id];
 	}
 
-	public static function ThinkTemplate(){
+	public static function &ThinkTemplate(){
 		static $cache = null;
 		if($cache){
 			return $cache;
 		}
-
-		return $cache = new ThinkTemplate();
+		$cache = new ThinkTemplate();
+		return $cache;
 	}
 
-	public static function TagLib($tagLib){
+	public static function &TagLib($tagLib){
 		$class = 'TagLib' . ucwords($tagLib);
 		if(isset(self::$TAGLIB[$class])){
 			return self::$TAGLIB[$class];
 		}
-
-		return self::$TAGLIB[$class] = new $class;
+		self::$TAGLIB[$class] = new $class;
+		return self::$TAGLIB[$class];
 	}
 
 	/**
 	 * @return UrlHelper
 	 * @static
 	 */
-	public static function UrlHelper(){
+	public static function &UrlHelper(){
 		static $c;
 		if($c){
 			return $c;
 		}
-
-		return $c = new UrlHelper();
+		$c = new UrlHelper();
+		return $c;
 	}
-	
-	public static function InStream($type){
+
+	public static function &InStream($type){
 		return InputStream::_getInstance($type);
 	}
-	public static function OutStream($arg){
+
+	public static function &OutStream($arg){
 		/*$factory = [ucfirst($type).'Stream','_getInstance'];
 
 		return $factory($arg);*/

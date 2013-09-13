@@ -1,2 +1,21 @@
 MyThink是对ThinkPHP进行修改、添加功能后以相同协议发布的软件。
 使用时请遵守协议。
+
+编译文件：
+
+define('APP_NAME', 'xxx'); // 应用名字，和生成url的定义匹配
+define('APP_PATH', __DIR__ . '/');
+define('LIB_PATH', APP_PATH);
+
+define('APP_DEBUG', false); // 是否调试（遗留问题，不是调试总开关）
+define('CORE_DEBUG', true); // 核心文件是否生成行号
+define('SHOW_TRACE', true); // 是否显示运行日志
+define('TRACE_DEBUG', false); // 日志是否记录堆栈情况
+define('TMPL_NO_CACHE', true); // 模板缓存是否调试（调试则永不缓存）
+define('TMPL_READABLE', false); // 输出是否去空白
+define('JS_DEBUG', false); // 在js中输出，对框架无影响 （ if(JS_DEBUG){console.log(arg);} ）
+define('STATIC_DEBUG', true); // 静态文件是否调试（调试时返回完整版，否则返回压缩版）
+define('LESS_DEBUG', true); // 是否使用less.js在客户端编译（STATIC_DEBUG为false时，不起作用）
+define('MEMORY_DEBUG', false); // 是否记录内存状态
+
+include 'mytp_include.php';

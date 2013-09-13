@@ -51,13 +51,13 @@ class View{
 	}
 
 	/**
-	 * 加载模板和页面输出 可以返回输出内容
+	 * 加载模板和页面输出
 	 * @access public
 	 *
 	 * @param string $templateFile 模板文件名
 	 * @param string $contentType
 	 *
-	 * @return mixed
+	 * @return null
 	 */
 	public function display($templateFile = '', $contentType = 'text/html'){
 		G('viewStartTime');
@@ -132,7 +132,7 @@ class View{
 	private function parse($file){
 		$prefix        = strpos($file, BASE_TMPL_PATH) === 0? '' : APP_NAME;
 		$tmplCacheFile = CACHE_PATH . $prefix . md5($file) . TMPL_CACHFILE_SUFFIX;
-		if(TMPL_DEBUG){
+		if(TMPL_NO_CACHE){
 			$cache = false;
 		} elseif(!is_file($tmplCacheFile)){
 			$cache = false;

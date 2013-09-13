@@ -22,7 +22,15 @@ echo_line('');
 echo_line("数据库定义：");
 foreach(array_merge(glob(BASE_CONF_PATH . 'db/*.php'), glob(CONF_PATH . 'db/*.php')) as $file){
 	$define = require $file;
-	@echo_line("\t - {$define['dbms']}: {$define['hostname']}{$define['dsn']}");
 	hidef_save('ThinkDb' . pathinfo($file, PATHINFO_FILENAME), $define, true);
+	echo_line("\t - " . basename($file));
+}
+
+echo_line("数据库调试定义：");
+foreach(array_merge(glob(BASE_CONF_PATH . APP_STATUS . '/db/*.php'), glob(CONF_PATH . APP_STATUS .
+																		  '/db/*.php')) as $file){
+	$define = require $file;
+	hidef_save('ThinkDb' . pathinfo($file, PATHINFO_FILENAME), $define, true);
+	echo_line("\t - " . basename($file));
 }
 echo_line('');

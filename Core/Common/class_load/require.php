@@ -15,8 +15,7 @@ function require_one(array $array, &$hit = null){
 			return require_once $file;
 		}
 	}
-	Think::halt('require_one: 找不到任何一个文件：' . implode_l("\n", $array));
-	exit();
+	Think::fail_error(ERR_NF_FILE, 'require_one: 找不到任何一个文件：' . implode_l("\n", $array));
 }
 
 /**

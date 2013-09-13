@@ -1,4 +1,4 @@
-<?php
+?php
 define('APP_DEBUG', true);
 define('APP_STATUS', 'debug');
 

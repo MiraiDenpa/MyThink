@@ -55,7 +55,7 @@ class HTML{
 		if(Strings::isEndWith($file, '.css')){
 			return self::css($url);
 		} else if(Strings::isEndWith($file, '.less')){
-			if(!LESS_DEBUG){
+			if(!STATIC_DEBUG || (STATIC_DEBUG&&!LESS_DEBUG) ){
 				$url = Strings::endWith(Strings::blocktrim($url, '.less'), '.css');
 			}
 			return self::css($url);
@@ -223,7 +223,7 @@ class HTML{
 	public static function attr(array $attr){
 		$ret = '';
 		foreach($attr as $k => $v){
-			$ret .= ' ' . $k . '="' . addslashes($v) . '"';
+			$ret .= ' ' . $k . '="' . htmlspecialchars($v) . '"';
 		}
 		return $ret;
 	}

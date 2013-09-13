@@ -401,9 +401,9 @@ class DbPdo extends Db{
 			$this->error = '';
 		}
 		if('' != $this->queryStr){
-			$this->error .= "\n [ SQL语句 ] : " . $this->queryStr;
+			$this->error .= "\n -> " . $this->queryStr;
 		}
-		trace($this->error, '', 'ERR');
+		trace($this->error, 'SQL语句', 'ERR');
 
 		return $this->error;
 	}

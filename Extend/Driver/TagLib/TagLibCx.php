@@ -54,6 +54,9 @@ class TagLibCx extends TagLib{
 		'url'        => array('attr' => 'app,action,method,params,suffix,protocol', 'close' => 0),
 		'script'     => ['attr' => 'type,wrap,globals,declare', 'must' => 'type', 'close' => 1],
 		'style'      => ['attr' => 'type', 'must' => 'type', 'close' => 1],
+		'link'      => ['attr' => 'rel,href,type', 'must' => 'rel,href,type', 'close' => 0],
+		'comment'    => ['attr' => '', 'must' => '', 'close' => 1],
+		'iif'        => ['attr' => 'name,then,else,type', 'must' => 'name', 'close' => 0],
 		//'formdescript' => ['attr' => 'template', 'must' => 'template', 'close' => 1],
 	);
 
@@ -168,7 +171,7 @@ class TagLibCx extends TagLib{
 			return $parseStr;
 		}
 
-		return;
+		return '';
 	}
 
 	/**
@@ -303,7 +306,7 @@ class TagLibCx extends TagLib{
 	 *
 	 * @return string
 	 */
-	public function _default($attr){
+	public function _default($attr,$content){
 		$parseStr = '<?php default: ?>';
 
 		return $parseStr;
@@ -317,6 +320,7 @@ class TagLibCx extends TagLib{
 	 *
 	 * @param string $attr     标签属性
 	 * @param string $content  标签内容
+	 * @param string $type  标签内容
 	 *
 	 * @return string
 	 */
@@ -341,43 +345,43 @@ class TagLibCx extends TagLib{
 
 		return $parseStr;
 	}
-
+/**  */
 	public function _eq($attr, $content){
 		return $this->_compare($attr, $content, 'eq');
 	}
-
+	/**  */
 	public function _equal($attr, $content){
 		return $this->_compare($attr, $content, 'eq');
 	}
-
+	/**  */
 	public function _neq($attr, $content){
 		return $this->_compare($attr, $content, 'neq');
 	}
-
+	/**  */
 	public function _notequal($attr, $content){
 		return $this->_compare($attr, $content, 'neq');
 	}
-
+	/**  */
 	public function _gt($attr, $content){
 		return $this->_compare($attr, $content, 'gt');
 	}
-
+	/**  */
 	public function _lt($attr, $content){
 		return $this->_compare($attr, $content, 'lt');
 	}
-
+	/**  */
 	public function _egt($attr, $content){
 		return $this->_compare($attr, $content, 'egt');
 	}
-
+	/**  */
 	public function _elt($attr, $content){
 		return $this->_compare($attr, $content, 'elt');
 	}
-
+	/**  */
 	public function _heq($attr, $content){
 		return $this->_compare($attr, $content, 'heq');
 	}
-
+	/**  */
 	public function _nheq($attr, $content){
 		return $this->_compare($attr, $content, 'nheq');
 	}
@@ -429,20 +433,20 @@ class TagLibCx extends TagLib{
 		return $parseStr;
 	}
 
-	// range标签的别名 用于in判断
+	/** range标签的别名 用于in判断*/
 	public function _in($attr, $content){
 		return $this->_range($attr, $content, 'in');
 	}
 
-	// range标签的别名 用于notin判断
+	/** range标签的别名 用于notin判断*/
 	public function _notin($attr, $content){
 		return $this->_range($attr, $content, 'notin');
 	}
-
+	/**  */
 	public function _between($attr, $content){
 		return $this->_range($attr, $content, 'between');
 	}
-
+	/**  */
 	public function _notbetween($attr, $content){
 		return $this->_range($attr, $content, 'notbetween');
 	}
@@ -506,7 +510,7 @@ class TagLibCx extends TagLib{
 
 		return $parseStr;
 	}
-
+	/**  */
 	public function _notempty($attr, $content){
 		$tag      = $this->parseXmlAttr($attr, 'notempty');
 		$name     = $tag['name'];
@@ -532,7 +536,7 @@ class TagLibCx extends TagLib{
 
 		return $parseStr;
 	}
-
+	/**  */
 	public function _notdefined($attr, $content){
 		$tag      = $this->parseXmlAttr($attr, '_notdefined');
 		$name     = $tag['name'];
@@ -711,9 +715,7 @@ class TagLibCx extends TagLib{
 	 */
 	public function _script($attr, $content){
 		$tag = $this->parseXmlAttr($attr, 'script');
-		if(!STATIC_DEBUG){
-			$content = script_whitespace($content);
-		}
+		
 		if(isset($tag['src']) || $tag['type'] != 'text/javascript' || !isset($tag['wrap']) || !$tag['wrap']){
 			return false;
 		}
@@ -722,15 +724,17 @@ class TagLibCx extends TagLib{
 		$globals = isset($tag['globals'])? $tag['globals'] : '';
 		$declare = isset($tag['declare'])? 'var ' . $tag['declare'] . ";\n" : '';
 
-		if(STATIC_DEBUG){
-			$content = "\n" . $content . "\n";
-		}
+		$content =$content . "\n"; // 防止最后一行是注释
+
+		unset($tag['type'],$tag['globals'],$tag['declare'],$tag['wrap']);
+		$attr = HTML::attr($tag);
+		
 		switch($wrap){
 		case 'ready':
-			return '<script type="text/javascript">"use strict";' . $declare . '$(function($){' . $content .
+			return '<script type="text/javascript"'.$attr.'>"use strict";' . $declare . '$(function($){' . $content .
 				   '});</script>';
 		case 'closure':
-			return '<script type="text/javascript">"use strict";' . $declare . '(function(' . $globals . '){' .
+			return '<script type="text/javascript"'.$attr.'>"use strict";' . $declare . '(function(' . $globals . '){' .
 				   $content . '})(' . $globals . ');</script>';
 		default:
 			Think::halt('&lt;script&gt; 中使用了未知的wrap属性。');
@@ -738,6 +742,26 @@ class TagLibCx extends TagLib{
 		}
 	}
 
+	/**
+	 * 预处理link标签
+	 *
+	 * @param $attr
+	 * @param $content
+	 *
+	 * @return string
+	 */
+	public function _link($attr, $content){
+		return false;
+	}
+
+	/**
+	 * 预处理style标签
+	 *
+	 * @param $attr
+	 * @param $content
+	 *
+	 * @return string
+	 */
 	public function _style($attr, $content){
 		$tag = $this->parseXmlAttr($attr, 'style');
 		if(isset($tag['parse'])){
@@ -749,7 +773,37 @@ class TagLibCx extends TagLib{
 			$content = "\n" . $content . "\n";
 		}
 		$content = broswer_css_perfix($content);
-		return '<style type="text/css" parse="">' . $content . '</style>';
+		return '<style type="text/css" parse="true">' . $content . '</style>';
+	}
+	/**  */
+	public function _iif($attr, $unused){
+		$tag  = $this->parseXmlAttr($attr, 'iif');
+		$name = $this->autoBuildVar($tag['name']);
+		if(!isset($tag['then'])){
+			$then = $name;
+		} elseif($tag['then']{0} == '$'){
+			$then = $this->autoBuildVar(substr($attr['then'], 1));
+		} else{
+			$then = var_export($tag['then'], true);
+		}
+		if(!isset($tag['else'])){
+			$else = "''";
+		} elseif($tag['else']{0} == '$'){
+			$else = $this->autoBuildVar(substr($tag['else'], 1));
+		} else{
+			$else = var_export($tag['else'], true);
+		}
+		if(!isset($tag['type'])){
+			$type = "empty";
+		} else{
+			$type = $tag['type'];
+		}
+
+		return '<?php echo (' . $type . '(' . $name . ')?' . $then . ':' . $else . ');?>';
+	}
+	/**  */
+	public function _comment($attr, $content){
+		return "\n";
 	}
 
 	/**

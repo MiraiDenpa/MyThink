@@ -1,12 +1,13 @@
 <?php
 /* 开始生成编译文件 */
 $compile = "<?php /* [SIG_GENERATE] */\n";
-$compile .= "\$GLOBALS['_beginTime'] = microtime(TRUE);\n";
+if(SHOW_TRACE){
+	$compile .= "\$GLOBALS['_beginTime'] = microtime(TRUE);\n";
+}
 if(MEMORY_DEBUG){
 	$compile .= "\$GLOBALS['_startUseMems'] = memory_get_usage();\n";
 }
 $compile .= "require(RUNTIME_PATH.'functions.php');\n";
-$compile .= "set_include_path(get_include_path() . PATH_SEPARATOR . VENDOR_PATH);\n";
 
 /* alias “查表导入” 的文件定义。 */
 $compile .= require __DIR__ . '/gen_alias.php';
@@ -24,9 +25,6 @@ if(MEMORY_DEBUG){
 }
 $compile .= "/* 启动应用 */\n";
 $compile .= substr(file_get_contents(__DIR__ . '/App.php'), 5);
-if(SHOW_TRACE){
-	$compile .= "ob_flush();\n";
-}
 
 echo_line('写入入口文件。');
 if(is_file(ENTRY_FILE)){

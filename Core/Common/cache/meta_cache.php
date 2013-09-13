@@ -1,7 +1,7 @@
 <?php
 
 function classmeta_read($id){
-	$file = CACHE_PATH . 'meta/class.' . $id . '.php';
+	$file = CACHE_PATH . 'meta/class.' . $id . '.' . APP_NAME . '.php';
 	if(is_file($file)){
 		$ret = require $file;
 		if($ret){
@@ -15,7 +15,7 @@ function classmeta_read($id){
 		trace(__FILE__,'缓存过时','DEBUG');
 		return false;
 	}";
-	trace( xdebug_filepath_anchor($file,0,$file), '更新类型meta缓存', 'CACHE');
+	trace(xdebug_filepath_anchor($file, 0, $file), '更新类型meta缓存', 'CACHE');
 	// </DEBUG>
 
 	file_put_contents($file, "<?php

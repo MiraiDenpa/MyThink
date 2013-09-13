@@ -11,10 +11,9 @@
  *
  * @return array|null
  */
-function trace($value = null, $label = null, $level = null, $record = false){
+function trace($value = null, $label = null, $level = 'DEBUG', $record = false){
 	static $_trace = array();
-	
-	
+
 	if(null === $value){ // 获取trace信息
 		return $_trace;
 	} else{
@@ -26,13 +25,12 @@ function trace($value = null, $label = null, $level = null, $record = false){
 			$lv = 'default';
 		}
 		if($label){
-			if(TRACE_DEBUG){
-				$safetrace = xdebug_get_function_stack();
-				$trace = str_replace("\n", '', $safetrace);
-				$label = HTML::smlabel($label, $lv, [
-												  'title'   => $trace,
-												  'onclick' => '$.dialog.alert($(this).attr(\'title\').replace(/\n/g, \'<br/>\'))'
-												  ]);
+			if($level == 'ERR' || TRACE_DEBUG){
+				$safetrace = safe_get_function_stack();
+				$label     = HTML::smlabel($label, $lv, [
+														'data-trace'   => $safetrace,
+														'onclick' => "trace_show(this)"
+														]);
 			} else{
 				$label = HTML::smlabel($label, $lv);
 			}
@@ -40,8 +38,8 @@ function trace($value = null, $label = null, $level = null, $record = false){
 			$label = trim($label);
 		}
 		if(!is_string($value)){
-			$info  = dump_some($value, 0);
-		}else{
+			$info = dump_some($value, 0);
+		} else{
 			$info = $value;
 		}
 		$level = strtoupper($level);

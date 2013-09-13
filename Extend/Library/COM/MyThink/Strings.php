@@ -72,7 +72,13 @@ class Strings{
 	 * @return string 链接后的字符串
 	 */
 	public static function section($delimiter, $string, $start, $end = -1, $flag = self::SEC_DEFAULT){
-		$arr = explode($delimiter, $string);
+		static $scache = [];
+		if(isset($scache[$delimiter][$string])){
+			$arr = $scache[$delimiter][$string];
+		}else{
+			$scache[$delimiter][$string] = $arr = explode($delimiter, $string);
+		}
+		
 		if($flag&self::SEC_SKIP){
 			$arr = array_filter($arr);
 		}

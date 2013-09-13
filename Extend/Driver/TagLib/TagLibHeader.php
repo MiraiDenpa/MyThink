@@ -150,34 +150,55 @@ class TagLibHeader extends TagLib{
 	 * @return mixed
 	 */
 	private function concatStatic($content){
-		$hash = md5(time());
-		$js   = $css = '';
-
+		$content = str_replace(PUBLIC_URL, 'PUBLIC_URL', $content);
 		// js 部分
-		if(preg_match_all('#<script src="(PUBLIC_URL.*?)"[^>]*?></script>#', $content, $mats)){
-			$brand1 = [];
-			$brand2 = [];
-			$insert = false;
-			foreach($mats[1] as $i => $url){
-				if($insert){
-					$content = str_replace($mats[0][$i], '', $content);
-				} else{
-					$insert  = true;
-					$content = str_replace($mats[0][$i], 'JS' . $hash, $content);
-				}
-
-				if(preg_match('#jquery|bootstrap|artdialog|createjs|jslib#i', $url) > 0){
-					$brand1[] = str_replace('PUBLIC_URL/', '', $url);
-				} else{
-					$brand2[] = str_replace('PUBLIC_URL/', '', $url);
-				}
+		if(preg_match_all('#<script src="PUBLIC_URL(.*?)"[^>]*?></script>#', $content, $mats)){
+			foreach($mats[1] as $index => $file){
+				$script  = HTML::script(PUBLIC_URL . '/getjs/' .pubfile_guid(trim($file, '/')) . '.js?_=' .
+										STATIC_VERSION
+				);
+				$content = str_replace($mats[0][$index], $script, $content);
 			}
-
-			$js = HTML::script(PUBLIC_URL . '/??' . (implode(',', $brand1)) . '?v=' . STATIC_VERSION);
-			$js .= HTML::script(PUBLIC_URL . '/??' . (implode(',', $brand2)) . '?v=' . STATIC_VERSION);
+		}
+		// css 部分
+		if(preg_match_all('#<link href="PUBLIC_URL(.*?)"[^>]*?>()#', $content, $mats)){
+			foreach($mats[1] as $index => $file){
+				$script  = HTML::css(PUBLIC_URL . '/getcss/' .pubfile_guid(trim($file, '/')) . '.css?_=' .
+										STATIC_VERSION
+				);
+				$content = str_replace($mats[0][$index], $script, $content);
+			}
 		}
 
-		return str_replace(['JS' . $hash, 'CSS' . $hash], [$js, $css], $content);
+		return $content;
+		//FIXME 需要更聪明的连接方式
+		$script  = '';
+		$content = str_replace(PUBLIC_URL, 'PUBLIC_URL', $content);
+
+		// js 部分
+		if(preg_match_all('#<script src="PUBLIC_URL(.*?)"[^>]*?></script>()#', $content, $mats)){
+			$concat = [];
+			foreach($mats[1] as $file){
+				$file     = trim($file, '/');
+				$guid     = pubfile_guid($file);
+				$concat[] = $guid . '.js';
+			}
+			$content = str_replace($mats[0], $mats[2], $content);
+			$script  = HTML::script(PUBLIC_URL . '/getjs/??' . (implode(',', $concat)) . '?v=' . STATIC_VERSION);
+		}
+		// css 部分
+		if(preg_match_all('#<link href="PUBLIC_URL(.*?)"[^>]*?>()#', $content, $mats)){
+			$concat = [];
+			foreach($mats[1] as $file){
+				$file     = trim($file, '/');
+				$guid     = pubfile_guid($file);
+				$concat[] = $guid . '.css';
+			}
+			$content = str_replace($mats[0], $mats[2], $content);
+			$script  = HTML::css(PUBLIC_URL . '/getcss/??' . (implode(',', $concat)) . '?v=' . STATIC_VERSION);
+		}
+
+		return $script . $content;
 	}
 
 	/** */
@@ -215,8 +236,8 @@ class TagLibHeader extends TagLib{
 				$found    = true;
 			}
 			if(isset($define['component'][$basefile])){ // 名称引入文件
-				$inject  = array_merge($inject, (array)$define['component'][$basefile]);
-				$found    = true;
+				$inject = array_merge($inject, (array)$define['component'][$basefile]);
+				$found  = true;
 			}
 			array_splice($files, $key, 1, $inject);
 			$count = count($files);
@@ -229,12 +250,15 @@ class TagLibHeader extends TagLib{
 		}
 
 		return array_filter(array_map(function ($val){
-			if($val{0} == '/'){
-				return PUBLIC_URL . $val;
-			} else{
-				return null;
-			}
-		}, $files));
+									if($val{0} == '/'){
+										return PUBLIC_URL . $val;
+									} else{
+										return null;
+									}
+								},
+								$files
+							)
+		);
 	}
 
 	/** */

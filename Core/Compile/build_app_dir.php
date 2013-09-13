@@ -38,10 +38,18 @@ if(is_writeable(APP_PATH)){
 	}
 	
 	// 写入测试Action
-	if(!is_file(LIB_PATH . 'Action/IndexAction.class.php')){
-		echo_line("\t copy - ".LIB_PATH . 'Action/IndexAction.class.php');
-		copy(THINK_PATH . 'Tpl/default_index.tpl', LIB_PATH . 'Action/IndexAction.php');
+	if(!is_file(LIB_PATH . 'Action/'.DEFAULT_ACTION.'Action.class.php')){
+		echo_line("\t copy - ".LIB_PATH . 'Action/'.DEFAULT_ACTION.'Action.class.php');
+		copy(THINK_PATH . 'Tpl/default_index.php', LIB_PATH . 'Action/'.DEFAULT_ACTION.'Action.php');
 	}
+
+	// 写.gitignore
+	if(!is_file(ROOT_PATH . '.gitignore')){
+		echo_line("\t copy - ".ROOT_PATH . '.gitignore');
+		copy(THINK_PATH . 'Tpl/gitignore', ROOT_PATH . '.gitignore');
+	}
+
+	
 } else{
 	echo_line('项目目录不可写，目录无法自动生成！');
 	exit;

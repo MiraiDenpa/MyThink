@@ -48,6 +48,11 @@ function __autoload($class){
 						 EXTEND_PATH . 'Driver/Template/' . $file,
 						 CORE_PATH . 'Driver/Template/' . $file
 					));
+	} elseif(substr($class, -6) == 'Entity'){ // 加载模板引擎驱动
+		require_one(array(
+						 BASE_LIB_PATH . 'Entity/' . $file,
+						 LIB_PATH . 'Entity/' . $file,
+					));
 	} elseif(substr($class, 0, 6) == 'TagLib'){ // 加载标签库驱动
 		require_one(array(
 						 BASE_LIB_PATH . 'TagLib/' . $file,
@@ -57,6 +62,8 @@ function __autoload($class){
 		require_one(array(
 						 EXTEND_PATH . 'Driver/Stream/' . $file,
 					));
+	} elseif(strpos($class, '\\') !== false){
+		require_once BASE_LIB_PATH . 'Lib/' . str_replace('\\', '/', $file);
 	} else{
 		return false;
 	}

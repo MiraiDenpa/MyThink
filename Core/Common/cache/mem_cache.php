@@ -18,11 +18,12 @@ function S($name, $value = '', $expire = DATA_CACHE_TIME){
 }
 
 /**
+ * TODO 把cas改成server id，实现分类存储
  *
- *
- * @param        $name
- * @param string $value
- * @param        $expire
+ * @param string $cas
+ * @param string $name
+ * @param mixed  $value
+ * @param int    $expire
  *
  * @return bool|mixed|string
  */
@@ -30,6 +31,9 @@ function SAS($cas, $name, $value = '', $expire = DATA_CACHE_TIME){
 	global $_g_cache;
 	if(is_null($_g_cache)){
 		$_g_cache = new ThinkMemcached();
+	}
+	if(!$name){
+		$_g_cache->flush();
 	}
 	if($value === ''){
 		N('cache_read_mem', 1);

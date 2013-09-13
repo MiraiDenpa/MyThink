@@ -40,14 +40,14 @@ class Db{
 	protected $error = '';
 	// 数据库连接ID 支持多个连接
 	protected $linkID = array();
-	// 当前连接ID
+	/** @var PDO 当前连接ID */
 	protected $_linkID = null;
 	// 当前查询ID
 	protected $queryID = null;
 	// 是否已经连接数据库
 	protected $connected = false;
 	// 数据库连接参数配置
-	protected $config = '';
+	protected $config = [];
 	// 数据库表达式
 	protected $comparison = array(
 		'eq'      => '=',
@@ -69,28 +69,16 @@ class Db{
 	protected $like_fields;
 
 	/**
-	 * 取得数据库类实例
-	 * @static
-	 * @access public
-	 * @return mixed 返回数据库驱动类
-	 */
-	public static function getInstance(){
-		$args = func_get_args();
-
-		return ThinkInstance::instance(__CLASS__, 'factory', $args);
-	}
-
-	/**
 	 * 加载数据库 支持配置文件或者 DSN
 	 * @access public
 	 *
-	 * @param mixed $config 数据库配置信息
+	 * @param string $config 数据库配置信息
 	 *
-	 * @return string
+	 * @return Db
 	 */
-	public function factory($config = ''){
+	public static function factory($config = ''){
 		// 读取数据库配置
-		$db_config = $this->parseConfig($config);
+		$db_config = hidef_load('ThinkDb' . $config);
 		if(empty($db_config['dbms'])){
 			$file = '';
 			$line = 0;
@@ -104,20 +92,22 @@ class Db{
 			Think::halt(LANG_NO_DB_CONFIG . ': ' . $config, false, $file, $line);
 		}
 		// 数据库类型
-		$this->dbType = ucwords(strtolower($db_config['dbms']));
-		$class        = 'Db' . $this->dbType;
+		$type  = ucwords(strtolower($db_config['dbms']));
+		$class = 'Db' . $type;
 		// 检查驱动类
 		if(class_exists($class)){
+			/** @var Db $db */
 			$db = new $class($db_config);
 			// 获取当前的数据库类型
 			if('pdo' != strtolower($db_config['dbms'])){
-				$db->dbType = strtoupper($this->dbType);
+				$db->dbType = strtoupper($type);
 			} else{
-				$db->dbType = $this->_getDsnType($db_config['dsn']);
+				$db->dbType = self::_getDsnType($db_config['dsn']);
 			}
 		} else{
 			// 类没有定义
-			throw_exception(L('_NO_DB_DRIVER_') . ': ' . $class);
+			Think::halt(LANG_NO_DB_DRIVER . ': ' . $class);
+			exit;
 		}
 
 		return $db;
@@ -131,23 +121,11 @@ class Db{
 	 *
 	 * @return string
 	 */
-	protected function _getDsnType($dsn){
+	protected static function _getDsnType($dsn){
 		$match  = explode(':', $dsn);
 		$dbType = strtoupper(trim($match[0]));
 
 		return $dbType;
-	}
-
-	/**
-	 * 分析数据库配置信息，支持数组和DSN
-	 * @access private
-	 *
-	 * @param mixed $db_config 数据库配置信息
-	 *
-	 * @return string
-	 */
-	private function parseConfig($db_config = ''){
-		return hidef_load('ThinkDb' . $db_config);
 	}
 
 	/**
@@ -174,7 +152,7 @@ class Db{
 	 *
 	 * @param boolean $master 主服务器
 	 *
-	 * @return void
+	 * @return mixed
 	 */
 	protected function multiConnect($master = false){
 		static $_config = array();
@@ -221,16 +199,18 @@ class Db{
 	 */
 	protected function debug(){
 		$this->modelSql[$this->model] = $this->queryStr;
-		$this->model                  = '_think_';
 		// 记录操作结束时间
 		if(DB_SQL_LOG){
 			G('queryEndTime');
-			trace($this->queryStr . ' [ RunTime:' . G('queryStartTime', 'queryEndTime', 6) . 's ]', '', 'SQL');
+			trace($this->queryStr . ' [ 执行时间:' . G('queryStartTime', 'queryEndTime', 6) . 's ]', $this->model, 'SQL');
 		}
+		$this->model = '_think_';
 	}
 
 	/**
 	 * 设置锁机制
+	 * @param $lock
+	 *
 	 * @access protected
 	 * @return string
 	 */
@@ -258,13 +238,13 @@ class Db{
 			if(is_array($val) && 'exp' == $val[0]){
 				$set[] = $this->parseKey($key) . '=' . $val[1];
 			} elseif(is_scalar($val) || is_null(($val))){ // 过滤非标量数据
-				if(DB_BIND_PARAM && 0 !== strpos($val, ':')){
+				/*if(DB_BIND_PARAM && 0 !== strpos($val, ':')){
 					$name  = md5($key);
 					$set[] = $this->parseKey($key) . '=:' . $name;
 					$this->bindParam($name, $val);
-				} else{
-					$set[] = $this->parseKey($key) . '=' . $this->parseValue($val);
-				}
+				} else{*/
+				$set[] = $this->parseKey($key) . '=' . $this->parseValue($val);
+				//}
 			}
 		}
 
@@ -735,7 +715,7 @@ class Db{
 					$values[] = ':' . $name;
 					$this->bindParam($name, $val);
 				} else{*/
-					$values[] = $this->parseValue($val);
+				$values[] = $this->parseValue($val);
 				//}
 			}
 		}
@@ -859,15 +839,15 @@ class Db{
 		}
 		if(DB_SQL_BUILD_CACHE){ // SQL创建缓存
 			$key   = md5(serialize($options));
-			$value = apc_fetch($key, $success);
-			if($success){
+			$value = SAS('global', $key);
+			if($value){
 				return $value;
 			}
 		}
 		$sql = $this->parseSql($this->selectSql, $options);
 		$sql .= $this->parseLock(isset($options['lock'])? $options['lock'] : false);
 		if(isset($key)){ // 写入SQL创建缓存
-			apc_store($key, $sql);
+			SAS('global', $key, $sql);
 		}
 
 		return $sql;

@@ -40,31 +40,25 @@
 	<div class="jumbotron fixed" style="margin:40px;">
 		<div class="clearfix row">
 			<h2>
-				<span class="glyphicon glyphicon-warning-sign" style="margin-right: 10px;margin-left: 20px;"></span>
-
-				错误{$code}　－　{$message}
+				<span class="glyphicon glyphicon-ok" style="margin-right: 10px;margin-left: 20px;"></span>
+				{$message}
 			</h2>
 		</div>
 		<div class="row">
 			<div class="well" style="height: 300px;">
 				<span class="text-muted">额外信息：</span>
-				<div>{$name}</div>
-				
-				<h3 class="text-warning">{$extra}</h3>
-
-				<div>{$info}</div>
+				<volist name="extra" id="cnt" key="name">
+					<div>{$name}: {$cnt}</div>
+				</volist>
 			</div>
 
 			<div id="actions" class="col-md-12 panel panel-footer text-center">
-				<a href="/" class="btn btn-primary btn-lg pull-left">&lt;&lt; 回首页</a>
+				<a href="javascript:history.back();" class="btn btn-primary btn-lg pull-left">&lt;&lt; 上一页</a>
 				<notempty name="jumpurl">
 					<span id="jumper">{$timeout}</span>
-					<a id="jumper_a" href="{$jumpurl}"><iif name="jumpname" else="$jumpurl"/></a>
+					<a id="jumper_a" href="{$jumpurl}"><iif type="isset" name="jumpname" else="$jumpurl"/></a>
 				</notempty>
 				&nbsp;
-				<div class="pull-right">
-					{$redirect}
-				</div>
 			</div>
 		</div>
 	</div>
