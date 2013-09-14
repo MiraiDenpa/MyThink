@@ -28,20 +28,6 @@ function compile_core_files(array $filearr){
 		if('?>' == substr($content, -2)){
 			$content = substr($content, 0, -2);
 		}
-		if(APP_DEBUG){
-			$lines = explode("\n", $content);
-			$linen = 0;
-			$fn    = basename($filename);
-			foreach($lines as &$line){
-				$linen++;
-				if(strpos($line, " *") === 0){
-					$line = str_pad("   {$fn}:{$linen}   ", $lonest_name, ' ', STR_PAD_RIGHT) . $line;
-				} else{
-					$line = str_pad("/* {$fn}:{$linen} */", $lonest_name, ' ', STR_PAD_RIGHT) . $line;
-				}
-			}
-			$content = implode("\n", $lines);
-		}
 		$result .= $content . "\n";
 	}
 
