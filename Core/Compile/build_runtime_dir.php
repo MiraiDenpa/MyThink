@@ -1,4 +1,5 @@
 <?php
+echo_line('创建临时文件目录结构');
 if(!is_dir(RUNTIME_PATH)){
 	mkdir(RUNTIME_PATH, 0777, true);
 }

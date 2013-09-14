@@ -34,6 +34,9 @@ require THINK_PATH.'Compile/hidef_save_constant.php';
 /* 定义所有常量 */
 require THINK_PATH.'Compile/gen_define_all.php';
 
+// 创建临时文件目录结构
+require THINK_PATH.'Compile/build_runtime_dir.php';
+
 /* 合并整个函数库 */
 echo_line('合并函数库');
 $list  = array_merge(glob(THINK_PATH . 'Common/*/*.php'), // 内置函数
@@ -66,10 +69,6 @@ if(!is_dir(LIB_PATH) || !is_dir(CONF_PATH)){
 	// 创建项目目录结构
 	require THINK_PATH.'Compile/build_app_dir.php';
 }
-
-echo_line('创建临时文件目录结构');
-// 创建临时文件目录结构
-require THINK_PATH.'Compile/build_runtime_dir.php';
 
 /* 开始生成编译文件 */
 require THINK_PATH.'Compile/gen_index.php';
