@@ -1,4 +1,15 @@
 <?php
+/**
+ * 使用预定义方法过滤：
+ * 		eg. 过滤器 test
+ * 		1. 定义方法
+ * 		protected function filter_test([&]变量值，[&]参数)
+ * 		2. 返回值是新的变量值，返回false表示出错（禁止程序执行）
+ * 		3. 使用： $post->filter('varname', 'test', $args)
+ * 检查方法于过滤相同，只是filter改成valid
+ * 
+ * @return $this
+ */
 abstract class InputStream{
 	protected $_DATA;
 	protected $parsed;
@@ -56,7 +67,7 @@ abstract class InputStream{
 		if(isset($this->_DATA[$name])){
 			$this->parsed[$name] = $this->_DATA[$name];
 		} else{
-			$this->is_opt[$name]       = true;
+			$this->is_opt[$name] = true;
 			$this->parsed[$name] = $default;
 		}
 		return $this;
@@ -73,7 +84,7 @@ abstract class InputStream{
 			if(isset($this->_DATA[$name])){
 				$this->parsed[$name] = $this->_DATA[$name];
 			} else{
-				$this->is_opt[$name]       = true;
+				$this->is_opt[$name] = true;
 				$this->parsed[$name] = $default;
 			}
 		}
@@ -88,10 +99,10 @@ abstract class InputStream{
 	 */
 	public function optionalArray($name){
 		if(!isset($this->_DATA[$name])){
-			$this->is_opt[$name]       = true;
+			$this->is_opt[$name] = true;
 			$this->parsed[$name] = [];
 		} elseif(!is_array($this->_DATA[$name])){
-			$this->is_opt[$name]       = true;
+			$this->is_opt[$name] = true;
 			$this->parsed[$name] = [];
 		} else{
 			$this->parsed[$name] = $this->_DATA[$name];
@@ -160,26 +171,54 @@ abstract class InputStream{
 	/**
 	 * 使用预定义方法过滤
 	 *
-	 * @param string $name
-	 * @param string $filter
-	 * @param mixed  $args
+	 * @param string     $name   变量名
+	 * @param string|int $filter 过滤器名称（类型）
+	 * @param mixed      $args   给过滤器的参数（只能传一个）
+	 * @param int        $err    错误类型
 	 *
 	 * @return $this
 	 */
-	public function filter($name, $filter, $args = null){
+	public function filter($name, $filter, $args = null, $err = ERR_INPUT_DENY){
 		if(isset($this->is_opt[$name])){
 			return $this;
 		}
 		if(is_int($filter)){
 			$ret = filter_var($this->parsed[$name], $filter, $args);
 		} else{
-			$ret = $this->_filter($this->parsed[$name], $filter, $args);
+			$filter = 'filter_' . $filter;
+			$ret    = $this->$filter($this->parsed[$name], $args);
 		}
 		if(false === $ret){
 			$call = $this->callback_error;
-			$call(ERR_INPUT_DENY, $name);
+			$call($err, $name);
 		} else{
 			$this->parsed[$name] = $ret;
+		}
+		return $this;
+	}
+	/**
+	 * 使用预定义方法检查
+	 *
+	 * @param string     $name   变量名
+	 * @param string|int $filter 过滤器名称（类型）
+	 * @param mixed      $args   给过滤器的参数（只能传一个）
+	 * @param int        $err    错误类型
+	 *
+	 * @return $this
+	 */
+	public function valid($name, $filter, $args = null, $err = ERR_INPUT_DENY){
+		if(isset($this->is_opt[$name])){
+			return $this;
+		}
+		if(is_int($filter)){
+			$ret = filter_var($this->parsed[$name], $filter, $args);
+		} else{
+			$filter = 'valid_' . $filter;
+			$ret    = $this->$filter($this->parsed[$name], $args);
+		}
+		if(false === $ret){
+			$call = $this->callback_error;
+			$call($err, $name);
 		}
 		return $this;
 	}
@@ -188,18 +227,19 @@ abstract class InputStream{
 	 * 使用回调函数过滤
 	 *
 	 * @param string   $name
-	 * @param callable $cb 只有一个参数，返回过滤后的值，返回$expect为失败
+	 * @param callable $cb  只有一个参数，返回过滤后的值，返回$expect为失败
+	 * @param int      $err 错误类型
 	 *
 	 * @return $this
 	 **/
-	public function filter_callback($name, callable $cb){
+	public function filter_callback($name, callable $cb, $err = ERR_INPUT_DENY){
 		if(isset($this->is_opt[$name])){
 			return $this;
 		}
 		$ret = filter_var($this->parsed[$name], FILTER_CALLBACK, ['options' => $cb]);
 		if(!$ret){
 			$call = $this->callback_error;
-			$call(ERR_INPUT_DENY, $name);
+			$call($err, $name);
 		}
 		return $this;
 	}

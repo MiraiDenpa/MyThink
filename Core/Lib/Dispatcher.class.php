@@ -19,7 +19,7 @@
  */
 class Dispatcher{
 	public $action_name = DEFAULT_ACTION;
-	public $method_name = DEFAULT_METHOD;
+	public $method_name;
 	public $default_action = false;
 	public $default_method = false;
 	public $request_method = REQUEST_METHOD;
@@ -136,15 +136,19 @@ class Dispatcher{
 			$this->action_name = DEFAULT_ACTION;
 			$this->default_action = true;
 		}
-		if(!empty($array)){
-			$this->method_name = array_shift($array);
-		} else{
-			$this->method_name    = DEFAULT_METHOD;
-			$this->default_method = true;
-		}
 
 		$name = $this->action_name . 'Action';
 		$meta = $this->meta = classmeta_read($name);
+		
+		if(!empty($array)){
+			$this->method_name = array_shift($array);
+		} else{
+			$this->method_name    = $meta['default_method'];
+			if(!trim($this->method_name)){
+				Think::fail_error(ERR_NALLOW_MISS_PATH);
+			}
+			$this->default_method = true;
+		}
 
 		if(isset($meta['method'][$this->method_name])){
 			$ref = $meta['method'][$this->method_name];
@@ -217,7 +221,7 @@ class Dispatcher{
 		$ret = json_encode($vars);
 
 		if(!$ret){
-			Think::fail_error(ERR_JSON_SERIALIZE);
+			Think::fail_error(ERR_JSON_SERIALIZE, json_last_message());
 		} else{
 			echo $ret;
 		}

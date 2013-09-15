@@ -291,16 +291,16 @@ class Model{
 			$where[$field] = $args[0];
 
 			return $this
-				   ->where($where)
-				   ->find();
+					->where($where)
+					->find();
 		} elseif(strtolower(substr($method, 0, 10)) == 'getfieldby'){
 			// 根据某个字段获取记录的某个值
 			$name         = parse_name(substr($method, 10));
 			$where[$name] = $args[0];
 
 			return $this
-				   ->where($where)
-				   ->getField($args[1]);
+					->where($where)
+					->getField($args[1]);
 		} elseif(isset($this->_scope[$method])){ // 命名范围的单独调用支持
 			return $this->scope($method, $args[0]);
 		} else{
@@ -309,7 +309,13 @@ class Model{
 														LIB_PATH . 'Model/' . $class . '.php',
 														BASE_LIB_PATH . 'Model/' . $file . '.php',
 														EXTEND_PATH . 'Model/' . $file . '.php'
-														]), 0, $class . ':' . $method) . LANG_METHOD_NOT_EXIST, true);
+														]
+											   ),
+											   0,
+											   $class . ':' . $method
+						) . LANG_METHOD_NOT_EXIST,
+						true
+			);
 			return null;
 		}
 	}
@@ -323,6 +329,10 @@ class Model{
 	 * @return boolean
 	 */
 	protected function _facade($data){
+		if(isset($data['$pk'])){
+			$data[$this->pk] = $data['$pk'];
+			unset($data['$pk']);
+		}
 		// 检查非数据字段
 		if(!empty($this->fields)){
 			foreach($data as $key => $val){
@@ -475,8 +485,7 @@ class Model{
 				unset($data[$pk]);
 			} else{
 				// 如果没有任何更新条件则不执行
-				$this->error = L('_OPERATION_WRONG_');
-
+				$this->error = LANG_OPERATION_WRONG;
 				return false;
 			}
 		}
@@ -1221,8 +1230,8 @@ class Model{
 				$map[$this->getPk()] = array('neq', $data[$this->getPk()]);
 			}
 			if($this
-			   ->where($map)
-			   ->find()
+					->where($map)
+					->find()
 			){
 				return false;
 			}
@@ -1553,8 +1562,8 @@ class Model{
 	 *
 	 * @return Model
 	 */
-	public function data($data = ''){
-		if('' === $data && !empty($this->data)){
+	public function data($data = null){
+		if(func_num_args() === 0){
 			return $this->data;
 		}
 		if(is_object($data)){
@@ -1562,7 +1571,7 @@ class Model{
 		} elseif(is_string($data)){
 			parse_str($data, $data);
 		} elseif(!is_array($data)){
-			throw_exception(L('_DATA_TYPE_INVALID_'));
+			Think::halt(LANG_DATA_TYPE_INVALID);
 		}
 		$this->data = $data;
 
@@ -1823,15 +1832,17 @@ class Model{
 	public function page($page_var_name = 'p'){
 		static $not_init = true;
 		if($not_init){
-			$this->register_callback('before_select', function ($data, &$options){
-				if(!isset($options['pager']) || !$options['pager']){
-					return;
+			$this->register_callback('before_select',
+				function ($data, &$options){
+					if(!isset($options['pager']) || !$options['pager']){
+						return;
+					}
+					$this->options    = $options;
+					$total            = $this->count();
+					$this->page       = new Page($total, $this->perPage, array(), $options['pager']);
+					$options['limit'] = $this->page->firstRow . ',' . $this->perPage;
 				}
-				$this->options    = $options;
-				$total            = $this->count();
-				$this->page       = new Page($total, $this->perPage, array(), $options['pager']);
-				$options['limit'] = $this->page->firstRow . ',' . $this->perPage;
-			});
+			);
 			$not_init = false;
 		}
 		$this->options['pager'] = $page_var_name;

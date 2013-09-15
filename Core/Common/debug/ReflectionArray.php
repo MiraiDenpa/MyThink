@@ -84,12 +84,12 @@ class ReflectionArray{
 		$meta['name']      = $ref->getName();
 		$meta['namespace'] = $ref->getNamespaceName();
 		$meta['parent']    = $ref->getParentClass();
-		$meta['file']    = $ref->getFileName();
+		$meta['file']      = $ref->getFileName();
 		$meta['traits']    = $ref->getTraitNames();
 
 		$meta['interfase'] = $ref->getInterfaceNames();
 
-		$mets = $ref->getMethods();
+		$mets           = $ref->getMethods();
 		$meta['method'] = '';
 		foreach($mets as $method){
 			/** @var ReflectionMethod $method */
@@ -98,11 +98,16 @@ class ReflectionArray{
 			}
 		}
 		if($ref->getParentClass()){
-			$meta['parent'] = $ref->getParentClass()->getName();
+			$meta['parent'] = $ref
+							  ->getParentClass()
+							  ->getName();
 		}
 
-		$meta['const']    = $ref->getConstants();
-		$meta['property'] = $ref->getProperties(ReflectionProperty::IS_PUBLIC);
+		$meta['const'] = $ref->getConstants();
+		$ppts          = $ref->getProperties(ReflectionProperty::IS_PUBLIC);
+		foreach($ppts as $ppt){
+			$meta['property'] = $ppt->getName();
+		}
 		$meta['abstract'] = $ref->isAbstract();
 
 		return $meta;

@@ -202,7 +202,7 @@ class Db{
 		// 记录操作结束时间
 		if(DB_SQL_LOG){
 			G('queryEndTime');
-			trace($this->queryStr . ' [ 执行时间:' . G('queryStartTime', 'queryEndTime', 6) . 's ]', $this->model, 'SQL');
+			trace(addcslashes($this->queryStr,"\0..\37!@\@\177..\377") . ' [ 执行时间:' . G('queryStartTime', 'queryEndTime', 6) . 's ]', $this->model, 'SQL');
 		}
 		$this->model = '_think_';
 	}

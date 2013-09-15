@@ -120,5 +120,4 @@ return array(
 
 	'PAGE_TRACE_SAVE'       => false,
 	'DEFAULT_ACTION'        => 'Empty',
-	'DEFAULT_METHOD'        => 'index',
 );
