@@ -1,5 +1,5 @@
 server{
-	root <?php echo ROOT_PATH;?>;
+	root <?php echo APP_PATH;?>;
 	index index.php;
 	server_name <?php echo $GLOBALS['URL_MAP'][APP_NAME];?>;
 	
@@ -22,11 +22,11 @@ server{
 		fastcgi_param  CONTENT_TYPE       $content_type;
 		fastcgi_param  CONTENT_LENGTH     $content_length;
 		
-		fastcgi_param  SCRIPT_FILENAME    <?php echo ROOT_PATH;?><?php echo PHP_SELF;?>;
+		fastcgi_param  SCRIPT_FILENAME    <?php echo APP_PATH;?><?php echo PHP_SELF;?>;
 		fastcgi_param  SCRIPT_NAME        <?php echo PHP_SELF;?>;
 		fastcgi_param  REQUEST_URI        $request_uri;
 		fastcgi_param  DOCUMENT_URI       $document_uri;
-		fastcgi_param  DOCUMENT_ROOT      <?php echo ROOT_PATH;?>;
+		fastcgi_param  DOCUMENT_ROOT      <?php echo APP_PATH;?>;
 		
 		fastcgi_param  SERVER_PROTOCOL    $server_protocol;
 		fastcgi_param  SERVER_SOFTWARE    nginx/$nginx_version;
