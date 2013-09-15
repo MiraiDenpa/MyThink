@@ -42,4 +42,4 @@ defined('STATIC_URL')   or define('STATIC_URL', '/Static'); //
 defined('PUBLIC_URL')   or define('PUBLIC_URL', '/Public'); // 
 
 defined('PHP_SELF')     or define('PHP_SELF', 'index.php');
-defined('ENTRY_FILE')   or define('ENTRY_FILE', ROOT_PATH . PHP_SELF);
+defined('ENTRY_FILE')   or define('ENTRY_FILE', APP_PATH . PHP_SELF);
