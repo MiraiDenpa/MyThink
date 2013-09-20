@@ -8,7 +8,7 @@
  */
 function html_whitespace($content){
 	$cache_replace = [];
-	if(preg_match_all('#(<script.*?>)(.*?)</script>#s', $content, $mats)){
+	if(preg_match_all('#(<script.*?[^\?]>)(.*?)</script>#s', $content, $mats)){
 		foreach($mats[2] as $id => $script){
 			if(!trim($script)){
 				continue;

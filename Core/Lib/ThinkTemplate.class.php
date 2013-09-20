@@ -270,7 +270,6 @@ class  ThinkTemplate{
 									 ],
 			function ($mats){
 				$str = str_replace(['[%', '%]'], ['<', '>'], $mats[0]);
-
 				return $this->parse($str);
 			},
 									 $content
