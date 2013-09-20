@@ -103,6 +103,7 @@ class Model{
 	/** @var Page 分页类对象 */
 	protected $page = null;
 	protected $perPage = 20;
+	protected $page_not_init = true;
 
 	protected $cache_cas = 'sql';
 
@@ -1830,8 +1831,7 @@ class Model{
 	 * @return $this
 	 */
 	public function page($page_var_name = 'p'){
-		static $not_init = true;
-		if($not_init){
+		if($this->page_not_init){
 			$this->register_callback('before_select',
 				function ($data, &$options){
 					if(!isset($options['pager']) || !$options['pager']){
@@ -1843,7 +1843,7 @@ class Model{
 					$options['limit'] = $this->page->firstRow . ',' . $this->perPage;
 				}
 			);
-			$not_init = false;
+			$this->page_not_init = false;
 		}
 		$this->options['pager'] = $page_var_name;
 		return $this;

@@ -132,9 +132,12 @@ class  ThinkTemplate{
 		// 模板解析
 		$tmplContent = $this->parse($tmplContent);
 		// 还原被替换的Literal标签
-		$tmplContent = preg_replace_callback('/<!--###literal(\d+)###-->/is', function ($mats){
-			return $this->restoreLiteral($mats[1]);
-		}, $tmplContent);
+		$tmplContent = preg_replace_callback('/<!--###literal(\d+)###-->/is',
+			function ($mats){
+				return $this->restoreLiteral($mats[1]);
+			},
+											 $tmplContent
+		);
 
 		// 优化生成的php代码
 		$tmplContent = str_replace('?><?php', '', $tmplContent);
@@ -168,9 +171,12 @@ class  ThinkTemplate{
 		$content = $this->parsePhp($content);
 		// 首先替换literal标签内容
 		$content = preg_replace_callback('/' . $begin . 'literal' . $end . '(.*?)' . $begin . '\/literal' . $end .
-										 '/is', function ($mats){
-			return $this->parseLiteral($mats[1]);
-		}, $content);
+										 '/is',
+			function ($mats){
+				return $this->parseLiteral($mats[1]);
+			},
+										 $content
+		);
 
 		// 内置标签库 无需使用taglib标签导入就可以使用
 		$tagLibs = explode(',', TAGLIB_BUILD_IN);
@@ -191,10 +197,12 @@ class  ThinkTemplate{
 
 		//解析普通模板标签 {tagName}
 		$content = preg_replace_callback('/(' . $this->config['tmpl_begin'] . ')([^\d\s' . $this->config['tmpl_begin'] .
-										 $this->config['tmpl_end'] . '].+?)(' . $this->config['tmpl_end'] .
-										 ')/is', function ($mats){
-			return $this->parseTag($mats[2]);
-		}, $content);
+										 $this->config['tmpl_end'] . '].+?)(' . $this->config['tmpl_end'] . ')/is',
+			function ($mats){
+				return $this->parseTag($mats[2]);
+			},
+										 $content
+		);
 
 		return $content;
 	}
@@ -223,8 +231,10 @@ class  ThinkTemplate{
 	protected function parseLayout($content){
 		// 读取模板中的布局标签
 		$find = preg_match('/' . $this->config['taglib_begin'] . 'layout\s(.+?)\s*?' . $this->config['taglib_end'] .
-						   '(.*)' . $this->config['taglib_begin'] . '\/layout' . $this->config['taglib_end'] .
-						   '/is', $content, $matches);
+						   '(.*)' . $this->config['taglib_begin'] . '\/layout' . $this->config['taglib_end'] . '/is',
+						   $content,
+						   $matches
+		);
 		if($find){
 			//替换Layout标签
 			$content = str_replace($matches[0], '', $content);
@@ -257,11 +267,14 @@ class  ThinkTemplate{
 		return preg_replace_callback([
 									 '#\[%([a-z0-9A-Z]+)%\].*?\[%/\1\%]#s',
 									 '#\[%([a-z0-9A-Z]+) .*?/%\]#s',
-									 ], function ($mats){
-			$str = str_replace(['[%', '%]'], ['<', '>'], $mats[0]);
+									 ],
+			function ($mats){
+				$str = str_replace(['[%', '%]'], ['<', '>'], $mats[0]);
 
-			return $this->parse($str);
-		}, $content);
+				return $this->parse($str);
+			},
+									 $content
+		);
 	}
 
 	// 解析模板中的include标签
@@ -270,7 +283,10 @@ class  ThinkTemplate{
 		$content = $this->parseLayout($content);
 		// 读取模板中的include标签
 		$find = preg_match_all('/' . $this->config['taglib_begin'] . 'include\s(.+?)\s*?\/' .
-							   $this->config['taglib_end'] . '/is', $content, $matches);
+							   $this->config['taglib_end'] . '/is',
+							   $content,
+							   $matches
+		);
 		if($find){
 			for($i = 0; $i < $find; $i++){
 				$include = $matches[1][$i];
@@ -384,7 +400,10 @@ class  ThinkTemplate{
 	public function getIncludeTagLib(& $content){
 		//搜索是否有TagLib标签
 		$find = preg_match('/' . $this->config['taglib_begin'] . 'taglib\s(.+?)(\s*?)\/' . $this->config['taglib_end'] .
-						   '\W/is', $content, $matches);
+						   '\W/is',
+						   $content,
+						   $matches
+		);
 		if($find){
 			//替换TagLib标签
 			$content = str_replace($matches[0], '', $content);
@@ -680,32 +699,9 @@ class  ThinkTemplate{
 	 * @return string
 	 */
 	private function parseTemplateName($templateName){
-		if(substr($templateName, 0, 1) == '$') //支持加载变量文件名
-		{
-			$templateName = $this->get(substr($templateName, 1));
-		}
-		$array    = explode(',', $templateName);
-		$parseStr = '';
+		$array = explode(',', $templateName);
 		foreach($array as $templateName){
-			if(false === strpos($templateName, $this->config['template_suffix'])){
-				// 解析规则为 分组@模板主题:模块:操作
-				if(strpos($templateName, '@')){
-					list($group, $templateName) = explode('@', $templateName);
-					$basePath = TMPL_PATH . '/' . $group . '/';
-				} else{
-					$basePath = THEME_PATH;
-				}
-				$templateName = str_replace(':', '/', $templateName);
-				$path         = explode('/', $templateName);
-				$action       = array_pop($path);
-				$module       = !empty($path)? array_pop($path) : MODULE_NAME;
-				if(!empty($path)){ // 设置模板主题
-					$basePath = dirname($basePath) . '/' . array_pop($path) . '/';
-				}
-				$templateName = $basePath . $module . '/' . $action . $this->config['template_suffix'];
-			}
-			// 获取模板文件内容
-			$parseStr .= file_get_contents($templateName);
+			$parseStr .= "\n" . file_get_contents(locateTemplate($templateName));
 		}
 
 		return $parseStr;

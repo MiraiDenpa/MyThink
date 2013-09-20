@@ -24,7 +24,7 @@ class Dispatcher{
 	public $default_method = false;
 	public $request_method = REQUEST_METHOD;
 	public $extension_name = 'html';
-	protected $param = [];
+	public $param = [];
 	protected $meta;
 	protected $GET = [];
 	protected $action = '';
@@ -124,27 +124,29 @@ class Dispatcher{
 		if(isset($part['extension'])){
 			$this->extension_name = strtolower($part['extension']);
 		}
-		$path = $part['dirname'] . '/' . $part['filename'];
+		$path = str_replace('.' . $this->extension_name, '', $path_info);
 
 		$path_info = trim($path, '/ ');
 
 		$array = $path_info? explode('/', $path_info) : [];
 
-		if(!empty($array)){
-			$this->action_name = ucfirst(strtolower(array_shift($array)));
+		$act = array_shift($array);
+		if($act){
+			$this->action_name = ucfirst(strtolower($act));
 		} else{
-			$this->action_name = DEFAULT_ACTION;
+			$this->action_name    = DEFAULT_ACTION;
 			$this->default_action = true;
 		}
 
 		$name = $this->action_name . 'Action';
 		$meta = $this->meta = classmeta_read($name);
-		
-		if(!empty($array)){
-			$this->method_name = array_shift($array);
+
+		$mtd = array_shift($array);
+		if($mtd){
+			$this->method_name = $mtd;
 		} else{
-			$this->method_name    = $meta['default_method'];
-			if(!trim($this->method_name)){
+			$this->method_name = $meta['default_method'];
+			if(!is_string($this->method_name) || !trim($this->method_name)){
 				Think::fail_error(ERR_NALLOW_MISS_PATH);
 			}
 			$this->default_method = true;
@@ -155,8 +157,21 @@ class Dispatcher{
 			if($ref['all_param'] && (count($array) < $ref['must_param'] || count($array) > $ref['all_param'])){
 				return '参数数量应该在' . $ref['must_param'] . '~' . $ref['all_param'] . '之间';
 			}
+			$lst = $this->meta['method'][$this->method_name]['param_list'];
+			foreach($array as $k => $v){
+				if($v != 'null'){
+					continue;
+				}
+				$array[$k] = $this->meta['method'][$this->method_name]['param'][$lst[$k]]['default_value'];
+			}
 		} elseif(!isset($meta['method']['__call'])){
 			return LANG_MODULE_NOT_EXIST . ' : ' . $name . '::' . $this->method_name . '()';
+		} else{
+			foreach($array as $k => $v){
+				if($v == 'null'){
+					$array[$k] = null;
+				}
+			}
 		}
 
 		$this->param = $array;

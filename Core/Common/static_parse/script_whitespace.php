@@ -27,7 +27,7 @@ function script_whitespace($script){
 		2 => array("pipe", "w")
 	);
 
-	$process = proc_open('uglifyjs2', $descriptorspec, $pipes, $cwd, $env);
+	$process = proc_open('uglifyjs2', $descriptorspec, $pipes);
 	trace('uglifyjs2', '执行程序', 'INFO');
 
 	$script .= "\n\n";

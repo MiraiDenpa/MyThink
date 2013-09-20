@@ -19,7 +19,7 @@ class UrlHelper{
 	/**
 	 *
 	 */
-	public function __construct($urlm=null){
+	public function __construct($urlm = null){
 		if($urlm){
 			$this->urlm = $urlm;
 		}
@@ -86,9 +86,17 @@ class UrlHelper{
 	}
 
 	/**
-	 * @param string $path
+	 * @param string|array $path
 	 */
 	public function setPath($path){
+		if(is_array($path)){
+			foreach($path as $k => $com){
+				if(""==$com){
+					$path[$k] = 'null';
+				}
+			}
+			$path = implode(URL_PATHINFO_DEPR, $path);
+		}
 		$this->path = $path;
 	}
 

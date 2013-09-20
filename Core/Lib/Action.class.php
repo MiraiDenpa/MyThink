@@ -45,9 +45,11 @@ abstract class Action{
 	public function __construct(Dispatcher &$dispatcher){
 		$this->dispatcher = & $dispatcher;
 		$this->meta       = & $dispatcher->getMeta();
-		foreach($this->meta['traits'] as $trait){
-			$method = '__' . $trait;
-			$this->$method();
+		foreach($this->meta['constructor'] as $fn){
+			if($fn == '__construct'){
+				continue;
+			}
+			$this->$fn();
 		}
 	}
 

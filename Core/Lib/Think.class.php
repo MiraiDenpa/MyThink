@@ -50,7 +50,7 @@ class Think{
 	 * @param mixed $e 异常对象
 	 */
 	static public function appException($e){
-		if(is_a($e, 'MongoException')){
+		if(APP_DEBUG && is_a($e, 'MongoException')){
 			self::fail_error(ERR_NO_SQL, $e->getMessage());
 			return;
 		}
@@ -182,6 +182,7 @@ class Think{
 			if($html){
 				echo "致命错误：{$msg}<br/><br/>Trace:<pre>";
 			} else{
+				trace('halt被调用','','EMERG');
 				echo "致命错误：" . nl2br(htmlspecialchars($msg)) . "<br/><br/>Trace:<pre>";
 			}
 			debug_print_backtrace();

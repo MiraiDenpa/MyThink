@@ -1,4 +1,7 @@
 <?php
+require $alias['COM\\MyThink\\Strings'];
+use \COM\MyThink\Strings;
+
 if(isset($GLOBALS['COMPILE'])){
 	echo_line("编译静态文件。");
 
@@ -20,8 +23,23 @@ if(isset($GLOBALS['COMPILE'])){
 
 	// 生成js全局变量定义文件
 	echo_line("\t生成js定义");
-	$f  = PUBLIC_PATH . 'basevar.js';
-	$js = 'window.Think = ' . json_encode($array) . ';';
+	$f = PUBLIC_PATH . 'basevar.js';
+	foreach($array as $name => $value){
+		if(Strings::isEndWith($name, '_PATH') || Strings::isStartWith($name, 'TMPL_') ||
+		   Strings::isStartWith($name, 'DB_') || Strings::isStartWith($name, 'COOKIE_') ||
+		   Strings::isEndWith($name, '_DEBUG') || Strings::isStartWith($name, 'LANG_') ||
+		   Strings::isEndWith($name, '_FILE') || Strings::isStartWith($name, 'MAIL_')
+		){
+			unset($array[$name]);
+			continue;
+		}
+		if(in_array($name, ['APP_NAME'])){
+			unset($array[$name]);
+			continue;
+		}
+	}
+	$array['URL_MAP'] = $GLOBALS['URL_MAP'];
+	$js               = 'window.Think = ' . json_encode($array, JSON_PRETTY_PRINT) . ';';
 	if(APP_DEBUG){
 		echo_line("\tjs定义： 附加less");
 		$js .= "\n" . file_get_contents(THINK_PATH . 'Tpl/debugless.js');
@@ -29,10 +47,10 @@ if(isset($GLOBALS['COMPILE'])){
 	file_put_contents($f, $js);
 	echo_line('');
 
-	require $alias['COM\\MyThink\\Strings'];
 	$tmpl = file_get_contents(__FILE__);
 	$tmpl = explode('/*[SIG]*/', $tmpl)[2];
 	$tmpl = '<?php
+		use \COM\MyThink\Strings;
 		function echo_line($msg){echo $msg . "\n";}
 		require "' . RUNTIME_PATH . 'functions.php";
 		require "' . RUNTIME_PATH . APP_NAME . '/const.php";
@@ -46,8 +64,6 @@ if(isset($GLOBALS['COMPILE'])){
 	return;
 }
 /*[SIG]*/
-
-use \COM\MyThink\Strings;
 
 /**  */
 function export_php($data){

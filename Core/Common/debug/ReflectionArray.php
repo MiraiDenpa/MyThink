@@ -13,29 +13,33 @@ class ReflectionArray{
 	 * @return array
 	 */
 	public static function parseFunction($function){
+		$meta = [];
 		if(is_object($function)){
 			$ref = & $function;
 		} else{
 			$ref = new ReflectionFunction($function);
 		}
 
-		$meta               = self::parseComment($ref->getDocComment());
+		$phd                = self::parseComment($ref->getDocComment());
 		$meta['namespace']  = $ref->getNamespaceName();
 		$meta['all_param']  = $ref->getNumberOfParameters();
 		$meta['must_param'] = $ref->getNumberOfRequiredParameters();
 		$meta['name']       = $ref->getName();
 
 		if(method_exists($ref, 'getModifiers')){ // 是一个method
-			$meta['modifiers'] = $ref->getModifiers();
+			$meta['modifiers']   = $ref->getModifiers();
+			$meta['constructor'] = $ref->isConstructor();
+			$meta['static']      = $ref->isStatic();
 		}
 
 		$params = $ref->getParameters();
 		foreach($params as $param){
-			$param                         = self::parseParam($param);
-			$meta['param'][$param['name']] = $param;
+			$param                            = self::parseParam($param);
+			$meta['param'][$param['name']]    = $param;
+			$meta['param_list'][$param['id']] = $param['name'];
 		}
 
-		return $meta;
+		return array_merge($meta, $phd);
 	}
 
 	/**
@@ -90,17 +94,23 @@ class ReflectionArray{
 		$meta['interfase'] = $ref->getInterfaceNames();
 
 		$mets           = $ref->getMethods();
-		$meta['method'] = '';
+		$meta['method'] = $meta['private_method'] = [];
 		foreach($mets as $method){
 			/** @var ReflectionMethod $method */
+			$method_meta = self::parseFunction($method);
+			if($method_meta['constructor']){
+				$meta['constructor'][] = $method_meta['name'];
+			}
 			if($method->isPublic() && $method->isUserDefined() && (!$all_final || $method->isFinal())){
-				$meta['method'][$method->name] = self::parseFunction($method);
+				$meta['method'][$method->name] = $method_meta;
+			} else{
+				$meta['private_method'][$method->name] = $method_meta;
 			}
 		}
 		if($ref->getParentClass()){
 			$meta['parent'] = $ref
-							  ->getParentClass()
-							  ->getName();
+					->getParentClass()
+					->getName();
 		}
 
 		$meta['const'] = $ref->getConstants();
@@ -131,7 +141,7 @@ class ReflectionArray{
 		$phd      = '';
 		foreach($lines as $line){
 			$line = trim($line);
-			if($line == '*/' || $line == '/**'){
+			if($line == '*/' || $line == '/**' || $line == '*'){
 				continue;
 			}
 			if(preg_match('#^\*\s+@(\S+)#', $line, $mats)){
@@ -156,12 +166,11 @@ class ReflectionArray{
 		if(isset($meta['param'])){
 			$params = array();
 			foreach($meta['param'] as &$text){
-				$text = trim($text);
-				$text = preg_replace('#^\*\s+#m', '', $text);
-				preg_match('#^(\S+)\s+\$(\S+)\s+(.*)#s', $text, $mats);
-				$params[$mats[2]] = array(
-					'type'    => $mats[1],
-					'comment' => $mats[3],
+				$text = preg_replace('#^\*\s+#m', '', trim($text));
+				preg_match('#^(?<type>\S*)\s*\$(?<name>\S+)\s*(?<comment>.*)#s', $text, $mats); // type name comment
+				$params[$mats['name']] = array(
+					'type'    => $mats['type'],
+					'comment' => $mats['comment'],
 				);
 			}
 			$meta['param'] = $params;
@@ -183,6 +192,9 @@ class ReflectionArray{
 		foreach($meta as &$prop){
 			if(is_string($prop)){
 				$prop = trim($prop);
+				if(!$prop){
+					$prop = true;
+				}
 			}
 		}
 

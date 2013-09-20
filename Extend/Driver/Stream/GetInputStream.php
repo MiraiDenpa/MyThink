@@ -1,18 +1,19 @@
 <?php
 class GetInputStream extends InputStream{
 	function __construct(){
-		$this->_DATA = &$_GET;
+		$this->_DATA = & $_GET;
 	}
 
-	/**
-	 * 使用预定义方法过滤
-	 *
-	 * @param string $name
-	 * @param string $filter
-	 * @param mixed  $args
-	 *
-	 * @return $this
-	 */
-	protected function _filter($name, $filter, $args = null){
+	protected function valid_pager($var, $notuse){
+		if(is_array($var)){
+			if($var[0] < 0 || $var[1] < 0){
+				return false;
+			}
+		} else{
+			if($var < 0){
+				return false;
+			}
+		}
+		return true;
 	}
 }

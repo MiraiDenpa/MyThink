@@ -7,7 +7,7 @@
  *
  * @return string
  */
-function locateTemplate($template = ''){
+function locateTemplate($template){
 	// 分析模板文件规则
 	if(!$template){ // 如果模板文件名为空 按照默认规则定位
 		$template = METHOD_NAME;

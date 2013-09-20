@@ -5,7 +5,7 @@
  *
  * @param string $action
  * @param string $model
- * @param string $path
+ * @param string|array $path
  * @param array  $vars   传入的参数
  * @param bool   $merge  如果是true，则把$_GET放进参数里
  *
