@@ -1,9 +1,7 @@
-<layout name="!layouts/simple_page" xmlns="http://www.w3.org/1999/html">
+<layout name="!layouts/simple_page">
 	$title=$message.' - 未来电波';
 </layout>
 <BrowserLib>
-	phpjs
-	artDialog
 	debug
 </BrowserLib>
 <AppendHeader>
@@ -63,9 +61,15 @@
 				</notempty>
 				&nbsp;
 				<div class="pull-right">
-					{$redirect}
+					<volist name="redirect" id="url" key="name">
+						<a href="{$url}" class="btn btn-default">{$name}</a>
+					</volist>
 				</div>
 			</div>
 		</div>
 	</div>
+
+	<if condition="APP_DEBUG">
+		{~xdebug_print_function_stack()}
+	</if>
 </div>

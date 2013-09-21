@@ -43,3 +43,5 @@ defined('PUBLIC_URL')   or define('PUBLIC_URL', '/Public'); //
 
 defined('PHP_SELF')     or define('PHP_SELF', 'index.php');
 defined('ENTRY_FILE')   or define('ENTRY_FILE', APP_PATH . PHP_SELF);
+
+defined('FPM_SOCK_PATH')     or define('FPM_SOCK_PATH', '/var/run/php-fpm/');

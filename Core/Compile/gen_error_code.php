@@ -2,23 +2,6 @@
 
 require $alias['UrlHelper'];
 
-function _UC($app,$action,$model,$path='',$vars=[],$suffix='html'){
-	static $hp;
-	if(!$hp){
-		$hp = @new UrlHelper($GLOBALS['URL_MAP']);
-	}
-
-	$hp->setApp($app);
-	$hp->setAction($action);
-	$hp->setMethod($model);
-	$hp->setProtocol('http');
-	$hp->setParamAll($vars);
-	$hp->setSuffix($suffix);
-	$hp->setPath($path);
-
-	return $hp->getUrl();
-}
-
 echo_line("定义错误码。");
 $error    = require BASE_CONF_PATH . 'error.php';
 $revert   = [];

@@ -20,12 +20,15 @@ class UrlHelper{
 	 *
 	 */
 	public function __construct($urlm = null){
+		// <DEBUG>
 		if($urlm){
 			$this->urlm = $urlm;
-		}
-		if(!$this->urlm){
+		} else{
+			// </DEBUG>
 			$this->urlm = hidef_load('urlmap');
+			// <DEBUG>
 		}
+		// </DEBUG>
 	}
 
 	/**
@@ -91,7 +94,7 @@ class UrlHelper{
 	public function setPath($path){
 		if(is_array($path)){
 			foreach($path as $k => $com){
-				if(""==$com){
+				if("" == $com){
 					$path[$k] = 'null';
 				}
 			}
@@ -133,12 +136,12 @@ class UrlHelper{
 
 		/* /action/method/path/to */
 		$params = $this->param;
-		$path   = $this->action . '/' . $this->method;
+		$path   = $this->action . URL_PATHINFO_DEPR . $this->method;
 		if($this->path){
-			$path .= '/' . $this->path;
+			$path .= URL_PATHINFO_DEPR . $this->path;
 		}
 
-		$url = $perfix . '/' . $path . '.' . $this->suffix;
+		$url = $perfix . URL_PATHINFO_DEPR . $path . '.' . $this->suffix;
 		if(empty($params)){
 			if($this->paramstr){
 				$url .= '?' . $this->paramstr;

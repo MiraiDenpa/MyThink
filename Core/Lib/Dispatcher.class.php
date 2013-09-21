@@ -126,9 +126,9 @@ class Dispatcher{
 		}
 		$path = str_replace('.' . $this->extension_name, '', $path_info);
 
-		$path_info = trim($path, '/ ');
+		$path_info = trim($path, '/ '.URL_PATHINFO_DEPR);
 
-		$array = $path_info? explode('/', $path_info) : [];
+		$array = $path_info? explode(URL_PATHINFO_DEPR, $path_info) : [];
 
 		$act = array_shift($array);
 		if($act){
@@ -270,5 +270,17 @@ class Dispatcher{
 			$vars['_PAGE_TRACE_'] = grab_page_trace();
 		}
 		echo serialize($vars);
+	}
+
+	/**
+	 * 二进制php序列化
+	 */
+	protected function return_bphp($t, $c, $vars){
+		Think::clear_ob();
+		header('Content-Type: ' . $c . '; charset=utf-8');
+		if(SHOW_TRACE){
+			$vars['_PAGE_TRACE_'] = grab_page_trace();
+		}
+		echo igbinary_serialize($vars);
 	}
 }

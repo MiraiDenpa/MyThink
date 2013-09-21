@@ -5,9 +5,7 @@ $alias = merge_config(array(
 						   '第三方类定义' => __DIR__ . '/library_map.php',
 						   '用户定义'   => CONF_PATH . 'alias.php',
 					  ));
-if(APP_DEBUG){
-	foreach($alias as $k => $v){
-		echo_line("\t - $k \t-> $v");
-	}
-}
+
+echo_line("\t - 共".count($alias)."个类");
+
 return 'global $_think_import_alias;$_think_import_alias = ' . var_export($alias, true) . ';';

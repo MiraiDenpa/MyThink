@@ -8,10 +8,13 @@ server{
 		break;
 	}
 	
-	location ~ ^/[^\/]+\.php$ {
-		include fastcgi_params;
-		fastcgi_pass  unix:/var/run/php-fpm/<?php echo APP_NAME;?>.sock;
-	}
+	include allow_xhr.conf;
+	include allow_public.conf;
+	
+	#location ~ ^/[^\/]+\.php$ {
+	#	include fastcgi_params;
+	#	fastcgi_pass  unix:<?php echo FPM_SOCK_PATH;?><?php echo APP_NAME;?>.sock;
+	#}
 	
 	location / {
 		fastcgi_param  PATH_INFO          $uri;
@@ -42,12 +45,12 @@ server{
 		# PHP only, required if PHP was built with --enable-force-cgi-redirect
 		fastcgi_param  REDIRECT_STATUS    200;
 		
-		fastcgi_pass  unix:/var/run/php-fpm/<?php echo APP_NAME;?>.sock;
+		fastcgi_pass  unix:<?php echo FPM_SOCK_PATH;?><?php echo APP_NAME;?>.sock;
 		break;
 	}
 	
-	error_page 404 /Error/http/404.html;
-	error_page 400 /Error/http/400.html;
+	error_page 404 /Public/404.html;
+	error_page 400 /Public/400.html;
 	
 	error_log <?php echo LOG_PATH; ?>ngx-error.log;
 	access_log <?php echo LOG_PATH; ?>ngx-access.log main;

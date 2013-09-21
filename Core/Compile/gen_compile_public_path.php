@@ -23,7 +23,7 @@ if(isset($GLOBALS['COMPILE'])){
 
 	// 生成js全局变量定义文件
 	echo_line("\t生成js定义");
-	$f = PUBLIC_PATH . 'basevar.js';
+	$f = PUBLIC_PATH . 'jslib/basevar.js';
 	foreach($array as $name => $value){
 		if(Strings::isEndWith($name, '_PATH') || Strings::isStartWith($name, 'TMPL_') ||
 		   Strings::isStartWith($name, 'DB_') || Strings::isStartWith($name, 'COOKIE_') ||
@@ -40,6 +40,7 @@ if(isset($GLOBALS['COMPILE'])){
 	}
 	$array['URL_MAP'] = $GLOBALS['URL_MAP'];
 	$js               = 'window.Think = ' . json_encode($array, JSON_PRETTY_PRINT) . ';';
+	$js .= "\nwindow.JS_DEBUG = " . json_encode(JS_DEBUG);
 	if(APP_DEBUG){
 		echo_line("\tjs定义： 附加less");
 		$js .= "\n" . file_get_contents(THINK_PATH . 'Tpl/debugless.js');

@@ -24,8 +24,8 @@ function map_path($act, $mtd, &$params){
 			}
 		}
 
-		return $act . '/' . $mtd . implode_l('/', $path);
+		return $act . URL_PATHINFO_DEPR . $mtd . implode_l(URL_PATHINFO_DEPR, $path);
 	} else{
-		return $act . '/' . $mtd;
+		return $act . URL_PATHINFO_DEPR . $mtd;
 	}
 }

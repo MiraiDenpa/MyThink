@@ -1,5 +1,5 @@
 [<?php echo APP_NAME;?>]
-listen = /var/run/php-fpm/<?php echo APP_NAME;?>.sock
+listen = <?php echo FPM_SOCK_PATH;?><?php echo APP_NAME;?>.sock
 
 ;listen.backlog = -1
 ;listen.allowed_clients = 127.0.0.1
@@ -56,3 +56,7 @@ php_admin_value[hidef.ini_path] = <?php echo $ini_path; ?>
 
 php_admin_value[hidef.data_path] = <?php echo $data_path; ?>
 
+php_admin_value[session.cookie_lifetime] = 604800
+php_admin_value[session.cookie_path] = /
+;php_admin_value[session.cookie_domain] = 
+;php_admin_value[session.cookie_httponly] = 

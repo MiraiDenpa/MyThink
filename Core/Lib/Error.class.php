@@ -29,13 +29,10 @@ class Error extends ThinkException{
 	}
 
 	public function getUrl(){
-		$r = S('ThinkError' . $this->code);
+		$r = S('ThinkErrorUrl' . $this->code);
 		if(!$r){
-			$r = '';
-			foreach((array)$this->info['url'] as $title => $url){
-				$r .= '<a href="' . $url . '" class="btn btn-lg btn-default">' . $title . '</a>';
-			}
-			S('ThinkError' . $this->code, $r);
+			$r = (array)$this->info['url'];
+			S('ThinkErrorUrl' . $this->code, $r);
 		}
 		return $r;
 	}

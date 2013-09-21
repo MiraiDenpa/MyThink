@@ -27,9 +27,9 @@ function echo_line($msg){
 $GLOBALS['COMPILE'] = true;
 echo_line(" --- 开始编译 --- ");
 
-require THINK_PATH.'Compile/compile_core_files.php';
 require THINK_PATH.'Compile/merge_config.php';
 require THINK_PATH.'Compile/hidef_save_constant.php';
+require THINK_PATH.'Compile/temp_uc.php';
 
 /* 定义所有常量 */
 require THINK_PATH.'Compile/gen_define_all.php';
@@ -38,26 +38,7 @@ require THINK_PATH.'Compile/gen_define_all.php';
 require THINK_PATH.'Compile/build_runtime_dir.php';
 
 /* 合并整个函数库 */
-echo_line('合并函数库');
-$list  = array_merge(glob(THINK_PATH . 'Common/*/*.php'), // 内置函数
-					 glob(BASE_LIB_PATH . 'Common/*.php'), // 用户全局函数
-					 glob(APP_PATH . 'Common/*.php'), // 用户定义函数
-					 glob(EXTEND_PATH . 'Function/*.php')); // Extend里定义的函数
-$flist = [];
-foreach($list as $file){
-	$flist[] = $file;
-	if(APP_DEBUG){
-		echo_line("\t - $file");
-	}
-}
-if(CORE_DEBUG){
-	echo_line(' -- CORE_DEBUG -- 调试模式，用include方式引入文件。');
-	$funcLib = "foreach(" . var_export($flist, true) . " as \$file){\n\trequire_once \$file;\n}\n";
-	file_put_contents(RUNTIME_PATH . 'functions.php', '<?php ' . $funcLib);
-} else{
-	$funcLib = compile_core_files($flist);
-	file_put_contents(RUNTIME_PATH . 'functions.php', '<?php ' . $funcLib);
-}
+require THINK_PATH.'Compile/gen_core_files.php';
 require RUNTIME_PATH . 'functions.php';
 echo_line('');
 

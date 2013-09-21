@@ -133,9 +133,6 @@ abstract class Action{
 	 * @return null
 	 */
 	protected function error($code, $extra = '', $jumpUrl = '', $jumptimeout = 5){
-		if(!empty($this->tVar)){
-			$this->tVar = ['extra' => $this->tVar];
-		}
 		$e                      = new Error($code);
 		$this->tVar['message']  = $e->getMessage();
 		$this->tVar['redirect'] = $e->getUrl();
@@ -165,10 +162,7 @@ abstract class Action{
 	 *
 	 * @return null
 	 */
-	protected function success($message, $jumpUrl = '', $jumptimeout = 2){
-		if(!empty($this->tVar)){
-			$this->tVar = ['extra' => $this->tVar];
-		}
+	protected function success($message = 'success', $jumpUrl = '', $jumptimeout = 2){
 		$this->tVar['message'] = $message;
 		if(is_string($jumpUrl)){
 			$this->tVar['jumpurl'] = $jumpUrl? $jumpUrl : '';

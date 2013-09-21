@@ -8,7 +8,8 @@ $config = merge_config(array(
 							'全局状态配置（' . APP_STATUS . '.php）' => BASE_CONF_PATH . APP_STATUS . '.php',
 							'项目配置'                           => CONF_PATH . 'config.php',
 							'项目状态配置（' . APP_STATUS . '.php）' => CONF_PATH . APP_STATUS . '.php',
-					   ));
+					   )
+);
 foreach($config as $n => $v){
 	if(is_array($v)){
 		echo_line("\t ** " . $n . ' - 配置项是数组！');
@@ -20,17 +21,21 @@ foreach($config as $n => $v){
 echo_line('');
 
 echo_line("数据库定义：");
+$define = [];
 foreach(array_merge(glob(BASE_CONF_PATH . 'db/*.php'), glob(CONF_PATH . 'db/*.php')) as $file){
-	$define = require $file;
-	hidef_save('ThinkDb' . pathinfo($file, PATHINFO_FILENAME), $define, true);
-	echo_line("\t - " . basename($file));
+	$define[pathinfo($file, PATHINFO_FILENAME)] = require $file;
 }
 
 echo_line("数据库调试定义：");
-foreach(array_merge(glob(BASE_CONF_PATH . APP_STATUS . '/db/*.php'), glob(CONF_PATH . APP_STATUS .
-																		  '/db/*.php')) as $file){
-	$define = require $file;
-	hidef_save('ThinkDb' . pathinfo($file, PATHINFO_FILENAME), $define, true);
-	echo_line("\t - " . basename($file));
+foreach(array_merge(glob(BASE_CONF_PATH . APP_STATUS . '/db/*.php'),
+					glob(CONF_PATH . APP_STATUS . '/db/*.php')
+		) as $file){
+	$define[pathinfo($file, PATHINFO_FILENAME)] = require $file;
 }
+
+foreach($define as $name => $data){
+	hidef_save('ThinkDb' . $name, $data, true);
+	echo_line("\t - " . $name);
+}
+
 echo_line('');

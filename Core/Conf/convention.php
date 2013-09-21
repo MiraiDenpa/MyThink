@@ -2,7 +2,7 @@
 // 默认配置文件
 return array(
 	/* Cookie设置 */
-	'COOKIE_EXPIRE'         => 1800,
+	'COOKIE_EXPIRE'         => 604800,
 	// Coodie有效期
 	'COOKIE_PATH'           => '/',
 	// Cookie路径

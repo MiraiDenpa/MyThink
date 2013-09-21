@@ -228,15 +228,14 @@
 				});
 			});
 
-			var ul = $('#think_page_trace_content .tab');
+			var ul = $('#think_page_trace_content');
 			var tab_buttons = $('#think_page_trace_tab').on('click', 'li', function (){
 				tab_buttons.find('.active').removeClass('active');
 				$(this).addClass('active');
 				var tab = '.tab_' + $(this).data('level');
-				ul.hide();
-				ul.filter(tab).show();
+				ul.children().hide().filter(tab).show();
 			});
-			tab_buttons.first().click();
+			tab_buttons.find('li:first').click();
 
 			var notes = $('#think_page_note_list');
 			var ajaxNote, ajaxContent, ajaxButtons;
