@@ -3,18 +3,7 @@ server{
 	index index.php;
 	server_name <?php echo $GLOBALS['URL_MAP'][APP_NAME];?>;
 	
-	location ~ ^/[^\/]+\.(png|ico|gif|html|css|js|txt)$ {
-		rewrite .* <?php echo PUBLIC_URL; ?>$uri;
-		break;
-	}
-	
-	include allow_xhr.conf;
-	include allow_public.conf;
-	
-	#location ~ ^/[^\/]+\.php$ {
-	#	include fastcgi_params;
-	#	fastcgi_pass  unix:<?php echo FPM_SOCK_PATH;?><?php echo APP_NAME;?>.sock;
-	#}
+<?php echo $NGINX_CONF; ?>
 	
 	location / {
 		fastcgi_param  PATH_INFO          $uri;
@@ -49,9 +38,6 @@ server{
 		break;
 	}
 	
-	error_page 404 /Public/404.html;
-	error_page 400 /Public/400.html;
-	
 	error_log <?php echo LOG_PATH; ?>ngx-error.log;
-	access_log <?php echo LOG_PATH; ?>ngx-access.log main;
+	access_log <?php echo APP_DEBUG?LOG_PATH.'ngx-access.log main':'off'; ?>;
 }

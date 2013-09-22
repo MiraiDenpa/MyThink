@@ -18,7 +18,7 @@
  * @author      liu21st <liu21st@gmail.com>
  */
 class Dispatcher{
-	public $action_name = DEFAULT_ACTION;
+	public $action_name;
 	public $method_name;
 	public $default_action = false;
 	public $default_method = false;
@@ -68,7 +68,7 @@ class Dispatcher{
 			if(!$this->action_name){
 				Think::halt('没有调用过parse_path。');
 			} else{
-				$this->action = ThinkInstance::A($this->action_name, $this);
+				$this->action = ThinkInstance::A(ACTION_PREFIX . $this->action_name, $this);
 				if(!$this->action_name){
 					_404(LANG_ACTION_NOT_EXIST . ':' . $this->action_name);
 				}
@@ -126,7 +126,7 @@ class Dispatcher{
 		}
 		$path = str_replace('.' . $this->extension_name, '', $path_info);
 
-		$path_info = trim($path, '/ '.URL_PATHINFO_DEPR);
+		$path_info = trim($path, '/ ' . URL_PATHINFO_DEPR);
 
 		$array = $path_info? explode(URL_PATHINFO_DEPR, $path_info) : [];
 
@@ -138,7 +138,7 @@ class Dispatcher{
 			$this->default_action = true;
 		}
 
-		$name = $this->action_name . 'Action';
+		$name = ACTION_PREFIX . $this->action_name . 'Action';
 		$meta = $this->meta = classmeta_read($name);
 
 		$mtd = array_shift($array);

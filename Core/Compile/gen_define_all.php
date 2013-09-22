@@ -1,17 +1,5 @@
 <?php
 
-//  版本信息
-define('THINK_VERSION', '3.1.3g');
-
-// 遗留问题
-define('TMPL_L_DELIM', '{');
-define('TMPL_R_DELIM', '}');
-
-// 待移动定义
-define('STR_TRIM_BOTH', 3);
-define('STR_TRIM_LEFT', 1);
-define('STR_TRIM_RIGHT', 2);
-
 // 路径设置 可在编译入口文件中重新定义 所有路径常量都必须以/ 结尾
 defined('CORE_PATH')    or define('CORE_PATH', THINK_PATH . 'Lib/'); // 系统核心类库目录
 defined('EXTEND_PATH')  or define('EXTEND_PATH', MTP_PATH . 'Extend/'); // 系统扩展目录

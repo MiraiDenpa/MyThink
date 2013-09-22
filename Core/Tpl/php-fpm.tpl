@@ -60,3 +60,5 @@ php_admin_value[session.cookie_lifetime] = 604800
 php_admin_value[session.cookie_path] = /
 ;php_admin_value[session.cookie_domain] = 
 ;php_admin_value[session.cookie_httponly] = 
+
+<?php echo $FPM_CONF; ?>

@@ -54,7 +54,7 @@ class TagLibCx extends TagLib{
 		'url'        => array('attr' => 'app,action,method,params,suffix,protocol', 'close' => 0),
 		'script'     => ['attr' => 'type,wrap,globals,declare', 'must' => 'type', 'close' => 1],
 		'style'      => ['attr' => 'type', 'must' => 'type', 'close' => 1],
-		'link'      => ['attr' => 'rel,href,type', 'must' => 'rel,href,type', 'close' => 0],
+		'link'       => ['attr' => 'rel,href,type', 'must' => 'rel,href,type', 'close' => 0],
 		'comment'    => ['attr' => '', 'must' => '', 'close' => 1],
 		'iif'        => ['attr' => 'name,then,else,type', 'must' => 'name', 'close' => 0],
 		//'formdescript' => ['attr' => 'template', 'must' => 'template', 'close' => 1],
@@ -306,7 +306,7 @@ class TagLibCx extends TagLib{
 	 *
 	 * @return string
 	 */
-	public function _default($attr,$content){
+	public function _default($attr, $content){
 		$parseStr = '<?php default: ?>';
 
 		return $parseStr;
@@ -320,7 +320,7 @@ class TagLibCx extends TagLib{
 	 *
 	 * @param string $attr     标签属性
 	 * @param string $content  标签内容
-	 * @param string $type  标签内容
+	 * @param string $type     标签内容
 	 *
 	 * @return string
 	 */
@@ -345,42 +345,52 @@ class TagLibCx extends TagLib{
 
 		return $parseStr;
 	}
-/**  */
+
+	/**  */
 	public function _eq($attr, $content){
 		return $this->_compare($attr, $content, 'eq');
 	}
+
 	/**  */
 	public function _equal($attr, $content){
 		return $this->_compare($attr, $content, 'eq');
 	}
+
 	/**  */
 	public function _neq($attr, $content){
 		return $this->_compare($attr, $content, 'neq');
 	}
+
 	/**  */
 	public function _notequal($attr, $content){
 		return $this->_compare($attr, $content, 'neq');
 	}
+
 	/**  */
 	public function _gt($attr, $content){
 		return $this->_compare($attr, $content, 'gt');
 	}
+
 	/**  */
 	public function _lt($attr, $content){
 		return $this->_compare($attr, $content, 'lt');
 	}
+
 	/**  */
 	public function _egt($attr, $content){
 		return $this->_compare($attr, $content, 'egt');
 	}
+
 	/**  */
 	public function _elt($attr, $content){
 		return $this->_compare($attr, $content, 'elt');
 	}
+
 	/**  */
 	public function _heq($attr, $content){
 		return $this->_compare($attr, $content, 'heq');
 	}
+
 	/**  */
 	public function _nheq($attr, $content){
 		return $this->_compare($attr, $content, 'nheq');
@@ -442,10 +452,12 @@ class TagLibCx extends TagLib{
 	public function _notin($attr, $content){
 		return $this->_range($attr, $content, 'notin');
 	}
+
 	/**  */
 	public function _between($attr, $content){
 		return $this->_range($attr, $content, 'between');
 	}
+
 	/**  */
 	public function _notbetween($attr, $content){
 		return $this->_range($attr, $content, 'notbetween');
@@ -510,6 +522,7 @@ class TagLibCx extends TagLib{
 
 		return $parseStr;
 	}
+
 	/**  */
 	public function _notempty($attr, $content){
 		$tag      = $this->parseXmlAttr($attr, 'notempty');
@@ -536,6 +549,7 @@ class TagLibCx extends TagLib{
 
 		return $parseStr;
 	}
+
 	/**  */
 	public function _notdefined($attr, $content){
 		$tag      = $this->parseXmlAttr($attr, '_notdefined');
@@ -715,7 +729,7 @@ class TagLibCx extends TagLib{
 	 */
 	public function _script($attr, $content){
 		$tag = $this->parseXmlAttr($attr, 'script');
-		
+
 		if(isset($tag['src']) || $tag['type'] != 'text/javascript' || !isset($tag['wrap']) || !$tag['wrap']){
 			return false;
 		}
@@ -724,18 +738,18 @@ class TagLibCx extends TagLib{
 		$globals = isset($tag['globals'])? $tag['globals'] : '';
 		$declare = isset($tag['declare'])? 'var ' . $tag['declare'] . ";\n" : '';
 
-		$content =$content . "\n"; // 防止最后一行是注释
+		$content = $content . "\n"; // 防止最后一行是注释
 
-		unset($tag['type'],$tag['globals'],$tag['declare'],$tag['wrap']);
+		unset($tag['type'], $tag['globals'], $tag['declare'], $tag['wrap']);
 		$attr = HTML::attr($tag);
-		
+
 		switch($wrap){
 		case 'ready':
-			return '<script type="text/javascript"'.$attr.'>"use strict";' . $declare . '$(function($){' . $content .
-				   '});</script>';
+			return '<script type="text/javascript"' . $attr . '>"use strict";' . $declare . '$(function($){' .
+				   $content . '});</script>';
 		case 'closure':
-			return '<script type="text/javascript"'.$attr.'>"use strict";' . $declare . '(function(' . $globals . '){' .
-				   $content . '})(' . $globals . ');</script>';
+			return '<script type="text/javascript"' . $attr . '>"use strict";' . $declare . '(function(' . $globals .
+				   '){' . $content . '})(' . $globals . ');</script>';
 		default:
 			Think::halt('&lt;script&gt; 中使用了未知的wrap属性。');
 			return '';
@@ -768,13 +782,15 @@ class TagLibCx extends TagLib{
 			return false;
 		}
 		if(!STATIC_DEBUG && $tag['type'] == 'text/less'){
-			$content = "\n" . $content . "\n"; // TODO 编译less
+			$content = less_compile($content);
+			$tag['type'] = 'text/css';
 		} else{
 			$content = "\n" . $content . "\n";
 		}
 		$content = broswer_css_perfix($content);
-		return '<style type="text/css" parse="true">' . $content . '</style>';
+		return '<style type="'.$tag['type'].'" parse="true">' . $content . '</style>';
 	}
+
 	/**  */
 	public function _iif($attr, $unused){
 		$tag  = $this->parseXmlAttr($attr, 'iif');
@@ -801,6 +817,7 @@ class TagLibCx extends TagLib{
 
 		return '<?php echo (' . $type . '(' . $name . ')?' . $then . ':' . $else . ');?>';
 	}
+
 	/**  */
 	public function _comment($attr, $content){
 		return "\n";
