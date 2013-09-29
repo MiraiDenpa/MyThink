@@ -40,7 +40,7 @@ if(isset($GLOBALS['COMPILE'])){
 	}
 	$array['URL_MAP'] = $GLOBALS['URL_MAP'];
 	$js               = 'window.Think = ' . json_encode($array, JSON_PRETTY_PRINT) . ';';
-	$js .= "\nwindow.JS_DEBUG = " . json_encode(JS_DEBUG);
+	$js .= "\nwindow.JS_DEBUG = " . json_encode(JS_DEBUG) . ';';
 	if(APP_DEBUG){
 		echo_line("\tjs定义： 附加less");
 		$js .= "\n" . file_get_contents(THINK_PATH . 'Tpl/debugless.js');
@@ -53,7 +53,7 @@ if(isset($GLOBALS['COMPILE'])){
 	$tmpl = '<?php
 		use \COM\MyThink\Strings;
 		function echo_line($msg){echo $msg . "\n";}
-		require "' . RUNTIME_PATH . 'functions.php";
+		require "' . RUNTIME_PATH . APP_NAME . '/functions.php";
 		require "' . RUNTIME_PATH . APP_NAME . '/const.php";
 		require "' . $alias['COM\\MyThink\\Strings'] . '";
 		' . $tmpl;

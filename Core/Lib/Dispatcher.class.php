@@ -157,12 +157,14 @@ class Dispatcher{
 			if($ref['all_param'] && (count($array) < $ref['must_param'] || count($array) > $ref['all_param'])){
 				return '参数数量应该在' . $ref['must_param'] . '~' . $ref['all_param'] . '之间';
 			}
-			$lst = $this->meta['method'][$this->method_name]['param_list'];
-			foreach($array as $k => $v){
-				if($v != 'null'){
-					continue;
+			if(isset($this->meta['method'][$this->method_name]['param_list'])){
+				$lst = $this->meta['method'][$this->method_name]['param_list'];
+				foreach($array as $k => $v){
+					if($v != 'null'){
+						continue;
+					}
+					$array[$k] = $this->meta['method'][$this->method_name]['param'][$lst[$k]]['default_value'];
 				}
-				$array[$k] = $this->meta['method'][$this->method_name]['param'][$lst[$k]]['default_value'];
 			}
 		} elseif(!isset($meta['method']['__call'])){
 			return LANG_MODULE_NOT_EXIST . ' : ' . $name . '::' . $this->method_name . '()';

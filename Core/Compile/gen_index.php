@@ -7,12 +7,12 @@ if(SHOW_TRACE){
 if(MEMORY_DEBUG){
 	$compile .= "\$GLOBALS['_startUseMems'] = memory_get_usage();\n";
 }
-$compile .= "require(RUNTIME_PATH.'functions.php');\n";
+$compile .= "require('" . RUNTIME_PATH . APP_NAME . "/functions.php');\n";
 
 /* alias “查表导入” 的文件定义。 */
 $compile .= require __DIR__ . '/gen_alias.php';
 
-echo_line('');/* 结束载入 */
+echo_line(''); /* 结束载入 */
 $compile .= "\n\n";
 $compile .= "require \$_think_import_alias['Think'];\n";
 $compile .= "G('loadTime');// 载入时间\n";

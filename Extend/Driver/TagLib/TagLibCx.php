@@ -27,8 +27,9 @@ class TagLibCx extends TagLib{
 			'attr'  => 'name,id,key,index,mod',
 			'must'  => 'name,id',
 			'level' => 3,
-			'alias' => 'iterate'
+			'alias' => ''
 		),
+		'oncelist'   => array('attr' => 'source,id,key,index,mod', 'must' => 'id,source', 'level' => 3),
 		'foreach'    => array('attr' => 'name,item,key', 'level' => 3),
 		'if'         => array('attr' => 'condition', 'level' => 2),
 		'elseif'     => array('attr' => 'condition', 'close' => 0),
@@ -140,6 +141,45 @@ class TagLibCx extends TagLib{
 		}
 
 		return '';
+	}
+
+	/**  */
+	public function _oncelist($attr, $content){
+		$tag    = $this->parseXmlAttr($attr, 'oncelist');
+		$source = $tag['source'];
+		$id     = $tag['id'];
+		$key    = isset($tag['key'])? $tag['key'] : 'key';
+		$index  = !empty($tag['index'])? $tag['index'] : 'i';
+		$modBase    = isset($tag['mod'])? intval($tag['mod']) : 2;
+
+		$file = LIB_PATH . 'DataSource/' . $source . '.json';
+		if(!is_file($file)){
+			$file = BASE_LIB_PATH . 'DataSource/' . $source . '.json';
+			if(!is_file($file)){
+				Think::halt('模板不存在： ' . $file);
+			}
+		}
+		$data = json_decode(file_get_contents($file), true);
+		if($data === null){
+			Think::halt(json_last_message());
+		}
+		$ob  = new OutputBuffer();
+		$__i = 0;
+		foreach($data as $__k => $__v){
+			$data = array(
+				$key   => $__k,
+				$id    => $__v,
+				$index => $__i++,
+				'mod'  => $__i%$modBase,
+			);
+			extract($data);
+			$parsestr = $this->tpl->parse($content);
+			eval('?>' . $parsestr);
+		}
+		$parsestr = $ob->get();
+		$ob       = null;
+
+		return $parsestr;
 	}
 
 	/**
@@ -738,7 +778,7 @@ class TagLibCx extends TagLib{
 		$globals = isset($tag['globals'])? $tag['globals'] : '';
 		$declare = isset($tag['declare'])? 'var ' . $tag['declare'] . ";\n" : '';
 
-		$content = $content . "\n"; // 防止最后一行是注释
+		$content = "\n" . $content . "\n"; // 防止最后一行是注释
 
 		unset($tag['type'], $tag['globals'], $tag['declare'], $tag['wrap']);
 		$attr = HTML::attr($tag);
@@ -782,13 +822,13 @@ class TagLibCx extends TagLib{
 			return false;
 		}
 		if(!STATIC_DEBUG && $tag['type'] == 'text/less'){
-			$content = less_compile($content);
+			$content     = less_compile($content);
 			$tag['type'] = 'text/css';
 		} else{
 			$content = "\n" . $content . "\n";
 		}
 		$content = broswer_css_perfix($content);
-		return '<style type="'.$tag['type'].'" parse="true">' . $content . '</style>';
+		return '<style type="' . $tag['type'] . '" parse="true">' . $content . '</style>';
 	}
 
 	/**  */

@@ -1,5 +1,7 @@
 <?php
 class GetInputStream extends InputStream{
+	use BaseInputStream;
+	
 	function __construct(){
 		$this->_DATA = & $_GET;
 	}

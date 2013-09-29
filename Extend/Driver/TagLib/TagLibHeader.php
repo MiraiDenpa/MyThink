@@ -89,9 +89,12 @@ class TagLibHeader extends TagLib{
 	 * @param $attr    空
 	 * @param $content 要添加的文件列表
 	 *
-	 * @return void
+	 * @return string
 	 */
 	public function _BrowserLib($attr, $content){
+		if(!$content){
+			return '';
+		}
 		$arr     = explode("\n", $content);
 		$arr     = array_map('trim', $arr);
 		$files   = $this->parseDependence($arr);
@@ -103,6 +106,7 @@ class TagLibHeader extends TagLib{
 				Think::halt('无法添加头部：多余内容' . dump_some($ret));
 			}
 		}
+		return '';
 	}
 
 	/**
@@ -154,7 +158,7 @@ class TagLibHeader extends TagLib{
 		// js 部分
 		if(preg_match_all('#<script src="PUBLIC_URL(.*?)"[^>]*?></script>#', $content, $mats)){
 			foreach($mats[1] as $index => $file){
-				$script  = HTML::script(PUBLIC_URL . '/getjs/' .pubfile_guid(trim($file, '/')) . '.js?_=' .
+				$script  = HTML::script(PUBLIC_URL . '/getjs/' . pubfile_guid(trim($file, '/')) . '.js?_=' .
 										STATIC_VERSION
 				);
 				$content = str_replace($mats[0][$index], $script, $content);
@@ -163,8 +167,8 @@ class TagLibHeader extends TagLib{
 		// css 部分
 		if(preg_match_all('#<link href="PUBLIC_URL(.*?)"[^>]*?>()#', $content, $mats)){
 			foreach($mats[1] as $index => $file){
-				$script  = HTML::css(PUBLIC_URL . '/getcss/' .pubfile_guid(trim($file, '/')) . '.css?_=' .
-										STATIC_VERSION
+				$script  = HTML::css(PUBLIC_URL . '/getcss/' . pubfile_guid(trim($file, '/')) . '.css?_=' .
+									 STATIC_VERSION
 				);
 				$content = str_replace($mats[0][$index], $script, $content);
 			}

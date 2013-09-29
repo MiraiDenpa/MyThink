@@ -160,13 +160,14 @@ class  ThinkTemplate{
 		if(empty($content)){
 			return '';
 		}
-		// 解析[%xxxxx%]标签
-		$content = $this->parseInline($content);
 
 		$begin = $this->config['taglib_begin'];
 		$end   = $this->config['taglib_end'];
 		// 检查include语法
 		$content = $this->parseInclude($content);
+		// 解析[%xxxxx%]标签
+		$content = $this->parseInline($content);
+
 		// 检查PHP语法
 		$content = $this->parsePhp($content);
 		// 首先替换literal标签内容
@@ -196,13 +197,15 @@ class  ThinkTemplate{
 		$this->parseTagLibAll($tagLibs, $content);
 
 		//解析普通模板标签 {tagName}
-		$content = preg_replace_callback('/(' . $this->config['tmpl_begin'] . ')([^\d\s' . $this->config['tmpl_begin'] .
-										 $this->config['tmpl_end'] . '].+?)(' . $this->config['tmpl_end'] . ')/is',
-			function ($mats){
-				return $this->parseTag($mats[2]);
-			},
-										 $content
+		preg_match_all('/(' . $this->config['tmpl_begin'] . ')([^\d\s' . $this->config['tmpl_begin'] .
+					   $this->config['tmpl_end'] . '].+?)(' . $this->config['tmpl_end'] . ')/is',
+					   $content,
+					   $mats
 		);
+		foreach($mats[2] as $i => $repl){
+			$repl    = $this->parseTag($repl);
+			$content = str_replace($mats[0][$i], $repl, $content);
+		}
 
 		return $content;
 	}
@@ -214,7 +217,7 @@ class  ThinkTemplate{
 	 */
 	protected function parseReplace(&$content){
 		// 替换特殊标志符号 如 {__STYLES__} 
-		while(preg_match_all('/\{__([A-Z0-9]+)__\}/', $content, $mats)){
+		while(preg_match_all('/\{__([A-Z0-9_]+)__\}/', $content, $mats)){
 			foreach($mats[1] as $i => $fnName){
 				$method  = 'TaglibReplace' . ucfirst(strtolower($fnName));
 				$content = str_replace($mats[0][$i], $method(), $content);
@@ -531,28 +534,28 @@ class  ThinkTemplate{
 	 * @return string
 	 */
 	public function parseTag($tagStr){
-		$tagStr = stripslashes($tagStr);
+		$parseStr = stripslashes($tagStr);
 		//还原非模板标签
-		if(preg_match('/^[\s|\d]/is', $tagStr)) //过滤空格和数字打头的标签
+		if(preg_match('/^[\s|\d]/is', $parseStr)) //过滤空格和数字打头的标签
 		{
-			return TMPL_L_DELIM . $tagStr . TMPL_R_DELIM;
+			return TMPL_L_DELIM . $parseStr . TMPL_R_DELIM;
 		}
-		$flag  = substr($tagStr, 0, 1);
-		$flag2 = substr($tagStr, 1, 1);
-		$name  = substr($tagStr, 1);
+		$flag  = substr($parseStr, 0, 1);
+		$flag2 = substr($parseStr, 1, 1);
+		$name  = substr($parseStr, 1);
 		if('$' == $flag && '.' != $flag2 && '(' != $flag2){ //解析模板变量 格式 {$varName}
 			return $this->parseVar($name);
 		} elseif(':' == $flag){ // 输出某个函数的结果
 			return '<?php echo ' . $name . ';?>';
 		} elseif('~' == $flag){ // 执行某个函数
 			return '<?php ' . $name . ';?>';
-		} elseif(substr($tagStr, 0, 2) == '//' || (substr($tagStr, 0, 2) == '/*' && substr($tagStr, -2) == '*/')){
+		} elseif(substr($parseStr, 0, 2) == '//' || (substr($parseStr, 0, 2) == '/*' && substr($parseStr, -2) == '*/')){
 			//注释标签
 			return '';
+		} else{
+			// 未识别的标签直接返回
+			return TMPL_L_DELIM . $tagStr . TMPL_R_DELIM;
 		}
-
-		// 未识别的标签直接返回
-		return TMPL_L_DELIM . $tagStr . TMPL_R_DELIM;
 	}
 
 	/**
@@ -698,7 +701,8 @@ class  ThinkTemplate{
 	 * @return string
 	 */
 	private function parseTemplateName($templateName){
-		$array = explode(',', $templateName);
+		$array    = explode(',', $templateName);
+		$parseStr = '';
 		foreach($array as $templateName){
 			$parseStr .= "\n" . file_get_contents(locateTemplate($templateName));
 		}

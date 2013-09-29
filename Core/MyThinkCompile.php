@@ -39,7 +39,7 @@ require THINK_PATH.'Compile/build_runtime_dir.php';
 
 /* 合并整个函数库 */
 require THINK_PATH.'Compile/gen_core_files.php';
-require RUNTIME_PATH . 'functions.php';
+require RUNTIME_PATH . APP_NAME.'/functions.php';
 echo_line('');
 
 /* 配置项目 */

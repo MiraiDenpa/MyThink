@@ -38,10 +38,10 @@ function SPT($exit = true){
 	echo "\n\n<!-- ThinkPageTrace -->\n";
 	echo $content;
 
-	if(ob_get_level()){
-		ob_flush();
-	}
 	if($exit){
+		while(ob_get_level()){
+			ob_end_flush();
+		}
 		echo "<div class=\"container\">
 		<div class=\"well\" style=\"text-align:center;\">调用了 `ShowPageTrace();` 程序中止 || 调用堆栈：</div>";
 		xdebug_print_function_stack();

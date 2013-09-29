@@ -34,15 +34,18 @@ function html_whitespace($content){
 	}
 	$content = str_replace(array_keys($cache_replace), array_values($cache_replace), $content);
 
-	$search  = [
-		'#^\s+#is',
-		'#\s+(<[a-z!/])#is',
+	$white_replace  = [
+		'#^\s+#is'=>'',
+		'#\s+(<[a-z!/])#is'=>'\1',
+		'#((</[a-z]+|"|/)>)\s+#is'=>'\1',
+		'#\s*&nbsp;\s*#is'=>'&nbsp;',
 	];
-	$replace = [
-		'',
-		'\1',
+	$content = preg_replace(array_keys($white_replace), array_values($white_replace), $content);
+
+	/*$speed_replace = [
+		'"use strict";'=>"\n"
 	];
-	$content = preg_replace($search, $replace, $content);
-	
+	$content = str_replace(array_keys($speed_replace), array_values($speed_replace), $content);
+	*/
 	return $content;
 }
