@@ -53,7 +53,7 @@ class ThinkInstance{
 		if(isset(self::$MODEL[$name])){
 			return self::$MODEL[$name];
 		}
-		$class = ucfirst($name) . 'Model';
+		$class = $name . 'Model';
 		/* <DEBUG>
 		if(!class_exists($class, false)){
 			echo "[$class] 模型文件加载成功，但没有定义正确的类型 -- 名称不符？";
