@@ -63,8 +63,8 @@ class UrlHelper{
 	 * @param string $name
 	 * @param mixed  $value
 	 */
-	public function setParam($name, &$value){
-		$this->param[$name] = & $value;
+	public function setParam($name, $value){
+		$this->param[$name] = $value;
 	}
 
 	/**
@@ -148,7 +148,12 @@ class UrlHelper{
 			}
 		} else{
 			$this->paramstr .= $this->paramstr? '&' : '';
-			$url .= '?' . $this->paramstr . http_build_query($params);
+			foreach($params as $k=>$v){
+				if($v{0} != '{'){
+					$params[$k]=urlencode($v);
+				}
+			}
+			$url .= '?' . $this->paramstr . dbl_implode('&','=',$params);
 		}
 
 		return $url;

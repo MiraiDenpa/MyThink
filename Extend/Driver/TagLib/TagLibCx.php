@@ -32,8 +32,8 @@ class TagLibCx extends TagLib{
 		'oncelist'   => array('attr' => 'source,id,key,index,mod', 'must' => 'id,source', 'level' => 3),
 		'foreach'    => array('attr' => 'name,item,key', 'level' => 3),
 		'if'         => array('attr' => 'condition', 'level' => 2),
-		'elseif'     => array('attr' => 'condition', 'close' => 0),
-		'else'       => array('attr' => '', 'close' => 0),
+		'elseif'     => array('attr' => 'condition', 'close' => 1),
+		'else'       => array('attr' => '', 'close' => 1),
 		'switch'     => array('attr' => 'name', 'level' => 2),
 		'case'       => array('attr' => 'value,break'),
 		'default'    => array('attr' => '', 'close' => 0),
@@ -45,8 +45,8 @@ class TagLibCx extends TagLib{
 		'range'      => array('attr' => 'name,value,type', 'level' => 3, 'alias' => 'in,notin,between,notbetween'),
 		'empty'      => array('attr' => 'name', 'level' => 3),
 		'notempty'   => array('attr' => 'name', 'level' => 3),
-		'present'    => array('attr' => 'name', 'level' => 3),
-		'notpresent' => array('attr' => 'name', 'level' => 3),
+		'present'    => array('attr' => 'name', 'level' => 3, 'alias' => 'isset'),
+		'notpresent' => array('attr' => 'name', 'level' => 3, 'alias' => 'notset'),
 		'defined'    => array('attr' => 'name', 'level' => 3),
 		'notdefined' => array('attr' => 'name', 'level' => 3),
 		'assign'     => array('attr' => 'name,value', 'close' => 0),
@@ -145,12 +145,12 @@ class TagLibCx extends TagLib{
 
 	/**  */
 	public function _oncelist($attr, $content){
-		$tag    = $this->parseXmlAttr($attr, 'oncelist');
-		$source = $tag['source'];
-		$id     = $tag['id'];
-		$key    = isset($tag['key'])? $tag['key'] : 'key';
-		$index  = !empty($tag['index'])? $tag['index'] : 'i';
-		$modBase    = isset($tag['mod'])? intval($tag['mod']) : 2;
+		$tag     = $this->parseXmlAttr($attr, 'oncelist');
+		$source  = $tag['source'];
+		$id      = $tag['id'];
+		$key     = isset($tag['key'])? $tag['key'] : 'key';
+		$index   = !empty($tag['index'])? $tag['index'] : 'i';
+		$modBase = isset($tag['mod'])? intval($tag['mod']) : 2;
 
 		$file = LIB_PATH . 'DataSource/' . $source . '.json';
 		if(!is_file($file)){
@@ -251,6 +251,9 @@ class TagLibCx extends TagLib{
 		$tag       = $this->parseXmlAttr($attr, 'elseif');
 		$condition = $this->parseCondition($tag['condition']);
 		$parseStr  = '<?php elseif(' . $condition . '): ?>';
+		if($content){
+			$parseStr .= "\n".$content;
+		}
 
 		return $parseStr;
 	}
@@ -260,11 +263,15 @@ class TagLibCx extends TagLib{
 	 * @access public
 	 *
 	 * @param string $attr 标签属性
+	 * @param string $content 标签内容
 	 *
 	 * @return string
 	 */
-	public function _else($attr){
+	public function _else($attr, $content){
 		$parseStr = '<?php else: ?>';
+		if($content){
+			$parseStr .= "\n".$content;
+		}
 
 		return $parseStr;
 	}

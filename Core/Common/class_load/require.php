@@ -29,3 +29,22 @@ function require_all(array $array){
 		}
 	}
 }
+
+/**
+ * 按顺序尝试导入文件
+ * 第一个成功导入的文件返回
+ *
+ * @param array $array 文件列表
+ * @param       string [out] $hit 被引入的文件
+ *
+ * @return mixed
+ */
+function include_one(array $array, &$hit = null){
+	foreach($array as $file){
+		if(is_file($file)){
+			$hit = $file;
+			return require_once $file;
+		}
+	}
+	return null;
+}
