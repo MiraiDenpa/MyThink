@@ -41,7 +41,7 @@ class Mongoo extends MongoCollection{
 		return $this->db->command(array('$eval' => $code, 'args' => $args));
 	}
 
-	public function findById($id, $field=[]){
+	public function findById($id, $field = []){
 		return $this->find(['_id' => new MongoId($id)], $field);
 	}
 
@@ -91,4 +91,6 @@ class Mongoo extends MongoCollection{
 	public function getPage(){
 		return $this->page;
 	}
+	
+	
 }

@@ -7,7 +7,10 @@ function _UC($app, $action, $method, $lpath = '', $params = [], $suffix = ''){
 	$domain = $GLOBALS['URL_MAP'][$app];
 	$perfix = 'http://' . $domain;
 
-	$path = $action . URL_PATHINFO_DEPR . $method;
+	$path = $action;
+	if($method){
+		$path .= URL_PATHINFO_DEPR . $method;
+	}
 	if($lpath){
 		$path .= URL_PATHINFO_DEPR . $lpath;
 	}

@@ -77,27 +77,29 @@ class Model{
 	);
 	// 回调函数名称列表
 	protected $callback = array(
-		'initialize',
-		'create',
-		'after_db',
-		// 前置过滤
-		'options_filter',
-		'data_filter',
-		// 写入
-		'before_write',
+		'create', // 调用create后（数据对象，x）
+		'after_db', // 切换完数据库链接 （DbPdo对象，x）
+		'options_filter', // 过滤options（options，x） 发生在where调用，带数据调用add、save，调用buildSql
+		'data_filter', // 过滤data （data，x） 发生在data调用，带数据调用add、save
+		
+		// 操作前回调（紧邻实际操作，在其他before回调后），参数是options。没有第二参数。不能取消操作
+		'before_read',
+		'before_write', 
+		
+		// 操作准备回调，参数是options。没有第二参数。返回false将取消本次操作并返回 null
 		'before_insert',
-		'after_insert',
 		'before_insert_all',
 		'before_update',
-		'after_update',
-		// 删除
 		'before_delete',
-		'after_delete',
-		// 读取
-		'before_read',
 		'before_find',
-		'after_find',
 		'before_select',
+		
+		// 结果回调，第一个参数是执行结果，可以进行修改，返回修改后的值。第二个是options。
+		'after_insert',
+		'after_insert_all',
+		'after_update',
+		'after_delete',
+		'after_find',
 		'after_select'
 	);
 	/** @var Page 分页类对象 */
@@ -114,23 +116,23 @@ class Model{
 	 *
 	 * @param string $name        模型名称
 	 */
-	public function __construct($name = ''){
+	public function __construct($arg1, $arg2){
 		if(func_num_args() > 2){
 			Think::halt('MODEL参数错误：多于2个 (' . func_num_args() . ').');
 		}
 		// 模型初始化
-		$this->doCallback('initialize', $name, $this);
+		$this->_initialize($arg1, $arg2);
 		// 获取模型名称
-		if(!empty($name)){
-			$this->name = $name;
-		} elseif(empty($this->name)){
-			$this->name = $this->getModelName();
-		}
+		$this->getModelName();
 
 		// 数据库初始化操作
 		// 获取数据库操作对象
 		// 当前模型有独立的数据库连接信息
 		$this->db(0, $this->connection);
+	}
+
+	/**  */
+	public function _initialize($arg1, $arg2){
 	}
 
 	/**
@@ -350,7 +352,7 @@ class Model{
 			$data = array_map($this->options['filter'], $data);
 			unset($this->options['filter']);
 		}
-		if(false === $this->doCallback('data_filter', $dataList, $options)){
+		if(false === $this->doCallback('data_filter', $data, $data)){
 			return false;
 		}
 
@@ -438,7 +440,7 @@ class Model{
 				return $insertId;
 			}
 		}
-
+		$this->doCallback('after_insert_all', $result, $options);
 		return $result;
 	}
 
@@ -502,7 +504,7 @@ class Model{
 			if(isset($pkValue)){
 				$data[$pk] = $pkValue;
 			}
-			$this->doCallback('after_update', $data, $options);
+			$this->doCallback('after_update', $result, $options);
 		}
 
 		return $result;
@@ -546,17 +548,18 @@ class Model{
 		if(empty($options['where'])){
 			Think::fail_error(ERR_DELETE_TABEL);
 		}
-		if(false === $this->doCallback('before_delete', $data, $options)){
+		if(false === $this->doCallback('before_delete', $options, $options)){
 			return false;
 		}
-
+		
+		$this->doCallback('before_write', $options, $options);
 		$result = $this->db->delete($options);
 		if(false !== $result){
 			$data = array();
 			if(isset($pkValue)){
 				$data[$pk] = $pkValue;
 			}
-			$this->doCallback('after_delete', $data, $options);
+			$this->doCallback('after_delete', $result, $options);
 		}
 
 		// 返回删除记录个数
@@ -591,10 +594,10 @@ class Model{
 		}
 		// 分析表达式
 		$options = $this->_parseOptions($options);
-		if(false === $this->doCallback('before_select', $data, $options)){
+		if(false === $this->doCallback('before_select', $options, $options)){
 			return false;
 		}
-		$this->doCallback('before_read', $data, $options);
+		$this->doCallback('before_read', $options, $options);
 		$resultSet = $this->db->select($options);
 		if(false === $resultSet){
 			return false;
@@ -602,7 +605,7 @@ class Model{
 		if(empty($resultSet)){ // 查询结果为空
 			return null;
 		}
-		$this->doCallback('after_select', $data, $options);
+		$this->doCallback('after_select', $resultSet, $options);
 
 		return $resultSet;
 	}
@@ -669,8 +672,7 @@ class Model{
 		}
 
 		// 表达式过滤
-		$fdata = array();
-		$this->doCallback('options_filter', $data, $options);
+		$this->doCallback('options_filter', $options, $options);
 
 		return $options;
 	}
@@ -717,10 +719,10 @@ class Model{
 		$options['limit'] = 1;
 		// 分析表达式
 		$options = $this->_parseOptions($options);
-		if(false === $this->doCallback('before_find', $data, $options)){
+		if(false === $this->doCallback('before_find', $options, $options)){
 			return false;
 		}
-		$this->doCallback('before_read', $data, $options);
+		$this->doCallback('before_read', $options, $options);
 		$resultSet = $this->db->select($options);
 		if(false === $resultSet){
 			return false;
@@ -729,7 +731,7 @@ class Model{
 			return null;
 		}
 		$this->data = $resultSet[0];
-		$this->doCallback('after_find', $data, $options);
+		$this->doCallback('after_find', $resultSet, $options);
 
 		/*if(!empty($this->options['result'])) {
 			return $this->returnResult($this->data,$this->options['result']);
@@ -846,6 +848,7 @@ class Model{
 			if(!isset($options['limit'])){
 				$options['limit'] = is_numeric($sepa)? $sepa : '';
 			}
+			$this->doCallback('before_read', $options, $options);
 			$resultSet = $this->db->select($options);
 			if(!empty($resultSet)){
 				$_field = explode(',', $field);
@@ -870,6 +873,7 @@ class Model{
 			if(true !== $sepa){ // 当sepa指定为true的时候 返回所有数据
 				$options['limit'] = is_numeric($sepa)? $sepa : 1;
 			}
+			$this->doCallback('before_read', $options, $options);
 			$result = $this->db->select($options);
 			if(!empty($result)){
 				if(true !== $sepa && 1 == $options['limit']){
@@ -965,6 +969,9 @@ class Model{
 
 		// 创建完成对数据进行自动处理
 		$this->autoOperation($data, $type);
+		
+		$this->doCallback('create', $data);
+		
 		// 赋值当前数据对象
 		$this->data = $data;
 
@@ -1404,7 +1411,7 @@ class Model{
 		$_linkNum[$linkNum] = $config;
 		// 切换数据库连接
 		$this->db = $_db[$linkNum];
-		$this->doCallback('after_db', $data, $options);
+		$this->doCallback('after_db', $this->db, $_db);
 		// 字段检测
 		if(!empty($this->name) && $this->autoCheckFields){
 			$this->_checkTableInfo();

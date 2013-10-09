@@ -45,13 +45,15 @@ class ThinkInstance{
 	 * D函数用于实例化Model 格式 项目://分组/模块
 	 *
 	 * @param string $name  Model资源地址
-	 * @param string $layer 业务层名称
+	 * @param string $arg1 参数1
+	 * @param string $arg2 参数2
 	 *
 	 * @return Model
 	 */
 	public static function &D($name, $arg1 = null, $arg2 = null){
-		if(isset(self::$MODEL[$name])){
-			return self::$MODEL[$name];
+		$cid = $name . ($arg1? md5(var_export($arg1,true) . var_export($arg2,true)) : '');
+		if(isset(self::$MODEL[$cid])){
+			return self::$MODEL[$cid];
 		}
 		$class = $name . 'Model';
 		/* <DEBUG>
@@ -60,8 +62,8 @@ class ThinkInstance{
 			SPT();
 		}
 		</DEBUG>*/
-		self::$MODEL[$name] = new $class($arg1, $arg2);
-		return self::$MODEL[$name];
+		self::$MODEL[$cid] = new $class($arg1, $arg2);
+		return self::$MODEL[$cid];
 	}
 
 	public static function &Db($config){
@@ -71,30 +73,6 @@ class ThinkInstance{
 		}
 		$c[$config] = Db::factory($config);
 		return $c[$config];
-	}
-
-	/**
-	 * M函数用于实例化一个没有模型文件的Model
-	 *
-	 * @param string $name        Model名称 支持指定基础模型 例如 MongoModel:User
-	 * @param string $tablePrefix 表前缀
-	 * @param mixed  $connection  数据库连接信息
-	 *
-	 * @return Model
-	 */
-	public static function &M($name = '', $connection = ''){
-		static $_model = array();
-		if(strpos($name, ':')){
-			list($class, $name) = explode(':', $name);
-		} else{
-			$class = 'Model';
-		}
-		$guid = $name . '_' . $class;
-		if(!isset($_model[$guid])){
-			$_model[$guid] = new $class($name, $connection);
-		}
-
-		return $_model[$guid];
 	}
 
 	/**

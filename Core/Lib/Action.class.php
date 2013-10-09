@@ -164,13 +164,15 @@ abstract class Action{
 	 */
 	protected function success($message = 'success', $jumpUrl = '', $jumptimeout = 2){
 		$this->tVar['message'] = $message;
-		if(is_string($jumpUrl)){
-			$this->tVar['jumpurl'] = $jumpUrl? $jumpUrl : '';
-		} else{
-			$this->tVar['jumpurl']  = $jumpUrl[1];
-			$this->tVar['jumpname'] = $jumpUrl[0];
+		if($jumpUrl){
+			$this->tVar['timeout'] = $jumptimeout;
+			if(is_string($jumpUrl)){
+				$this->tVar['jumpurl'] = $jumpUrl? $jumpUrl : '';
+			} else{
+				$this->tVar['jumpurl']  = $jumpUrl[1];
+				$this->tVar['jumpname'] = $jumpUrl[0];
+			}
 		}
-		$this->tVar['timeout'] = $jumptimeout;
 		$this->tVar['code']    = 0;
 		$this->display('!success');
 		return true;
