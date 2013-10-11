@@ -173,8 +173,49 @@ abstract class Action{
 				$this->tVar['jumpname'] = $jumpUrl[0];
 			}
 		}
-		$this->tVar['code']    = 0;
+		$this->tVar['code'] = 0;
 		$this->display('!success');
 		return true;
+	}
+
+	/**
+	 * @param array|bool $mdl
+	 * @param string     $msg
+	 * @param string     $jumpUrl
+	 * @param int        $jumptimeout
+	 *
+	 * @return bool
+	 */
+	protected function mongo_ret($mdl, $msg = '', $jumpUrl = '', $jumptimeout = 2){
+		if($mdl === true){
+			$this->success($msg, $jumpUrl, $jumptimeout);
+			return true;
+		} elseif($mdl === false){
+			$this->error(ERR_NO_SQL, $msg, $jumpUrl, $jumptimeout);
+			return false;
+		} else{
+			$this->assign('exist',
+						  (isset($mdl['n']) && (bool)$mdl['n']) ||
+						  (isset($mdl['updatedExisting']) && (bool)$mdl['updatedExisting'])
+			);
+			$err = '';
+			if(!empty($mdl['err'])){
+				$err .= $mdl['err'];
+			}
+			if(!empty($mdl['errmsg'])){
+				$err .= $mdl['errmsg'];
+			}
+			if($err){
+				$this->error(ERR_NO_SQL, $msg . ' ' . $err, $jumpUrl, $jumptimeout);
+			} else{
+				$this->success($msg, $jumpUrl, $jumptimeout);
+			}
+		}
+
+		if(isset($mdl['upserted'])){
+			return $mdl['upserted'];
+		} else{
+			return $mdl['ok'];
+		}
 	}
 }

@@ -101,7 +101,7 @@ class TagLibHeader extends TagLib{
 		$content = HTML::importFile($files);
 
 		if(trim($content)){
-			$ret = $this->_AddHeader('prepend="true"', trim($content));
+			$ret = $this->_AddHeader('prepenad="true"', trim($content));
 			if($ret){
 				Think::halt('无法添加头部：多余内容' . dump_some($ret));
 			}

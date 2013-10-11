@@ -252,7 +252,7 @@ class TagLibCx extends TagLib{
 		$condition = $this->parseCondition($tag['condition']);
 		$parseStr  = '<?php elseif(' . $condition . '): ?>';
 		if($content){
-			$parseStr .= "\n".$content;
+			$parseStr .= "\n" . $content;
 		}
 
 		return $parseStr;
@@ -262,7 +262,7 @@ class TagLibCx extends TagLib{
 	 * else标签解析
 	 * @access public
 	 *
-	 * @param string $attr 标签属性
+	 * @param string $attr    标签属性
 	 * @param string $content 标签内容
 	 *
 	 * @return string
@@ -270,7 +270,7 @@ class TagLibCx extends TagLib{
 	public function _else($attr, $content){
 		$parseStr = '<?php else: ?>';
 		if($content){
-			$parseStr .= "\n".$content;
+			$parseStr .= "\n" . $content;
 		}
 
 		return $parseStr;
@@ -721,6 +721,10 @@ class TagLibCx extends TagLib{
 	 */
 	public function _url($attr, $content){
 		$tag = $this->parseXmlAttr($attr, 'url');
+		if(isset($tag['map'])){
+			return map_url($tag['map']);
+		}
+
 		$url = ThinkInstance::UrlHelper();
 		$url->reset();
 

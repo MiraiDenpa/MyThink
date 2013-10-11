@@ -28,16 +28,20 @@ class Mongoo extends MongoCollection{
 	protected $db;
 
 	/**
-	 * @param string $name
+	 * @param $arg1
+	 * @param $arg2
 	 */
-	public function __construct($name){
-		$this->name = $name;
+	public function __construct($arg1, $arg2){
 		$this->init_connection($this->connection);
 		$this->db = $this->_link->selectDB($this->database);
+		$this->_initialize($arg1, $arg2);
 		parent::__construct($this->db, $this->collectionName);
 	}
 
-	public function execute($code, $arg = []){
+	public function _initialize($arg1, $arg2){
+	}
+
+	public function execute($code, $args = []){
 		return $this->db->command(array('$eval' => $code, 'args' => $args));
 	}
 
@@ -68,7 +72,6 @@ class Mongoo extends MongoCollection{
 		$this->_link    = new MongoClient($config['dsn'], (array)$config['params']);
 		$this->database = $config['params']['db'];
 	}
-
 	/**
 	 * 分页查询
 	 *
@@ -76,21 +79,18 @@ class Mongoo extends MongoCollection{
 	 * 分页如果需要修改参数，要添加到GET变量里
 	 *
 	 * @return $this
-	 */
+	 * /
 	protected function page($page_var_name = 'p'){
-		$this->page             = new Page($total, $this->perPage, array(), $options['pager']);
-		$options['limit']       = $this->page->firstRow . ',' . $this->perPage;
-		$this->options['pager'] = $page_var_name;
-		return $this;
-	}
-
+	$this->page             = new Page($total, $this->perPage, array(), $options['pager']);
+	$options['limit']       = $this->page->firstRow . ',' . $this->perPage;
+	$this->options['pager'] = $page_var_name;
+	return $this;
+	}*/
 	/**
 	 * 获取分页对象
 	 * @return Page
-	 */
+	 * /
 	public function getPage(){
-		return $this->page;
-	}
-	
-	
+	return $this->page;
+	}*/
 }

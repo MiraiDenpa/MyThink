@@ -110,11 +110,9 @@ class Model{
 	protected $cache_cas = 'sql';
 
 	/**
-	 * 架构函数
 	 * 取得DB类的实例对象 字段检查
-	 * @access public
-	 *
-	 * @param string $name        模型名称
+	 * @param $arg1
+	 * @param $arg2
 	 */
 	public function __construct($arg1, $arg2){
 		if(func_num_args() > 2){

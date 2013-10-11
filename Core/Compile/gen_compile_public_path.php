@@ -189,7 +189,7 @@ function compile_less($file){
 	$prel = str_replace(PUBLIC_PATH, PUBLIC_URL . '/', dirname($file));
 	$cmd  = 'lessc --no-ie-compat --yui-compress -sm=on --rp=' . escapeshellarg($prel . '/') . ' --include-path=' .
 			escapeshellarg(PUBLIC_PATH) . ' ' . escapeshellarg($file) . ' ' . escapeshellarg($base . '.css');
-	$cmd  = 'echo -e "\033[38;5;10m正在编译 ' . $base . '.css\n\t\t-> ' . $cmd . '\033[0m"' . "\n" . $cmd;
+	$cmd  = 'echo -e "\033[38;5;10m正在编译LESS ' . $base . '.less\n\t\t-> ' . $cmd . '\033[0m"' . "\n" . $cmd;
 	$cmd .= "\nif [ $? -ne 0 ]; then\n\techo -e '\033[38;5;9m失败，原样复制...\033[0m';cp -f " . escapeshellarg($file) . ' ' .
 			escapeshellarg($base . '.css') . "\nfi";
 	return $cmd;
@@ -201,7 +201,7 @@ function compile_css($file){
 	$prel = str_replace(PUBLIC_PATH, PUBLIC_URL . '/', dirname($file));
 	$cmd  = 'lessc --yui-compress -sm=on --rp=' . escapeshellarg($prel . '/') . ' ' . escapeshellarg($file) .
 			' > ' . escapeshellarg($base . '.css');
-	$cmd  = 'echo -e "\033[38;5;10m正在压缩 ' . $base . '.css\n\t\t-> ' . $cmd . '\033[0m"' . "\n" . $cmd;
+	$cmd  = 'echo -e "\033[38;5;10m正在压缩CSS ' . $base . '.css\n\t\t-> ' . $cmd . '\033[0m"' . "\n" . $cmd;
 	$cmd .= "\nif [ $? -ne 0 ]; then\n\techo -e '\033[38;5;9m失败，原样复制...\033[0m';cp -f " . escapeshellarg($file) . ' ' .
 			escapeshellarg($base . '.css') . "\nfi";
 	return $cmd;
@@ -213,7 +213,7 @@ function compile_js($file){
 	//$cmd  = 'unlink ' . escapeshellarg($base . '.js') . " 2>/dev/null\n";
 	$run = 'yuicompressor --type js --nomunge --line-break 200 ' . escapeshellarg($file) .
 		   ' -o ' . escapeshellarg($base . '.js');
-	$cmd = 'echo -e "\033[38;5;10m正在压缩 ' . $base . '.css\n\t\t-> ' . $run . '\033[0m"' . "\n";
+	$cmd = 'echo -e "\033[38;5;10m正在压缩JS ' . $base . '.js\n\t\t-> ' . $run . '\033[0m"' . "\n";
 	$cmd .= 'ERR=$(' . $run . ' 2>&1 >/dev/tty)';
 	$cmd .= "\nif [ -n \"\$ERR\" ]; then\n\techo -e '\033[38;5;9m'\${ERR}'\\n失败，原样复制...\033[0m';cp -f " .
 			escapeshellarg($file) . ' ' . escapeshellarg($base . '.js') . "\nfi";
