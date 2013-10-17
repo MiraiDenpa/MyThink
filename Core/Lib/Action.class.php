@@ -173,7 +173,7 @@ abstract class Action{
 				$this->tVar['jumpname'] = $jumpUrl[0];
 			}
 		}
-		$this->tVar['code'] = 0;
+		$this->tVar['code'] = ERR_NO_ERROR;
 		$this->display('!success');
 		return true;
 	}

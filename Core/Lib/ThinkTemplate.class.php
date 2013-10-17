@@ -223,6 +223,17 @@ class  ThinkTemplate{
 				$content = str_replace($mats[0][$i], $method(), $content);
 			}
 		}
+		// 常量定义
+		$const = get_defined_constants();
+		while(preg_match_all('/\{:([A-Z0-9_]+):\}/', $content, $mats)){
+			foreach($mats[1] as $i => $name){
+				if(isset($const[$name])){
+					$content = str_replace($mats[0][$i], $const[$name], $content);
+				} else{
+					$content = str_replace($mats[0][$i], '{' . $name . '}', $content);
+				}
+			}
+		}
 	}
 
 	// 检查PHP语法

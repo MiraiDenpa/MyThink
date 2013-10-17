@@ -46,7 +46,7 @@ class Error extends ThinkException{
 	}
 
 	public function getWhere(){
-		return $this->file . ':' . $this->code;
+		return $this->file . ':' . $this->line;
 	}
 
 	public function __toString(){

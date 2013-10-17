@@ -39,7 +39,7 @@ class Think{
 		set_exception_handler(array('Think', 'appException'));
 
 		header('Content-Type: text/html; charset=utf8');
-		self::$main_out_buffer            = new OutputBuffer('ContentReplace');
+		self::$main_out_buffer            = new OutputBuffer();
 		self::$main_out_buffer->end_flush = true;
 	}
 
@@ -49,9 +49,15 @@ class Think{
 	 *
 	 * @param mixed $e 异常对象
 	 */
-	static public function appException($e){
+	static public function appException(Exception $e){
 		if(APP_DEBUG && is_a($e, 'MongoException')){
-			self::fail_error(ERR_NO_SQL, $e->getMessage());
+			global $dispatcher;
+			$data['message']  = $e->getMessage();
+			$data['code']     = $e->getCode();
+			$data['extra']     = nl2br($e->getTraceAsString());
+			$data['where']    = $e->getFile().':'.$e->getLine();
+			$data['timeout']  = 0;
+			$dispatcher->display('!user_error', $data);
 			return;
 		}
 		$error            = array();
@@ -90,16 +96,20 @@ class Think{
 		case E_USER_ERROR:
 			$halt_string = '[' . error_code_to_type_str($errno) . '] ' . $errstr;
 			if(LOG_RECORD){
-				Log::write('[' . error_code_to_type_str($errno) . '] ' . $errstr . ' ON ' . $errfile . ':' .
-						   $errline, Log::ERR);
+				Log::write('[' . error_code_to_type_str($errno) . '] ' . $errstr . ' ON ' . $errfile . ':' . $errline,
+						   Log::ERR
+				);
 			}
 			Think::halt($halt_string, true, $errfile, $errline);
 			break;
 		case E_WARNING:
 			if(strpos($errstr, 'Missing argument') === 0){
-				$errstr = preg_replace_callback('#called in (.*?) on line (\d+)#', function ($mats){
-					return xdebug_filepath_anchor($mats[1], $mats[2]);
-				}, $errstr);
+				$errstr = preg_replace_callback('#called in (.*?) on line (\d+)#',
+					function ($mats){
+						return xdebug_filepath_anchor($mats[1], $mats[2]);
+					},
+												$errstr
+				);
 			}
 			break;
 		default:
@@ -132,7 +142,7 @@ class Think{
 				return;
 			}
 		}
-		
+
 		if(Think::$main_out_buffer){
 			Think::$main_out_buffer->flush();
 			Think::$main_out_buffer = null;
@@ -149,16 +159,17 @@ class Think{
 	 */
 	public static function fail_error($code, $extra_msg = ''){
 		global $dispatcher;
-		$e                      = new Error($code);
+		$e                = new Error($code);
 		$data['message']  = $e->getMessage();
-		$data['extra']  = $extra_msg;
+		$data['extra']    = $extra_msg;
 		$data['redirect'] = $e->getUrl();
 		$data['code']     = $e->getCode();
 		$data['info']     = $e->getInfo();
 		$data['name']     = $e->getName();
 		$data['where']    = $e->getWhere();
-		$data['timeout']    = 0;
+		$data['timeout']  = 0;
 		$dispatcher->display('!user_error', $data);
+		APP_DEBUG && xdebug_print_function_stack();
 		exit;
 	}
 
@@ -182,7 +193,7 @@ class Think{
 			if($html){
 				echo "致命错误：{$msg}<br/><br/>Trace:<pre>";
 			} else{
-				trace('halt被调用','','EMERG');
+				trace('halt被调用', '', 'EMERG');
 				echo "致命错误：" . nl2br(htmlspecialchars($msg)) . "<br/><br/>Trace:<pre>";
 			}
 			debug_print_backtrace();
@@ -214,7 +225,7 @@ class Think{
 		}
 		exit;
 	}
-	
+
 	public static function clear_ob(){
 		self::$main_out_buffer->clean();
 	}

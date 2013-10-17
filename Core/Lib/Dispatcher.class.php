@@ -209,6 +209,13 @@ class Dispatcher{
 	}
 
 	/**
+	 *
+	 */
+	public function finish(){
+		fastcgi_finish_request();
+	}
+
+	/**
 	 * 分拣显示操作
 	 * @param $templateFile
 	 * @param $vars

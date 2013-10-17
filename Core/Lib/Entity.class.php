@@ -1,11 +1,21 @@
 <?php
 abstract class Entity implements ArrayAccess{
-	protected $data = [];
+	private $data = [];
 
-	public function __construct($data){
-		foreach($data as $name => $value){
-			$this->$name = $value;
+	/**
+	 * 构造一个实体
+	 * @param array $array
+	 *
+	 * @return $this
+	 * @static
+	 */
+	public static function buildFromArray($array){
+		$cls = get_called_class();
+		$obj = new $cls;
+		foreach($array as $k => $v){
+			$obj->$k = $v;
 		}
+		return $obj;
 	}
 
 	public function mpath($path){
@@ -20,6 +30,7 @@ abstract class Entity implements ArrayAccess{
 
 	/**
 	 * @param mixed $name
+	 *
 	 * @return mixed
 	 */
 	public function __get($name){
@@ -29,6 +40,7 @@ abstract class Entity implements ArrayAccess{
 	/**
 	 * @param mixed $name
 	 * @param mixed $val
+	 *
 	 * @return void
 	 */
 	public function __set($name, $val){
@@ -37,6 +49,7 @@ abstract class Entity implements ArrayAccess{
 
 	/**
 	 * @param mixed $name
+	 *
 	 * @return void
 	 */
 	public function __unset($name){
@@ -45,6 +58,7 @@ abstract class Entity implements ArrayAccess{
 
 	/**
 	 * @param mixed $name
+	 *
 	 * @return bool
 	 */
 	public function __isset($name){
@@ -76,11 +90,12 @@ abstract class Entity implements ArrayAccess{
 	 * @return void
 	 */
 	public function offsetSet($offset, $value){
-		$this->$offset=$value;
+		$this->$offset = $value;
 	}
 
 	/**
 	 * @param mixed $offset
+	 *
 	 * @return void
 	 */
 	public function offsetUnset($offset){
@@ -92,9 +107,9 @@ abstract class Entity implements ArrayAccess{
 	 * @return array
 	 */
 	public function toArray(){
-		$data =get_object_vars($this);
-		$ret= array_merge($data, $data['data']);
-		unset($ret['data'],$ret['exist']);
+		$data = get_object_vars($this);
+		$ret  = array_merge($data, $data['data']);
+		unset($ret['data'], $ret['exist']);
 		return $ret;
 	}
 }

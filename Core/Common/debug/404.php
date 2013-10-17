@@ -11,6 +11,7 @@
  * @return void
  */
 function _404($msg = '', $url = ''){
+	http_response_code(404);
 	// <DEBUG>
 	Think::halt($msg);
 	// </DEBUG>
@@ -20,7 +21,6 @@ function _404($msg = '', $url = ''){
 	if(empty($url) && URL_404_REDIRECT){
 		$url = URL_404_REDIRECT;
 	}
-	http_response_code(404);
 	if($url){
 		redirect($url);
 	} else{
