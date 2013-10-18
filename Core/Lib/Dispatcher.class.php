@@ -140,11 +140,16 @@ class Dispatcher{
 
 		$name = ACTION_PREFIX . $this->action_name . 'Action';
 		if(!class_exists($name, true)){
-			$this->action = ThinkInstance::A(ACTION_PREFIX . 'Fallback', $this);
-			$name         = ACTION_PREFIX . 'FallbackAction';
-			if(!class_exists($name, true)){
-				$this->action = ThinkInstance::A('Fallback', $this);
-				$name         = 'FallbackAction';
+			$name = $this->action_name . 'Action';
+			if(alias_import($name)){
+				$this->action = ThinkInstance::A($this->action_name, $this);
+			} else{
+				$this->action = ThinkInstance::A(ACTION_PREFIX . 'Fallback', $this);
+				$name         = ACTION_PREFIX . 'FallbackAction';
+				if(!class_exists($name, true)){
+					$this->action = ThinkInstance::A('Fallback', $this);
+					$name         = 'FallbackAction';
+				}
 			}
 		}
 		$meta = $this->meta = classmeta_read($name);
