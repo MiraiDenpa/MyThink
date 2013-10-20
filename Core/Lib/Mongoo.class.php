@@ -19,13 +19,16 @@ class Mongoo extends MongoCollection{
 	/** @var string */
 	protected $name;
 
-	/** @var Page */
+	/** @var array */
 	protected $page;
 
 	/** @var string */
 	protected $database;
 	/** @var MongoDB */
 	protected $db;
+
+	public $perPage = 30;
+	public $url = '';
 
 	/**
 	 * @param $arg1
@@ -72,25 +75,32 @@ class Mongoo extends MongoCollection{
 		$this->_link    = new MongoClient($config['dsn'], (array)$config['params']);
 		$this->database = $config['params']['db'];
 	}
+
 	/**
 	 * 分页查询
+	 * @param MongoCursor $cur
+	 * @param int         $current
 	 *
-	 * @param string $page_var_name
-	 * 分页如果需要修改参数，要添加到GET变量里
-	 *
-	 * @return $this
-	 * /
-	protected function page($page_var_name = 'p'){
-	$this->page             = new Page($total, $this->perPage, array(), $options['pager']);
-	$options['limit']       = $this->page->firstRow . ',' . $this->perPage;
-	$this->options['pager'] = $page_var_name;
-	return $this;
-	}*/
+	 * @return array
+	 */
+	protected function pageCursor(MongoCursor &$cur, $current){
+		$count = $cur->count();
+		$cur
+				->skip(($current - 1)*$this->perPage)
+				->limit($this->perPage);
+		$this->page = [
+			'nowPage'   => $current,
+			'totalPage' => ceil($count/$this->perPage),
+			'totalRows' => $count,
+		];
+	}
+
 	/**
 	 * 获取分页对象
-	 * @return Page
-	 * /
+	 * @return array
+	 */
 	public function getPage(){
-	return $this->page;
-	}*/
+		$this->page['url'] = $this->url;
+		return $this->page;
+	}
 }

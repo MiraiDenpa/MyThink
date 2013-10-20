@@ -37,6 +37,9 @@ class Dispatcher{
 		if($this->extension_name == 'form'){
 			$this->callback = [&$this, 'return_json'];
 		} else{
+			if(!in_array($this->extension_name, ['html', 'json', 'jsonp', 'php', 'bphp'])){
+				_404('未知返回类型');
+			}
 			$this->callback = [&$this, 'return_' . $this->extension_name];
 		}
 	}
@@ -193,10 +196,10 @@ class Dispatcher{
 		if($this->extension_name == 'form'){
 			$this->callback = [&$this, 'return_json'];
 		} else{
+			if(!in_array($this->extension_name, ['html', 'json', 'jsonp', 'php', 'bphp'])){
+				_404('未知返回类型');
+			}
 			$this->callback = [&$this, 'return_' . $this->extension_name];
-		}
-		if(!is_callable($this->callback)){
-			return '无法处理的返回类型：' . $this->extension_name;
 		}
 
 		return 0;

@@ -91,7 +91,7 @@ class Page{
 				$parameter = $this->parameter;
 			}
 			$parameter[$this->varPage] = '__PAGE__';
-			$url           = UI(METHOD_NAME, $parameter, true);
+			$this->url                 = UI(METHOD_NAME, $parameter, true);
 		}
 		$ret['url'] = $this->url;
 		return $ret;

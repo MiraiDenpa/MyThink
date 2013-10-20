@@ -34,8 +34,8 @@ function require_all(array $array){
  * 按顺序尝试导入文件
  * 第一个成功导入的文件返回
  *
- * @param array $array 文件列表
- * @param       string [out] $hit 被引入的文件
+ * @param array        $array 文件列表
+ * @param       string $hit   [out] 被引入的文件
  *
  * @return mixed
  */

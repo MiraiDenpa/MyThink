@@ -8,6 +8,8 @@ tag('app_init', $dispatcher);
 // 定义当前请求的系统常量
 //define('NOW',$_SERVER['REQUEST_TIME']);
 // URL调度
+global $_g_cache;
+$_g_cache = new ThinkMemcached();
 $error = $dispatcher->parse_path($_SERVER['PATH_INFO']);
 $dispatcher->setData($_GET);
 if($error){ // 調度出錯

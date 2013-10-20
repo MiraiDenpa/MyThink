@@ -1,7 +1,5 @@
 <?php
 abstract class Entity implements ArrayAccess{
-	private $data = [];
-
 	/**
 	 * 构造一个实体
 	 * @param array $array
@@ -15,8 +13,11 @@ abstract class Entity implements ArrayAccess{
 		foreach($array as $k => $v){
 			$obj->$k = $v;
 		}
+		$obj->_init();
 		return $obj;
 	}
+	
+	protected function _init(){}
 
 	public function mpath($path){
 		$path = explode('.', $path);
@@ -26,43 +27,6 @@ abstract class Entity implements ArrayAccess{
 			$var = $var[array_shift($path)];
 		}
 		return empty($path)? $var : null;
-	}
-
-	/**
-	 * @param mixed $name
-	 *
-	 * @return mixed
-	 */
-	public function __get($name){
-		return $this->data[$name];
-	}
-
-	/**
-	 * @param mixed $name
-	 * @param mixed $val
-	 *
-	 * @return void
-	 */
-	public function __set($name, $val){
-		$this->data[$name] = $val;
-	}
-
-	/**
-	 * @param mixed $name
-	 *
-	 * @return void
-	 */
-	public function __unset($name){
-		unset($this->data[$name]);
-	}
-
-	/**
-	 * @param mixed $name
-	 *
-	 * @return bool
-	 */
-	public function __isset($name){
-		return isset($this->data[$name]);
 	}
 
 	/**

@@ -49,7 +49,7 @@ class TagLibCx extends TagLib{
 		'notpresent' => array('attr' => 'name', 'level' => 3, 'alias' => 'notset'),
 		'defined'    => array('attr' => 'name', 'level' => 3),
 		'notdefined' => array('attr' => 'name', 'level' => 3),
-		'assign'     => array('attr' => 'name,value', 'close' => 0),
+		'assign'     => array('attr' => 'name,value,source', 'must' => 'name', 'close' => 0),
 		'define'     => array('attr' => 'name,value', 'close' => 0),
 		'for'        => array('attr' => 'start,end,name,comparison,step', 'level' => 3),
 		'url'        => array('attr' => 'app,action,method,params,suffix,protocol', 'close' => 0),
@@ -143,7 +143,13 @@ class TagLibCx extends TagLib{
 		return '';
 	}
 
-	/**  */
+	/**
+	 * source : 源文件名
+	 * id : 循环值
+	 * key : 循环变量
+	 * index : 递增变量
+	 * mod : 取余结果变量
+	 */
 	public function _oncelist($attr, $content){
 		$tag     = $this->parseXmlAttr($attr, 'oncelist');
 		$source  = $tag['source'];
@@ -152,17 +158,8 @@ class TagLibCx extends TagLib{
 		$index   = !empty($tag['index'])? $tag['index'] : 'i';
 		$modBase = isset($tag['mod'])? intval($tag['mod']) : 2;
 
-		$file = LIB_PATH . 'DataSource/' . $source . '.json';
-		if(!is_file($file)){
-			$file = BASE_LIB_PATH . 'DataSource/' . $source . '.json';
-			if(!is_file($file)){
-				Think::halt('模板不存在： ' . $file);
-			}
-		}
-		$data = json_decode(file_get_contents($file), true);
-		if($data === null){
-			Think::halt(json_last_message());
-		}
+		$data = $this->source($source);
+
 		$ob  = new OutputBuffer();
 		$__i = 0;
 		foreach($data as $__k => $__v){
@@ -620,11 +617,20 @@ class TagLibCx extends TagLib{
 	public function _assign($attr, $content){
 		$tag  = $this->parseXmlAttr($attr, 'assign');
 		$name = $this->autoBuildVar($tag['name']);
-		if('$' == substr($tag['value'], 0, 1)){
-			$value = $this->autoBuildVar(substr($tag['value'], 1));
+		if(isset($tag['value'])){
+			if('$' == $tag['value']{0}){
+				$value = $this->autoBuildVar(substr($tag['value'], 1));
+			} elseif(':' == $tag['value']{0}){
+				$value = substr($tag['value'], 1);
+			} else{
+				$value = var_export($tag['value'], true);
+			}
+		} elseif(isset($tag['source'])){
+			$value = $this->source_php($tag['source']);
 		} else{
-			$value = var_export($tag['value'], true);
+			Think::halt('assign标签中source和value至少有一个。');
 		}
+
 		$parseStr = '<?php ' . $name . ' = ' . $value . '; ?>';
 
 		return $parseStr;
@@ -887,5 +893,62 @@ class TagLibCx extends TagLib{
 		$tpl = $tag['template'];
 		unset($tag['template']);
 		return HTML::form($content, $tpl, $tag);
+	}
+
+	private function source_php($source){
+		$d = S('TagLibCxSourcePhp.' . $source);
+		if($d){
+			return $d;
+		}
+		$hit = false;
+		include_one([
+					LIB_PATH . 'DataSource/' . $source . '.php',
+					BASE_LIB_PATH . 'DataSource/' . $source . '.php'
+					],
+					$hit
+		);
+		$ret = false;
+		if($hit){
+			$ret = 'require(\'' . $hit . '\')';
+		} else{
+			$file = LIB_PATH . 'DataSource/' . $source . '.json';
+			if(is_file($file)){
+				$ret = 'json_decode(file_get_contents(\'' . $file . '\'),false)';
+			}
+			$file = BASE_LIB_PATH . 'DataSource/' . $source . '.json';
+			if(is_file($file)){
+				$ret = 'json_decode(file_get_contents(\'' . $file . '\'),false)';
+			}
+		}
+		if($ret){
+			S('TagLibCxSourcePhp.' . $source, $ret);
+			return $ret;
+		} else{
+			return 'Think::halt("TaglibCx找不到资源[' . $source . ']");';
+		}
+	}
+
+	private function source($source){
+		$hit  = false;
+		$data = include_one([
+							LIB_PATH . 'DataSource/' . $source . '.php',
+							BASE_LIB_PATH . 'DataSource/' . $source . '.php'
+							],
+							$hit
+		);
+		if(!$hit){
+			$file = LIB_PATH . 'DataSource/' . $source . '.json';
+			if(!is_file($file)){
+				$file = BASE_LIB_PATH . 'DataSource/' . $source . '.json';
+				if(!is_file($file)){
+					Think::halt('模板不存在： ' . $file);
+				}
+			}
+			$data = json_decode(file_get_contents($file), true);
+			if($data === null){
+				Think::halt(json_last_message());
+			}
+		}
+		return $data;
 	}
 }

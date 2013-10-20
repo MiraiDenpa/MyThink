@@ -10,9 +10,6 @@
  */
 function S($name, $value = '', $expire = DATA_CACHE_TIME){
 	global $_g_cache;
-	if(is_null($_g_cache)){
-		$_g_cache = new ThinkMemcached();
-	}
 
 	return SAS($_g_cache->id, $name, $value, $expire);
 }
@@ -29,9 +26,7 @@ function S($name, $value = '', $expire = DATA_CACHE_TIME){
  */
 function SAS($cas, $name, $value = '', $expire = DATA_CACHE_TIME){
 	global $_g_cache;
-	if(is_null($_g_cache)){
-		$_g_cache = new ThinkMemcached();
-	}
+	$name = $cas . $name;
 	if(!$name){
 		$_g_cache->flush();
 	}
@@ -57,6 +52,45 @@ function SAS($cas, $name, $value = '', $expire = DATA_CACHE_TIME){
 	}
 
 	return $ret;
+}
+
+function CacheRead($cas, $name){
+	global $_g_cache;
+	N('cache_read_mem', 1);
+	$ret = $_g_cache->getByKey($cas, apc_fetch($cas) . $name);
+	//<DEBUG>
+	trace($name . '  -  ' . $_g_cache->getResultMessage() . dump_some($ret), '内存读取(' . $cas . ')', 'CACHE');
+	//</DEBUG>
+	return $ret;
+}
+
+function CacheClear($cas){
+	global $_g_cache;
+	N('cache_write_mem', 1);
+	if(!apc_inc($cas)){
+		apc_store($cas, rand());
+	}
+	//<DEBUG>
+	trace($cas . '  -  ' . $_g_cache->getResultMessage(), '内存清除', 'CACHE');
+	//</DEBUG>
+}
+
+function CacheWrite($cas, $name, $value, $expire = DATA_CACHE_TIME){
+	global $_g_cache;
+	N('cache_write_mem', 1);
+	$_g_cache->setByKey($cas, apc_fetch($cas) . $name, $value, $expire);
+	//<DEBUG>
+	trace($name . '  -  ' . $_g_cache->getResultMessage() . dump_some($value), '内存写入(' . $cas . ')', 'CACHE');
+	//</DEBUG>
+}
+
+function CacheDelete($cas, $name){
+	global $_g_cache;
+	N('cache_write_mem', 1);
+	$_g_cache->deleteByKey($cas, apc_fetch($cas) . $name);
+	//<DEBUG>
+	trace($name . '  -  ' . $_g_cache->getResultMessage(), '内存删除(' . $cas . ')', 'CACHE');
+	//</DEBUG>
 }
 
 class ThinkMemcached extends Memcached{
