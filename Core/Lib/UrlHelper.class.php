@@ -141,19 +141,19 @@ class UrlHelper{
 			$path .= URL_PATHINFO_DEPR . $this->path;
 		}
 
-		$url = $perfix . URL_PATHINFO_DEPR . $path . '.' . $this->suffix;
+		$url = $perfix . URL_PATHINFO_DEPR . $path . ($this->suffix? '.' . $this->suffix : '');
 		if(empty($params)){
 			if($this->paramstr){
 				$url .= '?' . $this->paramstr;
 			}
 		} else{
 			$this->paramstr .= $this->paramstr? '&' : '';
-			foreach($params as $k=>$v){
+			foreach($params as $k => $v){
 				if($v{0} != '{'){
-					$params[$k]=urlencode($v);
+					$params[$k] = urlencode($v);
 				}
 			}
-			$url .= '?' . $this->paramstr . dbl_implode('&','=',$params);
+			$url .= '?' . $this->paramstr . dbl_implode('&', '=', $params);
 		}
 
 		return $url;
