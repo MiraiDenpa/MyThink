@@ -8,7 +8,6 @@ if(isset($GLOBALS['COMPILE'])){
 	$array = get_defined_constants(true)['user'];
 	// 生成less变量定义文件
 	echo_line("\t生成less定义");
-	$f    = PUBLIC_PATH . 'basevar.less';
 	$less = '';
 	foreach($array as $name => $val){
 		if($val === ''){
@@ -19,32 +18,34 @@ if(isset($GLOBALS['COMPILE'])){
 		}
 		$less .= "@$name: $val;\n";
 	}
+	$f = PUBLIC_PATH . 'basevar.less';
 	file_put_contents($f, $less);
 
 	// 生成js全局变量定义文件
 	echo_line("\t生成js定义");
-	$f = PUBLIC_PATH . 'jslib/basevar.js';
+	$array['URL_MAP'] = $GLOBALS['URL_MAP'];
 	foreach($array as $name => $value){
 		if(Strings::isEndWith($name, '_PATH') || Strings::isStartWith($name, 'TMPL_') ||
 		   Strings::isStartWith($name, 'DB_') || Strings::isStartWith($name, 'COOKIE_') ||
-		   Strings::isEndWith($name, '_DEBUG') || Strings::isStartWith($name, 'LANG_') ||
-		   Strings::isEndWith($name, '_FILE') || Strings::isStartWith($name, 'MAIL_')
+		   Strings::isStartWith($name, 'LANG_') || Strings::isEndWith($name, '_FILE') ||
+		   Strings::isStartWith($name, 'MAIL_')
 		){
 			unset($array[$name]);
 			continue;
 		}
-		if(in_array($name, ['APP_NAME'])){
-			unset($array[$name]);
-			continue;
-		}
 	}
-	$array['URL_MAP'] = $GLOBALS['URL_MAP'];
-	$js               = 'window.Think = ' . json_encode($array, JSON_PRETTY_PRINT) . ';';
-	$js .= "\nwindow.JS_DEBUG = " . json_encode(JS_DEBUG) . ';';
+	$js = 'window.Think = ' . json_encode($array, JSON_PRETTY_PRINT) . ';';
+	$js .= 'window.JS_DEBUG = ' . json_encode(JS_DEBUG) . ';';
+
+	$js .= 'try{document.domain = ' . json_encode($GLOBALS['DOMAIN_MAP']) . '[Think.APP_NAME];}catch(e){}';
 	if(APP_DEBUG){
 		echo_line("\tjs定义： 附加less");
 		$js .= "\n" . file_get_contents(THINK_PATH . 'Tpl/debugless.js');
 	}
+	if(!is_dir(PUBLIC_PATH . 'scripts/basevar')){
+		mkdir(PUBLIC_PATH . 'scripts/basevar', 0777, true);
+	}
+	$f = PUBLIC_PATH . 'scripts/basevar/base-' . APP_NAME . '.js';
 	file_put_contents($f, $js);
 	echo_line('');
 

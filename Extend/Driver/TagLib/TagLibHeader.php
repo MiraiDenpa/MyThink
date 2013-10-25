@@ -232,7 +232,7 @@ class TagLibHeader extends TagLib{
 				$changed = $found = true;
 			}
 			if(isset($define['requirements'][$basefile])){ // 依赖文件
-				$inject  = array_merge($inject, (array)$define['requirements'][$basefile]);
+				$inject  = array_merge((array)$define['requirements'][$basefile],$inject);
 				$changed = $found = true;
 			}
 			if(isset($define['fileset'][$basefile])){ // 名称引入文件

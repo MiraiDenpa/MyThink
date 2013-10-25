@@ -10,7 +10,7 @@ if(is_file(BASE_CONF_PATH . APP_STATUS . '/urlmap.php')){
 	require(BASE_CONF_PATH . APP_STATUS . '/urlmap.php');
 }
 foreach($GLOBALS['URL_MAP'] as $app => $url){
-	echo_line("\t$app \t -> $url");
+	echo_line("\t$app \t -> ".(is_array($url)?'[multi-value]':$url));
 }
 if(!isset($GLOBALS['URL_MAP'][APP_NAME])){
 	echo_line('$GLOBALS[URL_MAP][' . APP_NAME . '] -- 定义有误(BASE_CONF_PATH/urlmap.php)');

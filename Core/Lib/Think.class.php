@@ -169,7 +169,7 @@ class Think{
 		$data['where']    = $e->getWhere();
 		$data['timeout']  = 0;
 		$dispatcher->display('!user_error', $data);
-		APP_DEBUG && xdebug_print_function_stack();
+		//APP_DEBUG && xdebug_print_function_stack();
 		exit;
 	}
 

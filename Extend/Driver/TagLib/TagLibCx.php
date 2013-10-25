@@ -716,7 +716,8 @@ class TagLibCx extends TagLib{
 	}
 
 	/**
-	 * url标签解析
+	 * 920223
+	 标签解析
 	 * 格式： <url app="{$var}" action="Login" method="index" path="" protocol="http" suffix="html" params="varname" param-A="{$a}"/>
 	 * @access public
 	 *
