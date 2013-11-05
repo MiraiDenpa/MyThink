@@ -153,28 +153,26 @@ class TagLibCx extends TagLib{
 	public function _oncelist($attr, $content){
 		$tag     = $this->parseXmlAttr($attr, 'oncelist');
 		$source  = $tag['source'];
-		$id      = $tag['id'];
-		$key     = isset($tag['key'])? $tag['key'] : 'key';
-		$index   = !empty($tag['index'])? $tag['index'] : 'i';
+		$__id__      = $tag['id'];
+		$__key__     = isset($tag['key'])? $tag['key'] : 'key';
+		$__index__   = !empty($tag['index'])? $tag['index'] : 'i';
 		$modBase = isset($tag['mod'])? intval($tag['mod']) : 2;
 
-		$data = $this->source($source);
+		$_d_a_t_a_ = $this->source($source);
 
-		$ob  = new OutputBuffer();
+		$__ob__  = new OutputBuffer();
 		$__i = 0;
-		foreach($data as $__k => $__v){
-			$data = array(
-				$key   => $__k,
-				$id    => $__v,
-				$index => $__i++,
-				'mod'  => $__i%$modBase,
-			);
-			extract($data);
-			$parsestr = $this->tpl->parse($content);
-			eval('?>' . $parsestr);
+		foreach($_d_a_t_a_ as $__k => $__v){
+			extract(array(
+						 $__key__   => $__k,
+						 $__id__    => $__v,
+						 $__index__ => $__i++,
+						 'mod'  => $__i%$modBase,
+					));
+			eval('?>' . $this->tpl->parse($content));
 		}
-		$parsestr = $ob->get();
-		$ob       = null;
+		$parsestr = $__ob__->get();
+		$__ob__       = null;
 
 		return $parsestr;
 	}

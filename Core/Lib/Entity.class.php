@@ -71,9 +71,6 @@ abstract class Entity implements ArrayAccess{
 	 * @return array
 	 */
 	public function toArray(){
-		$data = get_object_vars($this);
-		$ret  = array_merge($data, $data['data']);
-		unset($ret['data'], $ret['exist']);
-		return $ret;
+		return get_object_vars($this);
 	}
 }

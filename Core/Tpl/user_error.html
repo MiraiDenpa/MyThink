@@ -2,6 +2,8 @@
 	$title=$message.' - 未来电波';
 </layout>
 <BrowserLib>
+	phpjs
+	artDialog
 	debug
 </BrowserLib>
 <AddHeader>
@@ -57,7 +59,7 @@
 				<a href="/" class="btn btn-primary btn-lg pull-left">&lt;&lt; 回首页</a>
 				<notempty name="jumpurl">
 					<span id="jumper">{$timeout}</span>
-					<a id="jumper_a" href="{$jumpurl}"><iif name="jumpname" else="$jumpurl"/></a>
+					<a id="jumper_a" href="{$jumpurl}"><iif type="isset" name="jumpname" else="$jumpurl"/></a>
 				</notempty>
 				&nbsp;
 				<div class="pull-right">

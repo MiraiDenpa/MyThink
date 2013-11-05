@@ -92,6 +92,9 @@ abstract class Action{
 	 * @return null
 	 */
 	protected function display($templateFile = ''){
+		if(!$this->tVar['code']){
+			$this->tVar['code'] = ERR_NO_ERROR;
+		}
 		return $this->dispatcher->display($templateFile, $this->tVar);
 	}
 
@@ -190,14 +193,13 @@ abstract class Action{
 		if($mdl === true){
 			$this->success($msg, $jumpUrl, $jumptimeout);
 			return true;
-		} elseif($mdl === false){
+		} elseif(!$mdl){
 			$this->error(ERR_NO_SQL, $msg, $jumpUrl, $jumptimeout);
 			return false;
 		} else{
 			$this->assign('exist',
 						  (isset($mdl['n']) && (bool)$mdl['n']) ||
-						  (isset($mdl['updatedExisting']) && (bool)$mdl['updatedExisting'])
-			);
+						  (isset($mdl['updatedExisting']) && (bool)$mdl['updatedExisting']));
 			$err = '';
 			if(!empty($mdl['err'])){
 				$err .= $mdl['err'];
@@ -211,7 +213,9 @@ abstract class Action{
 				$this->success($msg, $jumpUrl, $jumptimeout);
 			}
 		}
-
+		if(isset($mdl['code']) && $mdl['code']){
+			return false;
+		}
 		if(isset($mdl['upserted'])){
 			return $mdl['upserted'];
 		} else{
