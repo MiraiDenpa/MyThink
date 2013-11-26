@@ -2,7 +2,7 @@
 
 function _UC($app, $action, $method, $lpath = '', $params = [], $suffix = ''){
 	if(!isset($GLOBALS['URL_MAP'][$app])){
-		Think::halt('URL_MAP[' . $app . '] -- 定义有误(BASE_CONF_PATH/urlmap.php)');
+		die('URL_MAP[' . $app . '] -- 定义有误(BASE_CONF_PATH/urlmap.php)');
 	}
 	$domain = $GLOBALS['URL_MAP'][$app];
 	$perfix = 'http://' . $domain;

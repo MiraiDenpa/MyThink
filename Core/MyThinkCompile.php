@@ -27,47 +27,61 @@ function echo_line($msg){
 $GLOBALS['COMPILE'] = true;
 echo_line(" --- 开始编译 --- ");
 
-require THINK_PATH.'Compile/merge_config.php';
-require THINK_PATH.'Compile/hidef_save_constant.php';
-require THINK_PATH.'Compile/temp_uc.php';
+require THINK_PATH . 'Compile/merge_config.php';
+require THINK_PATH . 'Compile/hidef_save_constant.php';
+require THINK_PATH . 'Compile/temp_uc.php';
 
 /* 定义所有常量 */
-require THINK_PATH.'Compile/gen_define_all.php';
+require THINK_PATH . 'Compile/gen_define_all.php';
 
 // 创建临时文件目录结构
-require THINK_PATH.'Compile/build_runtime_dir.php';
+require THINK_PATH . 'Compile/build_runtime_dir.php';
+
+// 创建项目目录结构
+if(!is_dir(LIB_PATH) || !is_dir(CONF_PATH)){
+	echo_line('创建项目目录结构');
+	require THINK_PATH . 'Compile/build_app_dir.php';
+}
+
+/* 载入urlmaps(添加GLOBAL.URL_MAP) */
+echo_line('URL二级域名路由定义。');
+if(is_file(BASE_CONF_PATH . '/urls.php')){
+	echo_line('   载入 应用-域名 对应表。');
+	require(BASE_CONF_PATH . '/urls.php');
+	if(is_file(BASE_CONF_PATH . APP_STATUS . '/urls.php')){
+		require(BASE_CONF_PATH . APP_STATUS . '/urls.php');
+	}
+	foreach($GLOBALS['URL_MAP'] as $app => $url){
+		echo_line("\t$app \t -> ".(is_array($url)?'[multi-value]':$url));
+	}
+}
 
 /* 合并整个函数库 */
-require THINK_PATH.'Compile/gen_core_files.php';
-require RUNTIME_PATH . APP_NAME.'/functions.php';
+require THINK_PATH . 'Compile/gen_core_files.php';
+require RUNTIME_PATH . APP_NAME . '/functions.php';
 echo_line('');
 
 /* 配置项目 */
-require THINK_PATH.'Compile/gen_config.php';
-
-if(!is_dir(LIB_PATH) || !is_dir(CONF_PATH)){
-	echo_line('创建项目目录结构');
-	// 创建项目目录结构
-	require THINK_PATH.'Compile/build_app_dir.php';
-}
-
-/* 开始生成编译文件 */
-require THINK_PATH.'Compile/gen_index.php';
-
-/* 语言包 */
-require THINK_PATH.'Compile/gen_language.php';
+require THINK_PATH . 'Compile/gen_config.php';
 
 /* 域名、路由 定义 */
-require THINK_PATH.'Compile/gen_urlmaps.php';
+require THINK_PATH . 'Compile/gen_urlmaps.php';
+hidef_save('urlmap', $GLOBALS['URL_MAP'], true);
+
+/* 开始生成编译文件 */
+require THINK_PATH . 'Compile/gen_index.php';
+
+/* 语言包 */
+require THINK_PATH . 'Compile/gen_language.php';
 
 /* 标签回调代码 */
-require THINK_PATH.'Compile/gen_error_code.php';
+require THINK_PATH . 'Compile/gen_error_code.php';
 
 /* 错误码定义 */
-require THINK_PATH.'Compile/gen_tags.php';
+require THINK_PATH . 'Compile/gen_tags.php';
 
 /* 静态文件生成 */
-require THINK_PATH.'Compile/gen_compile_public_path.php';
+require THINK_PATH . 'Compile/gen_compile_public_path.php';
 
 echo_line("写入常量ini文件。");
 $ini_path  = RUNTIME_PATH . APP_NAME;

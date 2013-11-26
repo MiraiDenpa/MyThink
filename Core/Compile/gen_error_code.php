@@ -9,7 +9,12 @@ $info_arr = [];
 foreach($error as $code => &$info){
 	$code += 10000;
 
-	$name = 'ERR_' . strtoupper($info[0]);
+	if(strpos($info[0], 'ERR_') === 0){
+		trigger_error('错误代码开头带ERR：' . $info[0]);
+		$name = $info[0];
+	} else{
+		$name = 'ERR_' . strtoupper($info[0]);
+	}
 
 	$info_arr[$code] = [
 		'name'    => $name,
