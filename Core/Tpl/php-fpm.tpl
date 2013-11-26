@@ -7,9 +7,6 @@ listen.owner = root
 listen.group = root
 listen.mode = 0666
 
-user = nginx
-group = GongT
-
 pm = dynamic
 pm.max_children = 50
 pm.start_servers = 5
