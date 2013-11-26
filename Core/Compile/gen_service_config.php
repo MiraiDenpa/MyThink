@@ -1,7 +1,9 @@
 <?php
 // 写入nginx配置文件
 echo_line("写入nginx配置文件");
-if(is_file(CONF_PATH . 'nginx.conf')){
+if(is_file(CONF_PATH . 'nginx.' . APP_STATUS . '.conf')){
+	$NGINX_CONF = file_get_contents(CONF_PATH . 'nginx.' . APP_STATUS . '.conf');
+} else if(is_file(CONF_PATH . 'nginx.conf')){
 	$NGINX_CONF = file_get_contents(CONF_PATH . 'nginx.conf');
 } else{
 	$NGINX_CONF = '';
@@ -16,11 +18,14 @@ file_put_contents('/etc/nginx/' . PROJECT_NAME . '.d/' . APP_NAME . '-ngx.conf',
 
 // 写入phpfpm配置文件
 echo_line("写入phpfpm配置文件");
-if(is_file(CONF_PATH . 'php-fpm.conf')){
+if(is_file(CONF_PATH . 'php-fpm.' . APP_STATUS . '.conf')){
+	$FPM_CONF = file_get_contents(CONF_PATH . 'php-fpm.' . APP_STATUS . '.conf');
+} else if(is_file(CONF_PATH . 'php-fpm.conf')){
 	$FPM_CONF = file_get_contents(CONF_PATH . 'php-fpm.conf');
 } else{
 	$FPM_CONF = '';
-}ob_start();
+}
+ob_start();
 require THINK_PATH . 'Tpl/php-fpm.tpl';
 $cnt = ob_get_clean();
 file_put_contents('/etc/php-fpm.d/' . APP_NAME . '-fpm.conf', $cnt);
