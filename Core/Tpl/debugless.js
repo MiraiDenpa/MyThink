@@ -1,5 +1,6 @@
 window.less = {
-	env: "development", // 或者"production"
+	//env: "development",
+	env: "production",
 	async: false,       // 异步加载导入的文件
 	fileAsync: false,   // 使用文件协议访问页面时异步加载导入的文件
 	poll: 5000,         // 在监视模式下，每两次请求之间的时间间隔（ms）

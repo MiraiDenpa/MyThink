@@ -35,9 +35,9 @@ class Mongoo extends MongoCollection{
 	 * @param $arg2
 	 */
 	public function __construct($arg1, $arg2){
+		$this->_initialize($arg1, $arg2);
 		$this->init_connection($this->connection);
 		$this->db = $this->_link->selectDB($this->database);
-		$this->_initialize($arg1, $arg2);
 		parent::__construct($this->db, $this->collectionName);
 	}
 

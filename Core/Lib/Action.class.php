@@ -92,7 +92,7 @@ abstract class Action{
 	 * @return null
 	 */
 	protected function display($templateFile = ''){
-		if(!$this->tVar['code']){
+		if(!isset($this->tVar['code'])){
 			$this->tVar['code'] = ERR_NO_ERROR;
 		}
 		return $this->dispatcher->display($templateFile, $this->tVar);

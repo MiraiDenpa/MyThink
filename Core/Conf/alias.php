@@ -32,6 +32,7 @@ return array(
 	'Log'            => CORE_PATH . 'Log.class.php',
 	'Model'          => CORE_PATH . 'Model.class.php',
 	'Mongoo'          => CORE_PATH . 'Mongoo.class.php',
+	'MongooFile'          => CORE_PATH . 'MongooFile.class.php',
 	'OutputBuffer'   => CORE_PATH . 'OutputBuffer.class.php',
 	'Page'           => CORE_PATH . 'Page.class.php',
 	'Think'          => CORE_PATH . 'Think.class.php',

@@ -65,8 +65,8 @@ class TagLibCx extends TagLib{
 	 * php标签解析
 	 * @access public
 	 *
-	 * @param string $attr     标签属性
-	 * @param string $content  标签内容
+	 * @param string $attr    标签属性
+	 * @param string $content 标签内容
 	 *
 	 * @return string
 	 */
@@ -87,8 +87,8 @@ class TagLibCx extends TagLib{
 	 *
 	 * @access public
 	 *
-	 * @param string $attr     标签属性
-	 * @param string $content  标签内容
+	 * @param string $attr    标签属性
+	 * @param string $content 标签内容
 	 *
 	 * @return string|void
 	 */
@@ -99,16 +99,18 @@ class TagLibCx extends TagLib{
 		if(isset($_iterateParseCache[$cacheIterateId])){
 			return $_iterateParseCache[$cacheIterateId];
 		}
-		$tag   = $this->parseXmlAttr($attr, 'volist');
-		$name  = $tag['name'];
-		$id    = $tag['id'];
-		$empty = isset($tag['empty'])? $tag['empty'] : '';
-		if($empty{0} == ':'){
-			$empty = substr($empty, 1);
-		} elseif(strpos($empty, 'LANG_') === 0){
-			$empty = substr($empty, 1);
-		} elseif($empty{0} != '$'){
-			$empty = var_export($empty, true);
+		$tag  = $this->parseXmlAttr($attr, 'volist');
+		$name = $tag['name'];
+		$id   = $tag['id'];
+		if(isset($tag['empty'])){
+			$empty = $tag['empty'];
+			if($empty{0} == ':'){
+				$empty = substr($empty, 1);
+			} elseif(strpos($empty, 'LANG_') === 0){
+				$empty = substr($empty, 1);
+			} elseif($empty{0} != '$'){
+				$empty = var_export($empty, true);
+			}
 		}
 		$key      = !empty($tag['key'])? $tag['key'] : 'key';
 		$index    = !empty($tag['index'])? $tag['index'] : 'i';
@@ -121,19 +123,22 @@ class TagLibCx extends TagLib{
 			$name = $this->autoBuildVar($name);
 		}
 
-		$parseStr .= "if(is_array({$name})):\n"; // -- 1
 		$parseStr .= "\t\${$index} = 0;\n";
-		$parseStr .= "\tif( count({$name})==0 ):\n";
-		$parseStr .= "\t\techo {$empty};\n";
-		$parseStr .= "\telse:\n";
+		if(isset($empty)){
+			$parseStr .= "\tif( count({$name})==0 ):\n";
+			$parseStr .= "\t\techo {$empty};\n";
+			$parseStr .= "\telse:\n";
+		}
 		$parseStr .= "\t\tforeach({$name} as \${$key}=>\${$id}):\n";
 		if($mod){
 			$parseStr .= "\t\t\t\$mod = (\${$index}%{$mod});\n";
 		}
 		$parseStr .= "\t\t\t++\${$index};\n?>";
 		$parseStr .= $this->tpl->parse($content);
-		$parseStr .= "\n<?php\n\t\tendforeach;\n";
-		$parseStr .= "\tendif;\nelse:\n\techo {$empty};\nendif; ?>\n";
+		$parseStr .= "\n<?php\n\t\tendforeach;?>\n";
+		if(isset($empty)){
+			$parseStr .= "<?php endif; ?>\n";
+		}
 		$_iterateParseCache[$cacheIterateId] = $parseStr;
 
 		if(!empty($parseStr)){
@@ -151,28 +156,28 @@ class TagLibCx extends TagLib{
 	 * mod : 取余结果变量
 	 */
 	public function _oncelist($attr, $content){
-		$tag     = $this->parseXmlAttr($attr, 'oncelist');
-		$source  = $tag['source'];
-		$__id__      = $tag['id'];
-		$__key__     = isset($tag['key'])? $tag['key'] : 'key';
-		$__index__   = !empty($tag['index'])? $tag['index'] : 'i';
-		$modBase = isset($tag['mod'])? intval($tag['mod']) : 2;
+		$tag       = $this->parseXmlAttr($attr, 'oncelist');
+		$source    = $tag['source'];
+		$__id__    = $tag['id'];
+		$__key__   = isset($tag['key'])? $tag['key'] : 'key';
+		$__index__ = !empty($tag['index'])? $tag['index'] : 'i';
+		$modBase   = isset($tag['mod'])? intval($tag['mod']) : 2;
 
 		$_d_a_t_a_ = $this->source($source);
 
-		$__ob__  = new OutputBuffer();
-		$__i = 0;
+		$__ob__ = new OutputBuffer();
+		$__i    = 0;
 		foreach($_d_a_t_a_ as $__k => $__v){
 			extract(array(
 						 $__key__   => $__k,
 						 $__id__    => $__v,
 						 $__index__ => $__i++,
-						 'mod'  => $__i%$modBase,
+						 'mod'      => $__i%$modBase,
 					));
 			eval('?>' . $this->tpl->parse($content));
 		}
 		$parsestr = $__ob__->get();
-		$__ob__       = null;
+		$__ob__   = null;
 
 		return $parsestr;
 	}
@@ -181,8 +186,8 @@ class TagLibCx extends TagLib{
 	 * foreach标签解析 循环输出数据集
 	 * @access public
 	 *
-	 * @param string $attr     标签属性
-	 * @param string $content  标签内容
+	 * @param string $attr    标签属性
+	 * @param string $content 标签内容
 	 *
 	 * @return string|void
 	 */
@@ -219,8 +224,8 @@ class TagLibCx extends TagLib{
 	 * 表达式支持 eq neq gt egt lt elt == > >= < <= or and || &&
 	 * @access public
 	 *
-	 * @param string $attr     标签属性
-	 * @param string $content  标签内容
+	 * @param string $attr    标签属性
+	 * @param string $content 标签内容
 	 *
 	 * @return string
 	 */
@@ -237,8 +242,8 @@ class TagLibCx extends TagLib{
 	 * 格式：见if标签
 	 * @access public
 	 *
-	 * @param string $attr     标签属性
-	 * @param string $content  标签内容
+	 * @param string $attr    标签属性
+	 * @param string $content 标签内容
 	 *
 	 * @return string
 	 */
@@ -281,8 +286,8 @@ class TagLibCx extends TagLib{
 	 * </switch>
 	 * @access public
 	 *
-	 * @param string $attr     标签属性
-	 * @param string $content  标签内容
+	 * @param string $attr    标签属性
+	 * @param string $content 标签内容
 	 *
 	 * @return string
 	 */
@@ -304,8 +309,8 @@ class TagLibCx extends TagLib{
 	 * case标签解析 需要配合switch才有效
 	 * @access public
 	 *
-	 * @param string $attr     标签属性
-	 * @param string $content  标签内容
+	 * @param string $attr    标签属性
+	 * @param string $content 标签内容
 	 *
 	 * @return string
 	 */
@@ -343,8 +348,8 @@ class TagLibCx extends TagLib{
 	 * 使用： <default />ddfdf
 	 * @access public
 	 *
-	 * @param string $attr     标签属性
-	 * @param string $content  标签内容
+	 * @param string $attr    标签属性
+	 * @param string $content 标签内容
 	 *
 	 * @return string
 	 */
@@ -360,9 +365,9 @@ class TagLibCx extends TagLib{
 	 * 格式： <compare name="" type="eq" value="" >content</compare>
 	 * @access public
 	 *
-	 * @param string $attr     标签属性
-	 * @param string $content  标签内容
-	 * @param string $type     标签内容
+	 * @param string $attr    标签属性
+	 * @param string $content 标签内容
+	 * @param string $type    标签内容
 	 *
 	 * @return string
 	 */
@@ -445,9 +450,9 @@ class TagLibCx extends TagLib{
 	 * example: <range name="a"  value="1,2,3" type='in' >content</range>
 	 * @access public
 	 *
-	 * @param string $attr     标签属性
-	 * @param string $content  标签内容
-	 * @param string $type     比较类型
+	 * @param string $attr    标签属性
+	 * @param string $content 标签内容
+	 * @param string $type    比较类型
 	 *
 	 * @return string
 	 */
@@ -511,8 +516,8 @@ class TagLibCx extends TagLib{
 	 * 格式： <present name="" >content</present>
 	 * @access public
 	 *
-	 * @param string $attr     标签属性
-	 * @param string $content  标签内容
+	 * @param string $attr    标签属性
+	 * @param string $content 标签内容
 	 *
 	 * @return string
 	 */
@@ -531,8 +536,8 @@ class TagLibCx extends TagLib{
 	 * 格式： <notpresent name="" >content</notpresent>
 	 * @access public
 	 *
-	 * @param string $attr     标签属性
-	 * @param string $content  标签内容
+	 * @param string $attr    标签属性
+	 * @param string $content 标签内容
 	 *
 	 * @return string
 	 */
@@ -551,8 +556,8 @@ class TagLibCx extends TagLib{
 	 * 格式： <empty name="" >content</empty>
 	 * @access public
 	 *
-	 * @param string $attr     标签属性
-	 * @param string $content  标签内容
+	 * @param string $attr    标签属性
+	 * @param string $content 标签内容
 	 *
 	 * @return string
 	 */
@@ -607,8 +612,8 @@ class TagLibCx extends TagLib{
 	 * 格式： <assign name="" value="" />
 	 * @access public
 	 *
-	 * @param string $attr     标签属性
-	 * @param string $content  标签内容
+	 * @param string $attr    标签属性
+	 * @param string $content 标签内容
 	 *
 	 * @return string
 	 */
@@ -640,8 +645,8 @@ class TagLibCx extends TagLib{
 	 * 格式： <define name="" value="" />
 	 * @access public
 	 *
-	 * @param string $attr     标签属性
-	 * @param string $content  标签内容
+	 * @param string $attr    标签属性
+	 * @param string $content 标签内容
 	 *
 	 * @return string
 	 */
@@ -663,8 +668,8 @@ class TagLibCx extends TagLib{
 	 * 格式： <for start="" end="" comparison="" step="" name="" />
 	 * @access public
 	 *
-	 * @param string $attr     标签属性
-	 * @param string $content  标签内容
+	 * @param string $attr    标签属性
+	 * @param string $content 标签内容
 	 *
 	 * @return string
 	 */
@@ -715,12 +720,12 @@ class TagLibCx extends TagLib{
 
 	/**
 	 * 920223
-	 标签解析
+	 * 标签解析
 	 * 格式： <url app="{$var}" action="Login" method="index" path="" protocol="http" suffix="html" params="varname" param-A="{$a}"/>
 	 * @access public
 	 *
-	 * @param string $attr     标签属性
-	 * @param string $content  标签内容
+	 * @param string $attr    标签属性
+	 * @param string $content 标签内容
 	 *
 	 * @return string
 	 */
@@ -904,8 +909,7 @@ class TagLibCx extends TagLib{
 					LIB_PATH . 'DataSource/' . $source . '.php',
 					BASE_LIB_PATH . 'DataSource/' . $source . '.php'
 					],
-					$hit
-		);
+					$hit);
 		$ret = false;
 		if($hit){
 			$ret = 'require(\'' . $hit . '\')';
@@ -933,8 +937,7 @@ class TagLibCx extends TagLib{
 							LIB_PATH . 'DataSource/' . $source . '.php',
 							BASE_LIB_PATH . 'DataSource/' . $source . '.php'
 							],
-							$hit
-		);
+							$hit);
 		if(!$hit){
 			$file = LIB_PATH . 'DataSource/' . $source . '.json';
 			if(!is_file($file)){
