@@ -10,6 +10,7 @@ class SimpleCURL{
 		trace("CURL - Simple 初始化，缓存：" . self::$cache . "秒，在 C(LOG_LEVEL) 添加“CURL”来查看详细日志。");
 		self::$ch = curl_init();
 		register_shutdown_function('curl_close', self::$ch);
+		curl_setopt(self::$ch,CURLOPT_COOKIE, $_SERVER['HTTP_COOKIE']);
 	}
 
 	public static function POST($url, $data=[]){

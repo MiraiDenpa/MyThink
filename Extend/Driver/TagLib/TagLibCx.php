@@ -719,7 +719,22 @@ class TagLibCx extends TagLib{
 	}
 
 	/**
-	 * 920223
+	 * 简易版include
+	 * 引入一个小文件，这个文件只能保存在Base/Tpl/onepice/里面
+	 * 格式： <url app="{$var}" action="Login" method="index" path="" protocol="http" suffix="html" params="varname" param-A="{$a}"/>
+	 * @access public
+	 *
+	 * @param string $attr    标签属性
+	 * @param string $content 标签内容
+	 *
+	 * @return string
+	 */
+	public function _onepice($attr, $content){
+		
+	}
+
+	/**
+	 * 
 	 * 标签解析
 	 * 格式： <url app="{$var}" action="Login" method="index" path="" protocol="http" suffix="html" params="varname" param-A="{$a}"/>
 	 * @access public
